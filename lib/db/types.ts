@@ -1,0 +1,173 @@
+// CVI Architects Platform Types
+
+export type ProjectStatusState = 'draft' | 'published' | 'archived';
+
+export interface ProjectRecord {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  client: string | null;
+  year: string | null;
+  location: string | null;
+  typology: string | null;
+  size: string | null;
+  status: string | null;
+  hero_image_url: string | null;
+  thumbnail_url: string | null;
+  summary: string | null;
+  description: string | null;
+  theme_bg_color: string;
+  theme_accent_color: string;
+  is_featured: number; // 0 or 1
+  status_state: ProjectStatusState;
+  sort_order: number;
+  custom_metadata_json: string; // JSON string of Record<string, string>
+  /** Exact site pin (WGS84). Null = fall back to the city centre of `location`. */
+  site_lat: number | null;
+  site_lng: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type BlockType =
+  | 'text'
+  | 'heading'
+  | 'image'
+  | 'full_bleed_image'
+  | 'two_column'
+  | 'gallery'
+  | 'horizontal_gallery'
+  | 'sticky_media'
+  | 'video'
+  | 'quote'
+  | 'stats'
+  | 'before_after'
+  | 'three_d_model'
+  | 'spatial_3d'
+  | 'three_d_viewer'
+  | 'webgl'
+  | 'spacer';
+
+export interface ProjectBlockRecord {
+  id: string;
+  project_id: string;
+  block_type: BlockType;
+  sort_order: number;
+  is_hidden: number; // 0 or 1
+  content_json: string; // JSON string
+  created_at: string;
+}
+
+export interface MediaAssetRecord {
+  id: string;
+  filename: string;
+  url: string;
+  mime_type: string;
+  size_bytes: number;
+  width: number;
+  height: number;
+  alt_text: string;
+  caption: string;
+  credit: string;
+  focal_point_x: number;
+  focal_point_y: number;
+  created_at: string;
+}
+
+export interface GlobalSettings {
+  companyName: string;
+  tagline: string;
+  legalName: string;
+  addressLine1: string;
+  addressLine2: string;
+  latitude: number;
+  longitude: number;
+  email: string;
+  phone: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  twitterUrl: string;
+  linkedinUrl: string;
+  copyrightText: string;
+  defaultSeoTitle: string;
+  defaultSeoDescription: string;
+  defaultOgImage: string;
+  manifesto: string;
+}
+
+export interface NavigationItemRecord {
+  id: string;
+  label: string;
+  href: string;
+  sort_order: number;
+  is_visible: number;
+  is_external: number;
+}
+
+export interface TeamMemberRecord {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  bio: string;
+  avatar_url: string;
+  sort_order: number;
+  is_leadership: number;
+  is_visible: number; // 0 or 1 — hidden members stay in the admin but leave the site
+}
+
+export type MessageStatus = 'new' | 'read' | 'archived';
+
+export interface ContactMessageRecord {
+  id: string;
+  name: string;
+  email: string;
+  typology: string | null;
+  scale: string | null;
+  message: string;
+  status: MessageStatus;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface SitePillar {
+  title: string;
+  desc: string;
+  img: string;
+}
+
+/** Editable copy for the public pages (stored as JSON in global_settings 'site_content'). */
+export interface SiteContent {
+  heroEyebrow: string;
+  heroTitle: string;
+  heroTitleMuted: string;
+  heroBody: string;
+  manifestoQuote: string;
+  manifestoAttribution: string;
+  teamEyebrow: string;
+  teamTitle: string;
+  teamIntro: string;
+  aboutEyebrow: string;
+  aboutTitle: string;
+  aboutBody: string;
+  pillars: SitePillar[];
+}
+
+export interface DisciplineRecord {
+  id: string;
+  title: string;
+  tagline: string | null;
+  description: string;
+  image_url: string;
+  sort_order: number;
+}
+
+export interface AdminUserRecord {
+  id: string;
+  username: string;
+  password_hash: string;
+  name: string;
+  role: string;
+  created_at: string;
+}

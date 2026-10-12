@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Surfaces */
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #121216;
+  --bg-tertiary: #1a1a20;
+  --bg-stone: #f5f3ef;
+  
+  /* Text & Ink */
+  --text-primary: #f4f4f6;
+  --text-secondary: #a3a3ad;
+  --text-muted: #666672;
+  --text-inverted: #0d0d10;
+
+  /* Architectural Accents */
+  --accent-skyblue: #4cb8f5;
+  --accent-skyblue-glow: rgba(76, 184, 245, 0.25);
+  --accent-terracotta: #b85d38;
+  --accent-verdigris: #3b7b6c;
+
+  /* CAD Drafting Lines */
+  --cad-crosshair: rgba(255, 255, 255, 0.15);
+  --cad-guide: rgba(76, 184, 245, 0.3);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Font Families */
+  --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Space Mono', monospace;
+  --font-display: 'Syne', 'Space Grotesk', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-skyblue);
+}
+
+/* Exclusion Blend-Mode Header */
+.mix-exclusion {
+  mix-blend-mode: exclusion;
+}
+
+/* Technical CAD Crosshairs */
+.cad-crosshair {
+  position: relative;
+}
+.cad-crosshair::before,
+.cad-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: var(--cad-crosshair);
+  pointer-events: none;
+}
+.cad-crosshair::before {
+  top: -6px;
+  bottom: -6px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+.cad-crosshair::after {
+  left: -6px;
+  right: -6px;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+/* Text Masking & Reveals */
+.overflow-mask {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.text-roll {
+  display: inline-block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Lens Noise Overlay */
+.film-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Fluid Typography Utilities */
+.hero-title {
+  font-size: clamp(2.8rem, 7.5vw + 0.5rem, 8.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 4.5vw + 0.5rem, 5.0rem);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: clamp(1.4rem, 2.2vw + 0.2rem, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.editorial-body {
+  font-size: clamp(1.05rem, 1.1vw + 0.3rem, 1.45rem);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+.cad-mono {
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 0.35vw + 0.45rem, 0.85rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.3s ease,
+              opacity 0.2s ease;
+}
+
+@media (max-width: 1024px) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
