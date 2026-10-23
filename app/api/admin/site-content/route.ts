@@ -19,8 +19,7 @@ export async function PUT(request: Request) {
 
   try {
     const saved = updateSiteContent(parsed.data);
-    revalidatePath('/');
-    revalidatePath('/about');
+    revalidatePath('/', 'layout');
     return ok(saved);
   } catch (err) {
     return serverError('site content update', err);

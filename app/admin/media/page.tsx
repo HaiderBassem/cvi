@@ -102,11 +102,11 @@ export default function AdminMediaPage() {
       </div>
 
       {loading ? (
-        <div className="p-12 text-center font-mono text-xs text-white/40">
+        <div className="p-12 text-center font-mono text-xs text-white/56">
           LOADING ASSET REPOSITORY...
         </div>
       ) : assets.length === 0 ? (
-        <div className="p-12 text-center font-mono text-xs text-white/40 border border-white/10 rounded-sm">
+        <div className="p-12 text-center font-mono text-xs text-white/56 border border-white/10 rounded-sm">
           NO MEDIA ASSETS FOUND. UPLOAD YOUR FIRST FILE ABOVE.
         </div>
       ) : (
@@ -129,7 +129,7 @@ export default function AdminMediaPage() {
                       sizes="(max-width: 768px) 50vw, 20vw"
                     />
                   ) : (
-                    <FileText className="w-8 h-8 text-white/40" />
+                    <FileText className="w-8 h-8 text-white/56" />
                   )}
 
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
@@ -150,9 +150,9 @@ export default function AdminMediaPage() {
                   </div>
                 </div>
 
-                <div className="p-2.5 font-mono text-[10px] text-white/50 flex flex-col gap-0.5">
+                <div className="p-2.5 font-mono text-xs text-white/50 flex flex-col gap-0.5">
                   <span className="text-white truncate font-medium">{a.filename}</span>
-                  <span className="text-white/40">{Math.round(a.size_bytes / 1024)} KB</span>
+                  <span className="text-white/56">{Math.round(a.size_bytes / 1024)} KB</span>
                 </div>
               </div>
             );

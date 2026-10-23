@@ -42,7 +42,7 @@ export default function AdminSeoPage() {
   };
 
   if (!settings) {
-    return <div className="font-mono text-xs text-white/40 p-12">LOADING SEO ATTRIBUTES...</div>;
+    return <div className="font-mono text-xs text-white/56 p-12">LOADING SEO ATTRIBUTES...</div>;
   }
 
   return (
@@ -109,7 +109,7 @@ export default function AdminSeoPage() {
 
         {/* Live Search Snippet Preview */}
         <div className="mt-6 pt-6 border-t border-white/10">
-          <div className="text-[10px] text-white/40 tracking-widest uppercase mb-3">
+          <div className="text-xs text-white/56 tracking-widest uppercase mb-3">
             GOOGLE SEARCH ENGINE SERP PREVIEW
           </div>
           <div className="p-4 bg-black/60 border border-white/10 rounded-sm font-sans">

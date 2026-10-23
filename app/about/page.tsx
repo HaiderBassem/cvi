@@ -20,42 +20,42 @@ export default function AboutPage() {
   return (
     <div className="w-full pt-32 pb-24 text-white">
       {/* Hero Statement */}
-      <section className="max-w-[1800px] mx-auto px-6 sm:px-12 mb-20 sm:mb-32">
+      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-20 sm:mb-32">
         <div className="font-mono text-xs tracking-widest text-skyblue uppercase mb-4">
           {content.aboutEyebrow}
         </div>
         <h1 className="hero-title font-display max-w-5xl mb-8">
           {content.aboutTitle}
         </h1>
-        <p className="editorial-body text-white/80 max-w-3xl font-light leading-relaxed">
+        <p className="editorial-body text-white/88 max-w-3xl font-normal leading-relaxed">
           {content.aboutBody}
         </p>
       </section>
 
       {/* Main Studio Atelier Image */}
-      <section className="max-w-[1800px] mx-auto px-4 sm:px-8 mb-24 sm:mb-36">
+      <section className="max-w-[112.5rem] mx-auto px-4 sm:px-8 mb-24 sm:mb-36">
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 shadow-2xl">
           <Image
-            src="/brand/who are we.jpg"
+            src={content.aboutImage}
             alt="CVI Architects Atelier"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute bottom-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 font-mono text-xs text-white/80">
-            AL-JADRIYA DESIGN STUDIOS • BAGHDAD
+          <div className="absolute bottom-6 left-6 bg-black/60 backdrop-blur-md px-4 py-2 font-mono text-xs text-white/88">
+            {content.aboutImageCaption}
           </div>
         </div>
       </section>
 
       {/* Four Studio Pillars */}
-      <section className="max-w-[1800px] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
+      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-            DESIGN PHILOSOPHY
+            {content.pillarsEyebrow}
           </div>
           <h2 className="section-title font-display text-white">
-            What Sets Us Apart
+            {content.pillarsTitle}
           </h2>
         </div>
 
@@ -73,7 +73,7 @@ export default function AboutPage() {
               </div>
               <span className="font-mono text-xs text-skyblue mb-2">0{i + 1}</span>
               <h3 className="card-title text-white font-display mb-3">{pillar.title}</h3>
-              <p className="text-white/70 text-xs sm:text-sm font-light leading-relaxed">
+              <p className="text-white/82 text-xs sm:text-sm font-normal leading-relaxed">
                 {pillar.desc}
               </p>
             </div>
@@ -82,13 +82,13 @@ export default function AboutPage() {
       </section>
 
       {/* 8 Core Disciplines */}
-      <section className="max-w-[1800px] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
+      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-            INTEGRATED CAPABILITIES
+            {content.aboutServicesEyebrow}
           </div>
           <h2 className="section-title font-display text-white">
-            Spatial Disciplines & Engineering
+            {content.aboutServicesTitle}
           </h2>
         </div>
 
@@ -108,13 +108,13 @@ export default function AboutPage() {
                     sizes="(max-width: 768px) 100vw, 25vw"
                   />
                 </div>
-                <span className="font-mono text-[10px] text-white/40 tracking-widest block mb-2">
+                <span className="font-mono text-xs text-white/62 tracking-widest block mb-2">
                   DISCIPLINE #{String(i + 1).padStart(2, '0')}
                 </span>
                 <h3 className="text-lg font-display font-medium text-white mb-2 group-hover:text-skyblue transition-colors">
                   {d.title}
                 </h3>
-                <p className="text-white/60 text-xs font-light leading-relaxed">
+                <p className="text-white/76 text-xs font-normal leading-relaxed">
                   {d.description}
                 </p>
               </div>
@@ -125,13 +125,13 @@ export default function AboutPage() {
 
       {/* Leadership Team */}
       {team.length > 0 && (
-      <section className="max-w-[1800px] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
+      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-            DESIGN DIRECTORS
+            {content.leadershipEyebrow}
           </div>
           <h2 className="section-title font-display text-white">
-            Studio Leadership
+            {content.leadershipTitle}
           </h2>
         </div>
 
@@ -153,7 +153,7 @@ export default function AboutPage() {
               <div className="font-mono text-xs text-skyblue mb-3 tracking-wider">
                 {member.role}
               </div>
-              <p className="text-white/60 text-xs font-light leading-relaxed">
+              <p className="text-white/76 text-xs font-normal leading-relaxed">
                 {member.bio}
               </p>
             </div>
@@ -163,18 +163,18 @@ export default function AboutPage() {
       )}
 
       {/* Direct Contact Teaser */}
-      <section className="max-w-[1800px] mx-auto px-6 sm:px-12 text-center py-20 border-t border-white/10">
+      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 text-center py-20 border-t border-white/10">
         <h2 className="section-title font-display text-white mb-6">
-          Collaborate With Our Baghdad Atelier
+          {content.aboutCtaTitle}
         </h2>
-        <p className="text-white/70 max-w-xl mx-auto text-base font-light mb-8">
-          We partner with institutional leaders, commercial developers, and visionary private patrons across Iraq and the Middle East.
+        <p className="text-white/82 max-w-xl mx-auto text-base font-normal mb-8">
+          {content.aboutCtaBody}
         </p>
         <Link
           href="/contact"
           className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-mono text-xs tracking-widest font-semibold hover:bg-skyblue hover:text-white transition-colors"
         >
-          <span>INITIATE DIALOGUE</span>
+          <span>{content.aboutCtaButton}</span>
           <ArrowUpRight className="w-4 h-4" />
         </Link>
       </section>

@@ -75,7 +75,8 @@ CVI/
 │   │   ├── Preloader.tsx            # Authentic CAD coordinate intro & SVG logo tracing
 │   │   ├── SmoothScroll.tsx         # Lenis smooth scroll engine synced with GSAP
 │   │   └── CustomCursor.tsx         # Contextual lerping cursor with morph states
-│   ├── webgl/WebGLCanvas.tsx        # Three.js Tigris river fluid displacement shader
+│   ├── projects/ProjectBackdrop.tsx # Per-project interactive 3D background (loads on demand)
+│   ├── projects/backdrop/engine.ts  # three.js engine: orbit (no zoom), finishes, lighting
 │   ├── site/
 │   │   ├── HomeClient.tsx           # Client-orchestrated 8-chapter homepage
 │   │   └── ContactForm.tsx          # Interactive inquiry form with architectural dispatch ID
@@ -184,3 +185,47 @@ node scripts/verify_live_site.mjs
 ---
 
 © 2026 CVI Architects Ltd. All Rights Reserved. Al-Jadriya, Baghdad, Iraq.
+
+
+## Project 3D backgrounds
+
+Each project page can show its own 3D model as the page background. The model is chosen per
+project in the admin (**Project → Parameters → 3D Background Model**) and stored in `projects.model_id`.
+
+- The model (and three.js itself) is downloaded **only when that project page is opened**.
+- Visitors can drag to turn the model; there is intentionally no zoom, so scrolling always scrolls the page.
+- Source files live in `FBX PROJECTS/` (git-ignored). To (re)convert them to web-ready GLBs:
+
+  ```bash
+  npm run models:build                 # all models listed in scripts/models/sources.mjs
+  npm run models:build -- budoor-zoo   # a single model
+  ```
+
+  Output goes to `public/models/projects/<id>.glb` and `lib/models/generated.json`.
+  To add a model, add it to `scripts/models/sources.mjs` and run the command above.
+
+
+## Editing the website (Admin)
+
+Sign in at `/admin`. Everything public can be changed there — no code needed.
+
+| Where | What you can change |
+|---|---|
+| **Projects** | Add, edit, hide, feature and delete projects. One page, one Save: title and web address, visibility (Published / Draft / Archived), cover and card pictures, **3D model**, facts, and the story (text, pictures, galleries, drawings, before/after, key figures, quotes). Ctrl/Cmd + S saves. |
+| **Site content** | Homepage (hero, buttons, key facts, section headings, quote, team heading) · Projects & contact pages · About page · Menu, footer & opening screen · Services (disciplines). |
+| **Menu & navigation** | The top-bar / phone-menu links: names, order, where they go, a short description, hide/show. |
+| **Team** | The people shown on the homepage and About page. |
+| **Studio settings** | Studio name, address, phone, email, social links, copyright line. |
+| **Search & SEO** | Titles, descriptions and the share picture. |
+| **Media library** | Uploaded pictures. |
+| **Messages** | Enquiries sent from the contact form. |
+
+### 3D models for projects
+
+On a project's edit page, **3D model** lets you pick a model from the library or upload a new one.
+The only accepted format is **`.fbx`** (up to 250 MB). On upload the server converts it to a light web
+format automatically (a 100 MB export becomes a few MB), and it is saved under `data/models/`. The model
+is downloaded by visitors only when they open that project.
+
+Adding a new editable text to the site is one line in `lib/content/copy.ts` (it then appears in
+Admin → Site content and is validated automatically) plus using it on the page.

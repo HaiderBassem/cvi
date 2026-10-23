@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { COPY_GROUPS, type CopyKey } from '../content/copy';
 
 /** Shared by the API routes and the admin forms, so both sides agree on the rules. */
 
@@ -65,7 +66,30 @@ export const PillarSchema = z.object({
   img: imageUrl,
 });
 
+/** One validated string per declared copy field (see lib/content/copy.ts). Missing keys fall back to the default. */
+const SAFE_LINK = /^\/(?!\/)[\w\-./#?=&%]*$|^https:\/\/\S+$/;
+const copyShape = Object.fromEntries(
+  COPY_GROUPS.flatMap((g) =>
+    g.fields.map((f) => {
+      const rule =
+        f.kind === 'image'
+          ? imageUrl
+          : f.key.endsWith('Href')
+            ? trimmed(f.max, f.label).regex(SAFE_LINK, 'Use a page of this site such as /contact, or a full https:// link.')
+            : trimmed(f.max, f.label);
+      return [f.key, rule.default(f.default)];
+    })
+  )
+) as unknown as Record<CopyKey, z.ZodDefault<z.ZodString>>;
+
+export const SiteStatSchema = z.object({
+  value: required(30, 'Number or word'),
+  label: required(60, 'Caption'),
+});
+
 export const SiteContentSchema = z.object({
+  ...copyShape,
+  heroStats: z.array(SiteStatSchema).max(4, 'Up to 4 facts.').default([]),
   heroEyebrow: trimmed(80, 'Eyebrow'),
   heroTitle: required(80, 'Headline'),
   heroTitleMuted: trimmed(80, 'Second line'),
@@ -84,4 +108,23 @@ export const SiteContentSchema = z.object({
 export const SiteLocationSchema = z.object({
   site_lat: z.number().min(-90).max(90).nullable(),
   site_lng: z.number().min(-180).max(180).nullable(),
+});
+
+/** A link in the site menu: a page of this site, or a full https:// address. */
+export const NavigationItemSchema = z.object({
+  id: z.string().max(64).optional(),
+  label: required(30, 'Name'),
+  href: z
+    .string()
+    .trim()
+    .min(1, 'Add where the link goes.')
+    .max(300)
+    .regex(/^\/(?!\/)[\w\-./#?=&%]*$|^https:\/\/\S+$/, 'Use a page of this site such as /contact, or a full https:// link.'),
+  hint: trimmed(80, 'Description').optional().default(''),
+  is_visible: z.coerce.number().int().min(0).max(1).default(1),
+  is_external: z.coerce.number().int().min(0).max(1).default(0),
+});
+
+export const NavigationSchema = z.object({
+  items: z.array(NavigationItemSchema).min(1, 'Keep at least one link.').max(10, 'Up to 10 links.'),
 });

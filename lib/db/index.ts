@@ -15,6 +15,8 @@ import type {
   SiteContent,
 } from './types';
 import { runMigrations } from './migrations';
+import { getModel } from '../models/catalog';
+import { COPY_DEFAULTS, DEFAULT_HERO_STATS } from '../content/copy';
 
 function newId(prefix: string) {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
@@ -107,11 +109,11 @@ export function createProject(p: Partial<ProjectRecord> & { title: string; slug:
     INSERT INTO projects (
       id, slug, title, subtitle, client, year, location, typology, size, status,
       hero_image_url, thumbnail_url, summary, description, theme_bg_color, theme_accent_color,
-      is_featured, status_state, sort_order, custom_metadata_json, created_at, updated_at
+      is_featured, status_state, sort_order, custom_metadata_json, model_id, created_at, updated_at
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?, ?,
-      ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?
     )
   `);
 
@@ -136,6 +138,7 @@ export function createProject(p: Partial<ProjectRecord> & { title: string; slug:
     p.status_state || 'published',
     p.sort_order ?? 0,
     p.custom_metadata_json || '{}',
+    getModel(p.model_id) ? p.model_id! : null,
     p.created_at || now,
     p.updated_at || now
   );
@@ -179,6 +182,7 @@ export function updateProject(id: string, updates: Partial<ProjectRecord>): Proj
       custom_metadata_json = ?,
       site_lat = ?,
       site_lng = ?,
+      model_id = ?,
       updated_at = ?
     WHERE id = ?
   `);
@@ -205,6 +209,8 @@ export function updateProject(id: string, updates: Partial<ProjectRecord>): Proj
     updated.custom_metadata_json,
     updated.site_lat ?? null,
     updated.site_lng ?? null,
+    // Only ever store an id the catalog knows, so a stale or hand-edited value cannot 404 the viewer.
+    getModel(updated.model_id) ? updated.model_id : null,
     updated.updated_at,
     id
   );
@@ -226,6 +232,97 @@ export function reorderProjects(ids: string[]): boolean {
     stmt.run(index, id);
   });
   return true;
+}
+
+/** A project can be saved only if its web address is free. */
+export class SlugTakenError extends Error {
+  constructor(public slug: string) {
+    super(`The address "${slug}" is already used by another project.`);
+  }
+}
+
+/**
+ * Create or update a project together with its story sections in ONE transaction, so a failure
+ * part-way can never leave a project half-written. `input.project.id` present = update.
+ */
+export function saveProjectBundle(input: {
+  project: {
+    id?: string;
+    slug: string;
+    title: string;
+    subtitle: string;
+    client: string;
+    year: string;
+    location: string;
+    typology: string;
+    size: string;
+    status: string;
+    summary: string;
+    description: string;
+    hero_image_url: string;
+    thumbnail_url: string;
+    theme_bg_color: string;
+    is_featured: number;
+    status_state: ProjectRecord['status_state'];
+    model_id: string | null;
+    custom_metadata: Record<string, string>;
+  };
+  blocks: { id?: string; block_type: ProjectBlockRecord['block_type']; is_hidden: number; content: Record<string, unknown> }[];
+}): { project: ProjectRecord; blocks: ProjectBlockRecord[] } {
+  const db = getDb();
+  const p = input.project;
+
+  const clash = db.prepare('SELECT id FROM projects WHERE slug = ? AND id != ?').get(p.slug, p.id ?? '') as { id: string } | undefined;
+  if (clash) throw new SlugTakenError(p.slug);
+
+  const fields = {
+    slug: p.slug,
+    title: p.title,
+    subtitle: p.subtitle || null,
+    client: p.client || null,
+    year: p.year || null,
+    location: p.location || null,
+    typology: p.typology || null,
+    size: p.size || null,
+    status: p.status || null,
+    summary: p.summary || null,
+    description: p.description || null,
+    hero_image_url: p.hero_image_url || null,
+    thumbnail_url: p.thumbnail_url || null,
+    theme_bg_color: p.theme_bg_color,
+    is_featured: p.is_featured,
+    status_state: p.status_state,
+    model_id: p.model_id,
+    custom_metadata_json: JSON.stringify(p.custom_metadata),
+  };
+
+  db.exec('BEGIN');
+  try {
+    let id = p.id;
+    if (id && getProjectById(id)) {
+      updateProject(id, fields);
+    } else {
+      const next = db.prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 AS n FROM projects').get() as { n: number };
+      id = createProject({ ...fields, id, sort_order: Number(next.n) }).id;
+    }
+    const now = new Date().toISOString();
+    const blocks = saveBlocksForProject(
+      id,
+      input.blocks.map((b, i) => ({
+        id: b.id && !b.id.startsWith('new_') ? b.id : '',
+        block_type: b.block_type,
+        sort_order: i,
+        is_hidden: b.is_hidden,
+        content_json: JSON.stringify(b.content),
+        created_at: now,
+      }))
+    );
+    db.exec('COMMIT');
+    return { project: getProjectById(id)!, blocks };
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
 }
 
 // ----------------- CONTENT BLOCKS -----------------
@@ -336,8 +433,8 @@ export function saveNavigationItems(items: NavigationItemRecord[]): NavigationIt
   db.prepare('DELETE FROM navigation_items').run();
 
   const insert = db.prepare(`
-    INSERT INTO navigation_items (id, label, href, sort_order, is_visible, is_external)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO navigation_items (id, label, href, hint, sort_order, is_visible, is_external)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
   items.forEach((item, index) => {
@@ -345,6 +442,7 @@ export function saveNavigationItems(items: NavigationItemRecord[]): NavigationIt
       item.id || 'nav_' + (index + 1),
       item.label,
       item.href,
+      item.hint || null,
       index,
       item.is_visible ? 1 : 0,
       item.is_external ? 1 : 0
@@ -482,6 +580,8 @@ export function saveDisciplines(items: (DisciplineInput & { id?: string })[]): D
 // ----------------- SITE CONTENT -----------------
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
+  ...COPY_DEFAULTS,
+  heroStats: DEFAULT_HERO_STATS,
   heroEyebrow: 'International Architectural Practice',
   heroTitle: 'Computational Geometry.',
   heroTitleMuted: 'Monumental Form.',

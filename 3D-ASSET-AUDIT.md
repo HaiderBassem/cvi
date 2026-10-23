@@ -5,11 +5,25 @@
 
 ---
 
+## 0. Update 2026-10-24 — Per-project models, no site-wide 3D
+
+- The site-wide WebGL background (homepage mosque + open-data city context) and the project-page
+  "massing / city context" demos were **removed**. Nothing 3D renders outside a project page.
+- Every project page may now use the studio's **own FBX model for that project** as its interactive
+  background (`components/projects/ProjectBackdrop.tsx`). 25 FBX exports were converted to
+  meshopt-compressed GLBs (`npm run models:build`, 0.04–2.8 MB each, loaded only when the page opens).
+- The FBX files carry no textures or materials, so finishes (stone, glass, metal, ground…) are
+  art-directed by Revit category names. The panel states: *"rendered from the studio's design model.
+  Finishes are illustrative."* Geometry is the studio's; colours and lighting are `DESIGN_INTERACTION`.
+- Project ↔ model links are stored in `projects.model_id`. Only 11 links whose FBX clearly matches the
+  project were seeded; the rest are assigned in the admin.
+
 ## 1. Executive Summary of Corrections Applied
 
 1. **Elimination of Invented Procedural Skyscraper (`ArchitecturalMonument.ts`)**:
    - *Previous state:* An arbitrary 16-level parametric skyscraper was generated procedurally and rendered on the homepage canvas, creating the misleading impression that it was an unbuilt or conceptual CVI building.
    - *Correction applied:* The fictional building has been **completely removed**. It is replaced by `BrandTectonicArmature.ts` — an **abstract architectural brand sculpture** derived exclusively from the geometric glyph contours of the authentic CVI CAD logo (`logo cvi arch-01 (6).ai` / `cvi-arch-logo.svg`), surrounded by **floating spatial projection planes displaying genuine CVI project drawings & masterplans**. The HUD is clearly labeled: `STUDIO BRAND ARTIFACT · NON-PROJECT GEOMETRY`.
+   - *Update (2026-10-17):* The brand sculpture has itself been replaced by the studio's real project model of the **Imam Al-Hassan Mosque** (`مسجد الامام الحسن.fbx`, 3ds Max export) via `MosqueModel.ts`, served as `public/models/imam-hassan-mosque.glb` (meshopt-compressed, true to scale at 1 scene unit = 5 m, with the city context at the same scale). Surface finishes are an art-directed palette mapped from the model's material names, as the source carries no textures. The HUD reads `IMAM AL-HASSAN MOSQUE · PROJECT MODEL`.
 
 2. **Purging of Fabricated Project Metrics from Case Studies**:
    - *Previous state:* The case study 3D viewer displayed fabricated numbers: `+142.0 m elevation`, `18 FLOORS`, and called a directional light "solar analysis".

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getProjectById, updateProject, deleteProject } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -34,6 +35,7 @@ export async function PUT(request: Request, { params }: Params) {
     if (!updated) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true, data: updated });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to update project' }, { status: 500 });
@@ -48,5 +50,6 @@ export async function DELETE(request: Request, { params }: Params) {
 
   const { id } = await params;
   deleteProject(id);
+  revalidatePath('/', 'layout');
   return NextResponse.json({ success: true });
 }

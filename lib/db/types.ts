@@ -1,5 +1,7 @@
 // CVI Architects Platform Types
 
+import type { CopyKey, SiteStat } from '../content/copy';
+
 export type ProjectStatusState = 'draft' | 'published' | 'archived';
 
 export interface ProjectRecord {
@@ -26,6 +28,8 @@ export interface ProjectRecord {
   /** Exact site pin (WGS84). Null = fall back to the city centre of `location`. */
   site_lat: number | null;
   site_lng: number | null;
+  /** Id of the 3D model shown behind the project page (lib/models/catalog.ts). Null = none. */
+  model_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -100,6 +104,8 @@ export interface NavigationItemRecord {
   id: string;
   label: string;
   href: string;
+  /** One line shown under the link in the phone menu. */
+  hint: string | null;
   sort_order: number;
   is_visible: number;
   is_external: number;
@@ -138,7 +144,8 @@ export interface SitePillar {
 }
 
 /** Editable copy for the public pages (stored as JSON in global_settings 'site_content'). */
-export interface SiteContent {
+export interface SiteContent extends Record<CopyKey, string> {
+  heroStats: SiteStat[];
   heroEyebrow: string;
   heroTitle: string;
   heroTitleMuted: string;

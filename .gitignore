@@ -30,3 +30,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# source 3D exports (hundreds of MB) — converted GLBs live in public/models/projects
+FBX PROJECTS/
+FBX PROJECTS.zip

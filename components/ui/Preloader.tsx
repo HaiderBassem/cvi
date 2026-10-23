@@ -1,135 +1,86 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import gsap from 'gsap';
+import React, { useEffect, useState } from 'react';
 
 interface PreloaderProps {
+  /** The letters shown in the middle (edited in Admin → Site content). */
+  text?: string;
+  /** Background picture. */
+  image?: string;
   onComplete?: () => void;
 }
 
-export function Preloader({ onComplete }: PreloaderProps) {
-  const [progress, setProgress] = useState(0);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
+type Stage = 'centered' | 'spread' | 'slideUp' | 'done';
+
+
+/**
+ * Opening screen, matching the studio's main site: the dark map of Baghdad with the letters
+ * C V I together in the centre; after 1 s they spread apart; after 2 s the whole screen slides
+ * up and away. It is part of the server-rendered page, so there is no flash of content first.
+ */
+export function Preloader({ text = 'CVI', image = '/brand/loader-map.jpg', onComplete }: PreloaderProps) {
+  const letters = Array.from(text.trim() || 'CVI');
+  const [stage, setStage] = useState<Stage>('centered');
 
   useEffect(() => {
-    // Check if user already saw preloader in this session
-    const hasSeen = sessionStorage.getItem('cvi_preloader_seen');
-    if (hasSeen) {
-      setIsDismissed(true);
-      if (onComplete) onComplete();
+    // Respect reduced motion: no staged animation, just get out of the way.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setStage('done');
+      onComplete?.();
       return;
     }
 
-    let current = 0;
-    const interval = setInterval(() => {
-      current += Math.floor(Math.random() * 14) + 6;
-      if (current >= 100) {
-        current = 100;
-        clearInterval(interval);
-        setTimeout(() => {
-          dismiss();
-        }, 400);
-      }
-      setProgress(current);
-    }, 60);
+    // Hold the page still while the screen is up.
+    const body = document.body;
+    const prev = { overflow: body.style.overflow, overscroll: body.style.overscrollBehavior };
+    body.style.overflow = 'hidden';
+    body.style.overscrollBehavior = 'none';
 
-    const dismiss = () => {
-      if (containerRef.current) {
-        gsap.to(containerRef.current, {
-          yPercent: -100,
-          duration: 1.1,
-          ease: 'power4.inOut',
-          onComplete: () => {
-            setIsDismissed(true);
-            sessionStorage.setItem('cvi_preloader_seen', 'true');
-            if (onComplete) onComplete();
-          },
-        });
-      }
+    const spread = window.setTimeout(() => setStage('spread'), 1000);
+    const slide = window.setTimeout(() => setStage('slideUp'), 2000);
+    const finish = window.setTimeout(() => {
+      body.style.overflow = prev.overflow;
+      body.style.overscrollBehavior = prev.overscroll;
+      setStage('done');
+      onComplete?.();
+    }, 2800);
+
+    return () => {
+      window.clearTimeout(spread);
+      window.clearTimeout(slide);
+      window.clearTimeout(finish);
+      body.style.overflow = prev.overflow;
+      body.style.overscrollBehavior = prev.overscroll;
     };
-
-    return () => clearInterval(interval);
   }, [onComplete]);
 
-  if (isDismissed) return null;
+  if (stage === 'done') return null;
 
   return (
     <div
-      ref={containerRef}
-      className="fixed inset-0 z-[10000] bg-[#f5f3ef] text-[#111114] flex flex-col items-center justify-center p-6 select-none overflow-hidden"
+      role="status"
+      aria-label="Loading CVI Architects"
+      className="fixed left-0 top-0 z-[10000] flex h-screen w-screen select-none items-center justify-center bg-[#222] bg-cover bg-center"
+      style={{
+        backgroundImage: `url('${image.replace(/'/g, '%27')}')`,
+        transition: 'transform 0.8s cubic-bezier(0.77, 0, 0.175, 1)',
+        transform: stage === 'slideUp' ? 'translateY(-100vh)' : 'translateY(0)',
+        pointerEvents: stage === 'slideUp' ? 'none' : 'auto',
+      }}
     >
-      {/* CAD Architectural Crosshair Guides */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-black/10 -translate-y-1/2" />
-        <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-black/10 -translate-x-1/2" />
-      </div>
-
-      {/* Precision CAD Bounding Box */}
-      <div className="relative border border-black/20 p-8 sm:p-12 max-w-xl w-full flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm shadow-xl">
-        {/* Dimension Ticks */}
-        <div className="absolute -top-3 left-4 text-[10px] font-mono tracking-widest text-black/60 bg-[#f5f3ef] px-2">
-          WIDTH: 248.16 MM
-        </div>
-        <div className="absolute -bottom-3 right-4 text-[10px] font-mono tracking-widest text-black/60 bg-[#f5f3ef] px-2">
-          HEIGHT: 74.16 MM
-        </div>
-        <div className="absolute -left-3 top-4 -rotate-90 origin-left text-[9px] font-mono tracking-widest text-black/40">
-          GRID: 33°17&apos;25.9&quot;N
-        </div>
-
-        {/* Vector Traced Logo Lockup */}
-        <div className="w-full max-w-[320px] aspect-[248/74] mb-6 flex items-center justify-center">
-          <svg
-            viewBox="0 0 248.16 74.16"
-            className="w-full h-auto text-black transition-all duration-700"
-            fill="currentColor"
-          >
-            <use href="/cvi-arch-logo.svg#cvi-arch-logo" />
-          </svg>
-        </div>
-
-        {/* Studio Subtext */}
-        <div className="text-[11px] font-mono tracking-[0.25em] uppercase text-black/70 mb-8 text-center">
-          Architectural Tectonics • Baghdad Atelier
-        </div>
-
-        {/* Progress Metric & Bar */}
-        <div className="w-full max-w-xs flex flex-col gap-2">
-          <div className="flex justify-between items-center text-[11px] font-mono text-black/80">
-            <span>COORDINATE MAPPING</span>
-            <span>{progress}%</span>
-          </div>
-          <div className="w-full h-[2px] bg-black/10 overflow-hidden relative">
-            <div
-              className="h-full bg-black transition-all duration-100 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Direct Skip Trigger */}
-      <button
-        onClick={() => {
-          if (containerRef.current) {
-            gsap.to(containerRef.current, {
-              yPercent: -100,
-              duration: 0.8,
-              ease: 'power4.inOut',
-              onComplete: () => {
-                setIsDismissed(true);
-                sessionStorage.setItem('cvi_preloader_seen', 'true');
-                if (onComplete) onComplete();
-              },
-            });
-          }
+      <div
+        className="flex flex-row font-semibold text-white"
+        style={{
+          gap: stage === 'centered' ? 0 : '30vw',
+          transition: 'gap 1s cubic-bezier(0.77, 0, 0.175, 1)',
+          fontSize: 'clamp(32px, 3.2vw, 48px)',
+          letterSpacing: 10,
         }}
-        className="absolute bottom-8 text-[10px] font-mono tracking-widest text-black/40 hover:text-black transition-colors uppercase cursor-pointer"
       >
-        [ CLICK TO ENTER ATELIER ]
-      </button>
+        {letters.map((letter, i) => (
+          <span key={i}>{letter === ' ' ? '\u00a0' : letter}</span>
+        ))}
+      </div>
     </div>
   );
 }

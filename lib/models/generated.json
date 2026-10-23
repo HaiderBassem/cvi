@@ -1,0 +1,563 @@
+{
+  "al-hanana-villa": {
+    "id": "al-hanana-villa",
+    "label": "Al Hanana Villa",
+    "bytes": 457940,
+    "triangles": 64186,
+    "sourceTriangles": 64330,
+    "edges": 9564,
+    "height": 28.1,
+    "footprint": [
+      72.2,
+      100
+    ],
+    "groundRadius": 78,
+    "classes": {
+      "stone": 50924,
+      "metal": 12722,
+      "glass": 528,
+      "ground": 12
+    },
+    "dropped": 0,
+    "seconds": 0.2
+  },
+  "al-masoudi-park": {
+    "id": "al-masoudi-park",
+    "label": "Al Masoudi Park",
+    "bytes": 46268,
+    "triangles": 7714,
+    "sourceTriangles": 7758,
+    "edges": 480,
+    "height": 0.3,
+    "footprint": [
+      100,
+      50
+    ],
+    "groundRadius": 71.1,
+    "classes": {
+      "ground": 1130,
+      "stone": 1678,
+      "wood": 2196,
+      "green": 1706,
+      "water": 1048
+    },
+    "dropped": 0,
+    "seconds": 0
+  },
+  "imam-hassan-mosque": {
+    "id": "imam-hassan-mosque",
+    "label": "Imam Hassan Mosque",
+    "bytes": 1651940,
+    "triangles": 219771,
+    "sourceTriangles": 402615,
+    "edges": 18976,
+    "height": 41.8,
+    "footprint": [
+      99.7,
+      100
+    ],
+    "groundRadius": 88.7,
+    "classes": {
+      "stone": 335772,
+      "wood": 55509,
+      "glass": 1434,
+      "metal": 2180,
+      "ground": 2044
+    },
+    "dropped": 0,
+    "seconds": 0.8
+  },
+  "al-kadhimiya-resort": {
+    "id": "al-kadhimiya-resort",
+    "label": "Al Kadhimiya Resort",
+    "bytes": 450696,
+    "triangles": 96289,
+    "sourceTriangles": 100514,
+    "edges": 1552,
+    "height": 4.3,
+    "footprint": [
+      100,
+      46.7
+    ],
+    "groundRadius": 70.2,
+    "classes": {
+      "stone": 80641,
+      "ground": 6742,
+      "green": 4118,
+      "water": 976,
+      "metal": 3110,
+      "wood": 1328
+    },
+    "dropped": 0,
+    "seconds": 0.4
+  },
+  "bmc-management": {
+    "id": "bmc-management",
+    "label": "BMC Management Building",
+    "bytes": 2121392,
+    "triangles": 216878,
+    "sourceTriangles": 1011358,
+    "edges": 23371,
+    "height": 16.8,
+    "footprint": [
+      100,
+      80.2
+    ],
+    "groundRadius": 80.9,
+    "classes": {
+      "stone": 960220,
+      "glass": 8968,
+      "metal": 23924,
+      "ground": 40
+    },
+    "dropped": 0,
+    "seconds": 1.6
+  },
+  "budoor-al-najaf-management": {
+    "id": "budoor-al-najaf-management",
+    "label": "Budoor Al-Najaf Management",
+    "bytes": 1418540,
+    "triangles": 212597,
+    "sourceTriangles": 795257,
+    "edges": 20486,
+    "height": 21.6,
+    "footprint": [
+      32.1,
+      100
+    ],
+    "groundRadius": 67,
+    "classes": {
+      "stone": 403842,
+      "glass": 6504,
+      "ground": 160,
+      "wood": 348914,
+      "metal": 1268,
+      "water": 12
+    },
+    "dropped": 0,
+    "seconds": 1.3
+  },
+  "budoor-al-najaf-sales-center": {
+    "id": "budoor-al-najaf-sales-center",
+    "label": "Budoor Al-Najaf Sales Center",
+    "bytes": 1586088,
+    "triangles": 217227,
+    "sourceTriangles": 454863,
+    "edges": 10395,
+    "height": 9.3,
+    "footprint": [
+      100,
+      80.9
+    ],
+    "groundRadius": 81.2,
+    "classes": {
+      "stone": 372461,
+      "glass": 9188,
+      "metal": 22890,
+      "wood": 42567,
+      "water": 12
+    },
+    "dropped": 3,
+    "seconds": 0.8
+  },
+  "budoor-zoo": {
+    "id": "budoor-zoo",
+    "label": "Budoor Zoo",
+    "bytes": 2131508,
+    "triangles": 222949,
+    "sourceTriangles": 1090814,
+    "edges": 16573,
+    "height": 5.6,
+    "footprint": [
+      38.3,
+      100
+    ],
+    "groundRadius": 68.2,
+    "classes": {
+      "ground": 1882,
+      "stone": 63329,
+      "water": 1282,
+      "glass": 9870,
+      "metal": 1009332
+    },
+    "dropped": 0,
+    "seconds": 1.5
+  },
+  "restaurant-606": {
+    "id": "restaurant-606",
+    "label": "606 Restaurant",
+    "bytes": 1296956,
+    "triangles": 241765,
+    "sourceTriangles": 273534,
+    "edges": 10838,
+    "height": 14.8,
+    "footprint": [
+      89.9,
+      100
+    ],
+    "groundRadius": 84.7,
+    "classes": {
+      "stone": 105948,
+      "wood": 34848,
+      "glass": 7720,
+      "metal": 92695,
+      "ground": 30448
+    },
+    "dropped": 0,
+    "seconds": 0.6
+  },
+  "bmc-workshops": {
+    "id": "bmc-workshops",
+    "label": "Al Binaa Al Markazi Workshops",
+    "bytes": 628840,
+    "triangles": 101842,
+    "sourceTriangles": 1635374,
+    "edges": 1504,
+    "height": 1.1,
+    "footprint": [
+      100,
+      52.6
+    ],
+    "groundRadius": 71.8,
+    "classes": {
+      "stone": 376865,
+      "wood": 56592,
+      "water": 43481,
+      "metal": 50520,
+      "glass": 75758
+    },
+    "dropped": 10,
+    "seconds": 1.3
+  },
+  "aldyar-management": {
+    "id": "aldyar-management",
+    "label": "Al-Diyar Management",
+    "bytes": 334164,
+    "triangles": 56034,
+    "sourceTriangles": 56134,
+    "edges": 4847,
+    "height": 21.7,
+    "footprint": [
+      100,
+      76.3
+    ],
+    "groundRadius": 79.5,
+    "classes": {
+      "stone": 14694,
+      "glass": 752,
+      "metal": 3528,
+      "wood": 37060
+    },
+    "dropped": 0,
+    "seconds": 0.1
+  },
+  "medical-industrial-city": {
+    "id": "medical-industrial-city",
+    "label": "Medical Industrial City (Pharmacity)",
+    "bytes": 1046292,
+    "triangles": 239165,
+    "sourceTriangles": 657917,
+    "edges": 7534,
+    "height": 1.8,
+    "footprint": [
+      100,
+      23.3
+    ],
+    "groundRadius": 65.6,
+    "classes": {
+      "stone": 552471,
+      "ground": 52082,
+      "green": 39936
+    },
+    "dropped": 0,
+    "seconds": 1.3
+  },
+  "al-sadr-towers": {
+    "id": "al-sadr-towers",
+    "label": "Al Sadr Towers",
+    "bytes": 187724,
+    "triangles": 27261,
+    "sourceTriangles": 30868,
+    "edges": 3802,
+    "height": 24,
+    "footprint": [
+      100,
+      71.3
+    ],
+    "groundRadius": 77.7,
+    "classes": {
+      "stone": 15988,
+      "ground": 8092,
+      "green": 6788
+    },
+    "dropped": 0,
+    "seconds": 0.1
+  },
+  "al-zareef": {
+    "id": "al-zareef",
+    "label": "Al-Zareef",
+    "bytes": 1730788,
+    "triangles": 227612,
+    "sourceTriangles": 1905991,
+    "edges": 19699,
+    "height": 30.3,
+    "footprint": [
+      100,
+      93.6
+    ],
+    "groundRadius": 86.2,
+    "classes": {
+      "ground": 5574,
+      "green": 580,
+      "stone": 1020782,
+      "glass": 606845,
+      "metal": 81662,
+      "water": 32546,
+      "wood": 432
+    },
+    "dropped": 0,
+    "seconds": 2
+  },
+  "maitham-house": {
+    "id": "maitham-house",
+    "label": "Maitham House Façade",
+    "bytes": 2886884,
+    "triangles": 222511,
+    "sourceTriangles": 463192,
+    "edges": 8778,
+    "height": 33.2,
+    "footprint": [
+      48.5,
+      100
+    ],
+    "groundRadius": 70.7,
+    "classes": {
+      "stone": 84953,
+      "ground": 132,
+      "glass": 1912,
+      "metal": 4080,
+      "wood": 4953,
+      "green": 366574
+    },
+    "dropped": 0,
+    "seconds": 0.7
+  },
+  "zulfiqar-villa": {
+    "id": "zulfiqar-villa",
+    "label": "Zulfiqar Villa",
+    "bytes": 1590100,
+    "triangles": 211199,
+    "sourceTriangles": 268367,
+    "edges": 29759,
+    "height": 27.4,
+    "footprint": [
+      98.9,
+      100
+    ],
+    "groundRadius": 88.4,
+    "classes": {
+      "stone": 238955,
+      "glass": 3560,
+      "metal": 16216,
+      "ground": 228
+    },
+    "dropped": 0,
+    "seconds": 0.6
+  },
+  "se7en-castle-school": {
+    "id": "se7en-castle-school",
+    "label": "Se7en Castle School (18 classes)",
+    "bytes": 956968,
+    "triangles": 151353,
+    "sourceTriangles": 157067,
+    "edges": 22291,
+    "height": 12,
+    "footprint": [
+      100,
+      88.1
+    ],
+    "groundRadius": 84,
+    "classes": {
+      "stone": 110957,
+      "metal": 32644,
+      "water": 6840,
+      "glass": 912
+    },
+    "dropped": 0,
+    "seconds": 0.4
+  },
+  "ahl-al-bayt-mosque": {
+    "id": "ahl-al-bayt-mosque",
+    "label": "Ahl Al-Bayt Mosque",
+    "bytes": 2542452,
+    "triangles": 218076,
+    "sourceTriangles": 3029059,
+    "edges": 19580,
+    "height": 23.9,
+    "footprint": [
+      99.6,
+      100
+    ],
+    "groundRadius": 88.7,
+    "classes": {
+      "stone": 2398289,
+      "wood": 583338,
+      "water": 1472
+    },
+    "dropped": 0,
+    "seconds": 5.7
+  },
+  "ahmad-asad-garden": {
+    "id": "ahmad-asad-garden",
+    "label": "Ahmad Asad Garden",
+    "bytes": 692256,
+    "triangles": 132970,
+    "sourceTriangles": 139044,
+    "edges": 5091,
+    "height": 15.8,
+    "footprint": [
+      77.4,
+      100
+    ],
+    "groundRadius": 79.9,
+    "classes": {
+      "ground": 654,
+      "stone": 132348
+    },
+    "dropped": 8,
+    "seconds": 0.3
+  },
+  "al-ghadeer-kindergarten": {
+    "id": "al-ghadeer-kindergarten",
+    "label": "Al-Ghadeer Kindergarten",
+    "bytes": 93324,
+    "triangles": 12748,
+    "sourceTriangles": 12760,
+    "edges": 1810,
+    "height": 5.2,
+    "footprint": [
+      100,
+      72.2
+    ],
+    "groundRadius": 78,
+    "classes": {
+      "stone": 10494,
+      "glass": 548,
+      "metal": 1706
+    },
+    "dropped": 1,
+    "seconds": 0.2
+  },
+  "al-muhsin-mosque": {
+    "id": "al-muhsin-mosque",
+    "label": "Al Muhsin Mosque",
+    "bytes": 820744,
+    "triangles": 150840,
+    "sourceTriangles": 154943,
+    "edges": 6975,
+    "height": 27.9,
+    "footprint": [
+      67.5,
+      100
+    ],
+    "groundRadius": 76.4,
+    "classes": {
+      "stone": 46382,
+      "wood": 102338,
+      "glass": 576,
+      "metal": 1544
+    },
+    "dropped": 0,
+    "seconds": 0.4
+  },
+  "al-jid-mosque": {
+    "id": "al-jid-mosque",
+    "label": "Al-Jid Mosque",
+    "bytes": 898356,
+    "triangles": 112884,
+    "sourceTriangles": 456692,
+    "edges": 6953,
+    "height": 30.3,
+    "footprint": [
+      100,
+      77.4
+    ],
+    "groundRadius": 79.9,
+    "classes": {
+      "stone": 215965,
+      "glass": 1020,
+      "metal": 1440,
+      "wood": 13672
+    },
+    "dropped": 0,
+    "seconds": 0.6
+  },
+  "ghadeer-karbala-mosque": {
+    "id": "ghadeer-karbala-mosque",
+    "label": "Al-Ghadeer Mosque, Karbala",
+    "bytes": 1313604,
+    "triangles": 204435,
+    "sourceTriangles": 745827,
+    "edges": 16066,
+    "height": 14.4,
+    "footprint": [
+      100,
+      92.9
+    ],
+    "groundRadius": 85.9,
+    "classes": {
+      "stone": 675055,
+      "glass": 1892,
+      "metal": 6752,
+      "wood": 420
+    },
+    "dropped": 0,
+    "seconds": 1.3
+  },
+  "maqam-imam-sadiq": {
+    "id": "maqam-imam-sadiq",
+    "label": "Maqam of Imam al-Sadiq",
+    "bytes": 1997676,
+    "triangles": 216583,
+    "sourceTriangles": 725574,
+    "edges": 24345,
+    "height": 26.4,
+    "footprint": [
+      100,
+      99.3
+    ],
+    "groundRadius": 88.6,
+    "classes": {
+      "stone": 485100,
+      "wood": 41322,
+      "glass": 5436,
+      "metal": 182484
+    },
+    "dropped": 0,
+    "seconds": 1.1
+  },
+  "glass-factory-management": {
+    "id": "glass-factory-management",
+    "label": "Glass Factory Management (CBC Site)",
+    "bytes": 860932,
+    "triangles": 95380,
+    "sourceTriangles": 4926087,
+    "edges": 13805,
+    "height": 3.9,
+    "footprint": [
+      100,
+      51.7
+    ],
+    "groundRadius": 71.5,
+    "classes": {
+      "ground": 9372,
+      "stone": 2049231,
+      "wood": 177742,
+      "metal": 37232,
+      "glass": 67551,
+      "water": 868
+    },
+    "dropped": 0,
+    "seconds": 3.5
+  }
+}

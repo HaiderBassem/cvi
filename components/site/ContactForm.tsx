@@ -19,8 +19,8 @@ type Key = keyof typeof EMPTY;
 type FieldErrors = Partial<Record<Key, string>>;
 
 const inputBase =
-  'w-full bg-white/5 border rounded-sm px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-skyblue transition-colors';
-const labelClass = 'block font-mono text-[11px] text-white/60 mb-2 uppercase';
+  'w-full bg-white/5 border rounded-sm px-4 py-3 text-sm text-white placeholder:text-white/55 focus:outline-none focus:border-skyblue transition-colors';
+const labelClass = 'block font-mono text-[13px] text-white/76 mb-2 uppercase';
 
 export default function ContactForm() {
   const uid = useId();
@@ -85,13 +85,13 @@ export default function ContactForm() {
         </div>
         <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">Brief received</div>
         <h4 className="text-xl sm:text-2xl font-display text-white mb-3">Thank you, {sent.name}.</h4>
-        <p className="text-white/70 text-sm font-light max-w-md mx-auto mb-8 leading-relaxed">
+        <p className="text-white/82 text-sm font-normal max-w-md mx-auto mb-8 leading-relaxed">
           Your project brief has reached the CVI studio. We&apos;ll reply to the email address you gave us.
         </p>
         <button
           type="button"
           onClick={() => setSent(null)}
-          className="font-mono text-xs uppercase tracking-widest text-white/60 hover:text-skyblue transition-colors underline underline-offset-4 cursor-pointer"
+          className="font-mono text-xs uppercase tracking-widest text-white/76 hover:text-skyblue transition-colors underline underline-offset-4 cursor-pointer"
         >
           Send another brief
         </button>
@@ -115,7 +115,7 @@ export default function ContactForm() {
   return (
     <div className="border border-white/10 p-8 sm:p-12 rounded-sm bg-white/[0.01]">
       <h3 className="card-title font-display text-white mb-2">Send an Architectural Brief</h3>
-      <p className="text-white/60 text-xs font-mono mb-8 tracking-wider uppercase">Read by the studio directors</p>
+      <p className="text-white/76 text-xs font-mono mb-8 tracking-wider uppercase">Read by the studio directors</p>
 
       <form onSubmit={handleSubmit} noValidate data-contact-form className="relative flex flex-col gap-6">
         {formError && (

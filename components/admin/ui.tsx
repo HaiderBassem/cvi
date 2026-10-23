@@ -122,7 +122,7 @@ const TONES: Record<Tone, string> = {
 
 export function StatusChip({ tone = 'neutral', children }: { tone?: Tone; children: React.ReactNode }) {
   return (
-    <span className={cx('inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-[10px] uppercase tracking-wider', TONES[tone])}>
+    <span className={cx('inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border font-mono text-xs uppercase tracking-wider', TONES[tone])}>
       {children}
     </span>
   );
@@ -141,7 +141,7 @@ export function EmptyState({
 }) {
   return (
     <div className="px-6 py-12 text-center">
-      <div className="mx-auto mb-3 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/45" aria-hidden="true">
+      <div className="mx-auto mb-3 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60" aria-hidden="true">
         {icon}
       </div>
       <p className="text-sm font-medium text-white">{title}</p>

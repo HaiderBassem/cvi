@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { getSettings } from '@/lib/db';
+import { getSettings, getSiteContent } from '@/lib/db';
 import { Mail, Phone, MapPin, ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import ContactForm from '@/components/site/ContactForm';
 
@@ -11,19 +11,20 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   const settings = getSettings();
+  const content = getSiteContent();
 
   return (
-    <div className="w-full pt-32 pb-24 text-white max-w-[1800px] mx-auto px-6 sm:px-12">
+    <div className="w-full pt-32 pb-24 text-white max-w-[112.5rem] mx-auto px-6 sm:px-12">
       {/* Header */}
       <header className="max-w-4xl mb-16 sm:mb-24">
         <div className="font-mono text-xs tracking-widest text-skyblue uppercase mb-4">
-          COMMISSION & INQUIRY • BAGHDAD HQ
+          {content.contactEyebrow}
         </div>
         <h1 className="hero-title font-display text-white mb-6">
-          Initiate Spatial Dialogue
+          {content.contactTitle}
         </h1>
-        <p className="editorial-body text-white/70 max-w-2xl font-light">
-          We welcome conversations with discerning developers, civic leaders, and private patrons seeking architectural innovation and structural longevity.
+        <p className="editorial-body text-white/82 max-w-2xl font-normal">
+          {content.contactIntro}
         </p>
       </header>
 
@@ -40,12 +41,12 @@ export default function ContactPage() {
             <div className="text-base font-display text-white mb-2">
               {settings.companyName}
             </div>
-            <p className="text-white/70 text-sm font-light leading-relaxed mb-4">
+            <p className="text-white/82 text-sm font-normal leading-relaxed mb-4">
               {settings.addressLine1}
               <br />
               {settings.addressLine2}
             </p>
-            <div className="text-[11px] text-white/40 tracking-wider">
+            <div className="text-[13px] text-white/62 tracking-wider">
               COORDINATES: {settings.latitude}° N, {settings.longitude}° E
             </div>
           </div>
@@ -58,7 +59,7 @@ export default function ContactPage() {
             </div>
             <div className="flex flex-col gap-4 text-sm font-sans">
               <div>
-                <span className="text-white/40 block text-xs font-mono mb-1">TELEPHONE / WHATSAPP</span>
+                <span className="text-white/62 block text-xs font-mono mb-1">TELEPHONE / WHATSAPP</span>
                 <a
                   href={`tel:${settings.phone.replace(/\s+/g, '')}`}
                   className="text-white hover:text-skyblue transition-colors font-mono text-base"
@@ -67,7 +68,7 @@ export default function ContactPage() {
                 </a>
               </div>
               <div>
-                <span className="text-white/40 block text-xs font-mono mb-1">ELECTRONIC MAIL</span>
+                <span className="text-white/62 block text-xs font-mono mb-1">ELECTRONIC MAIL</span>
                 <a
                   href={`mailto:${settings.email}`}
                   className="text-white hover:text-skyblue transition-colors font-mono text-base"
@@ -88,37 +89,37 @@ export default function ContactPage() {
                 href={settings.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between text-white/80 hover:text-white group border-b border-white/5 pb-2"
+                className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
                 <span>Instagram (@cvi.arch)</span>
-                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-skyblue transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
                 href={settings.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between text-white/80 hover:text-white group border-b border-white/5 pb-2"
+                className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
                 <span>Facebook (CVI Architects)</span>
-                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-skyblue transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
                 href={settings.twitterUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between text-white/80 hover:text-white group border-b border-white/5 pb-2"
+                className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
                 <span>X / Twitter (@CVIarch)</span>
-                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-skyblue transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
                 href={settings.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between text-white/80 hover:text-white group"
+                className="flex items-center justify-between text-white/88 hover:text-white group"
               >
                 <span>LinkedIn</span>
-                <ArrowUpRight className="w-4 h-4 text-white/40 group-hover:text-skyblue transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
             </div>
           </div>

@@ -38,7 +38,7 @@ function Shell({
           {label}
           {required && <span className="text-skyblue"> *</span>}
         </label>
-        {counter && <span className="font-mono text-[10px] text-white/35 tabular-nums">{counter}</span>}
+        {counter && <span className="font-mono text-xs text-white/52 tabular-nums">{counter}</span>}
       </div>
       {children}
       {error ? (
@@ -46,7 +46,7 @@ function Shell({
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-hint`} className="text-xs text-white/40">
+        <p id={`${id}-hint`} className="text-xs text-white/56">
           {hint}
         </p>
       ) : null}
@@ -154,7 +154,7 @@ export function Toggle({
         <label htmlFor={id} className="text-sm text-white cursor-pointer">
           {label}
         </label>
-        {description && <p className="text-xs text-white/45 mt-0.5">{description}</p>}
+        {description && <p className="text-xs text-white/60 mt-0.5">{description}</p>}
       </div>
       <button
         id={id}
@@ -182,8 +182,8 @@ export function FormSection({ title, description, children }: { title: string; d
   return (
     <section className="space-y-4">
       <div>
-        <h3 className="font-mono text-[11px] uppercase tracking-widest text-skyblue">{title}</h3>
-        {description && <p className="text-xs text-white/45 mt-1">{description}</p>}
+        <h3 className="font-mono text-xs uppercase tracking-widest text-skyblue">{title}</h3>
+        {description && <p className="text-xs text-white/60 mt-1">{description}</p>}
       </div>
       <div className="space-y-4">{children}</div>
     </section>

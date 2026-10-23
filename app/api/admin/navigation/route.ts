@@ -1,33 +1,31 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getNavigationItems, saveNavigationItems } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { NavigationSchema } from '@/lib/validation/schemas';
+import { ok, parseJson, requireAdmin, serverError } from '@/lib/http/api';
+import type { NavigationItemRecord } from '@/lib/db/types';
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const items = getNavigationItems(false);
-  return NextResponse.json({ success: true, data: items });
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
+  return ok(getNavigationItems(false));
 }
 
-export async function POST(request: Request) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+/** Replace the whole menu (order = array order). */
+export async function PUT(request: Request) {
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
+
+  const parsed = await parseJson(request, NavigationSchema);
+  if ('response' in parsed) return parsed.response;
 
   try {
-    const body = await request.json();
-    const { items } = body;
-    if (!Array.isArray(items)) {
-      return NextResponse.json({ error: 'Items array required' }, { status: 400 });
-    }
-
-    const saved = saveNavigationItems(items);
-    return NextResponse.json({ success: true, data: saved });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Failed to save navigation' }, { status: 500 });
+    const saved = saveNavigationItems(
+      parsed.data.items.map((i, n) => ({ ...i, id: i.id || `nav_${Date.now().toString(36)}${n}`, sort_order: n, hint: i.hint || null }) as NavigationItemRecord)
+    );
+    revalidatePath('/', 'layout');
+    return ok(saved);
+  } catch (err) {
+    return serverError('navigation update', err);
   }
 }

@@ -1,7 +1,10 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getProjectById, getBlocksByProjectId } from '@/lib/db';
-import { ProjectStoryEditor } from '@/components/admin/ProjectStoryEditor';
+import ProjectEditor from '@/components/admin/ProjectEditor';
+import { listModelsWithUsage, listTypologies } from '@/lib/models/usage';
+
+export const dynamic = 'force-dynamic';
 
 interface AdminProjectEditPageProps {
   params: Promise<{ id: string }>;
@@ -15,12 +18,13 @@ export default async function AdminProjectEditPage({ params }: AdminProjectEditP
     notFound();
   }
 
-  const blocks = getBlocksByProjectId(project.id, true);
-
   return (
-    <ProjectStoryEditor
+    <ProjectEditor
+      key={project.id}
       initialProject={project}
-      initialBlocks={blocks}
+      initialBlocks={getBlocksByProjectId(project.id, true)}
+      models={listModelsWithUsage()}
+      typologies={listTypologies()}
     />
   );
 }

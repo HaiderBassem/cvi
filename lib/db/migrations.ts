@@ -48,6 +48,47 @@ export const MIGRATIONS: Migration[] = [
     up: [`ALTER TABLE team_members ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1`],
     down: [`ALTER TABLE team_members DROP COLUMN is_visible`],
   },
+  {
+    version: 4,
+    name: 'add_project_model_id',
+    // `model_id` names a converted 3D model (lib/models/catalog.ts). The seeded links are only the
+    // ones whose FBX clearly belongs to the project; everything else is chosen in the admin.
+    up: [
+      `ALTER TABLE projects ADD COLUMN model_id TEXT`,
+      ...(
+        [
+          ['budoor-zoo', 'budoor-zoo'],
+          ['606-restaurants', 'restaurant-606'],
+          ['albina-almarkazy-workshop', 'bmc-workshops'],
+          ['diyar-management', 'aldyar-management'],
+          ['babylon-industrial-city', 'medical-industrial-city'],
+          ['al-zareef', 'al-zareef'],
+          ['se7en-castle-school-complex', 'se7en-castle-school'],
+          ['al-ghadeer-kindergarten', 'al-ghadeer-kindergarten'],
+          ['imam-hassan-mosque', 'imam-hassan-mosque'],
+          ['al-jid-mosque', 'al-jid-mosque'],
+          ['ghadeer-karbala-mosque', 'ghadeer-karbala-mosque'],
+        ] as const
+      ).map(([slug, model]) => `UPDATE projects SET model_id = '${model}' WHERE slug = '${slug}' AND model_id IS NULL`),
+    ],
+    down: [`ALTER TABLE projects DROP COLUMN model_id`],
+  },
+  {
+    version: 5,
+    name: 'add_navigation_hint_and_plain_labels',
+    // `hint` is the one-line description under each link in the phone menu. The seeded labels
+    // are only replaced where they are still the original ones, so edits made in the admin win.
+    up: [
+      `ALTER TABLE navigation_items ADD COLUMN hint TEXT`,
+      `UPDATE navigation_items SET label = 'Home', hint = 'Back to the start' WHERE id = 'nav_home' AND label = 'Index'`,
+      `UPDATE navigation_items SET hint = 'Our architecture and design work' WHERE id = 'nav_projects' AND hint IS NULL`,
+      `UPDATE navigation_items SET label = 'About us', hint = 'Who we are and how we work' WHERE id = 'nav_about' AND label = 'About'`,
+      `UPDATE navigation_items SET hint = 'Start a project with us' WHERE id = 'nav_contact' AND hint IS NULL`,
+      // The admin login is not a public menu item; it has its own small link.
+      `UPDATE navigation_items SET is_visible = 0 WHERE id = 'nav_admin'`,
+    ],
+    down: [`ALTER TABLE navigation_items DROP COLUMN hint`],
+  },
 ];
 
 function ensureLedger(db: DatabaseSync) {

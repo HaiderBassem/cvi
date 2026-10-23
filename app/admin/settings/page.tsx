@@ -42,7 +42,7 @@ export default function AdminSettingsPage() {
   };
 
   if (!settings) {
-    return <div className="font-mono text-xs text-white/40 p-12">LOADING STUDIO SETTINGS...</div>;
+    return <div className="font-mono text-xs text-white/56 p-12">LOADING STUDIO SETTINGS...</div>;
   }
 
   return (

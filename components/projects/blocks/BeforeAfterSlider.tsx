@@ -45,9 +45,9 @@ export function BeforeAfterSlider({
   return (
     <div className="w-full my-12 sm:my-20">
       {title && (
-        <div className="flex items-center justify-between mb-4 font-mono text-xs text-white/60">
+        <div className="flex items-center justify-between mb-4 font-mono text-xs text-white/76">
           <span className="tracking-widest uppercase">{title}</span>
-          <span className="text-white/40">[ DRAG TO REVEAL ]</span>
+          <span className="text-white/62">[ DRAG TO REVEAL ]</span>
         </div>
       )}
 
@@ -70,7 +70,7 @@ export function BeforeAfterSlider({
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1600px"
           />
-          <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-[10px] tracking-widest text-white/90">
+          <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-widest text-white/90">
             {afterLabel}
           </div>
         </div>
@@ -87,7 +87,7 @@ export function BeforeAfterSlider({
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1600px"
           />
-          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-[10px] tracking-widest text-white/90">
+          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-widest text-white/90">
             {beforeLabel}
           </div>
         </div>
@@ -97,7 +97,7 @@ export function BeforeAfterSlider({
           className="absolute top-0 bottom-0 w-[2px] bg-white shadow-2xl z-20 pointer-events-none"
           style={{ left: `${sliderPos}%` }}
         >
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-mono text-[10px] font-bold shadow-2xl">
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-mono text-xs font-bold shadow-2xl">
             ◄►
           </div>
         </div>

@@ -1,23 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import { Space_Grotesk, JetBrains_Mono, Syne } from 'next/font/google';
+import { Manrope, Cormorant_Garamond } from 'next/font/google';
 import '@/styles/globals.css';
 import { SiteChrome } from '@/components/site/SiteChrome';
 import { getSettings } from '@/lib/db';
+import { getChromeData } from '@/lib/site/chrome';
 
-const spaceGrotesk = Space_Grotesk({
+// Manrope: a clean, open sans that stays legible at small sizes (body, labels, controls).
+const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
+// Cormorant Garamond: a high-contrast editorial serif for headlines and numerals.
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
-});
-
-const syne = Syne({
-  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
 });
@@ -83,15 +82,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const settings = getSettings();
+  const chrome = getChromeData();
 
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${syne.variable} dark`}
+      className={`${manrope.variable} ${cormorant.variable} dark`}
     >
-      <body className="bg-[#0a0a0c] text-[#f4f4f6] selection:bg-[#4cb8f5] selection:text-black">
-        <SiteChrome companyName={settings.companyName} coordinates={`${settings.latitude}° N, ${settings.longitude}° E`}>
+      <body className="text-[#f4f4f6] selection:bg-[#4cb8f5] selection:text-black">
+        <SiteChrome chrome={chrome}>
           {children}
         </SiteChrome>
       </body>

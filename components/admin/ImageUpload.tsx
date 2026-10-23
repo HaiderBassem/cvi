@@ -28,6 +28,9 @@ interface Props {
 export default function ImageUpload({ label, value, onChange, onBusyChange, error, required, aspect = 'aspect-[4/3]', hint }: Props) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  // An upload can finish after the parent re-rendered: always report to the newest handler.
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -51,7 +54,7 @@ export default function ImageUpload({ label, value, onChange, onBusyChange, erro
       const res = await fetch('/api/admin/media', { method: 'POST', body: fd });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.success) throw new Error(body.error || 'Upload failed. Please try again.');
-      onChange(body.data.url as string);
+      onChangeRef.current(body.data.url as string);
     } catch (e) {
       setUploadError((e as Error).message);
     } finally {
@@ -144,7 +147,7 @@ export default function ImageUpload({ label, value, onChange, onBusyChange, erro
         }}
       />
 
-      {shownError ? <p className="text-xs text-red-300">{shownError}</p> : hint ? <p className="text-xs text-white/40">{hint}</p> : null}
+      {shownError ? <p className="text-xs text-red-300">{shownError}</p> : hint ? <p className="text-xs text-white/56">{hint}</p> : null}
     </div>
   );
 }

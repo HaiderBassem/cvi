@@ -4,24 +4,20 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
+import type { SiteChromeData } from '@/lib/site/chrome';
 
-interface HeaderProps {
-  companyName?: string;
-  coordinates?: string;
-}
-
-export function Header({
-  companyName = 'CVI ARCHITECTS',
-  coordinates = '33.2905° N, 44.3924° E',
-}: HeaderProps) {
+/**
+ * Top bar and phone menu. Links, button, contact details and social links all come from the
+ * admin (Menu & navigation, Site content, Studio settings) — nothing here is hard-coded.
+ */
+export function Header({ chrome }: { chrome: SiteChromeData }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { nav, cta, contact } = chrome;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -31,13 +27,16 @@ export function Header({
     setIsMenuOpen(false);
   }, [pathname]);
 
-  const navLinks = [
-    { label: 'Overview', href: '/', num: '01' },
-    { label: 'Architecture', href: '/projects', num: '02' },
-    { label: 'Atelier Story', href: '/about', num: '03' },
-    { label: 'Direct Dialogue', href: '/contact', num: '04' },
-    { label: 'Studio CMS', href: '/admin', num: '05' },
-  ];
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMenuOpen]);
+
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : !/^https?:\/\//.test(href) && pathname.startsWith(href));
+  const ctaExternal = /^https?:\/\//.test(cta.href);
+  const linkProps = (external: boolean) => (external ? { target: '_blank', rel: 'noopener noreferrer' } : {});
 
   return (
     <>
@@ -46,63 +45,67 @@ export function Header({
           scrolled ? 'backdrop-blur-md bg-black/30 py-4' : 'py-6'
         }`}
       >
-        <div className="max-w-[1800px] mx-auto flex items-center justify-between text-white pointer-events-auto">
-          {/* Brand Logo Lockup */}
-          <Link
-            href="/"
-            className="flex items-center gap-3 group focus:outline-none"
-            aria-label="CVI Architects Homepage"
-          >
-            <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center font-mono text-[10px] tracking-widest text-white group-hover:border-skyblue group-hover:text-skyblue transition-colors">
+        <div className="max-w-[112.5rem] mx-auto flex items-center justify-between gap-4 text-white pointer-events-auto">
+          {/* Brand */}
+          <Link href="/" className="flex items-center gap-3 group focus:outline-none" aria-label={`${chrome.companyName} homepage`}>
+            <div className="w-8 h-8 shrink-0 rounded-full border border-white/20 flex items-center justify-center text-xs tracking-widest text-white group-hover:border-skyblue group-hover:text-skyblue transition-colors">
               CVI
             </div>
-            <div className="flex flex-col">
-              <span className="font-display font-semibold text-sm sm:text-base tracking-[0.15em] text-white">
-                {companyName}
-              </span>
-              <span className="text-[9px] font-mono tracking-widest text-white/50 hidden sm:inline-block">
-                BAGHDAD ATELIER
-              </span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-display font-semibold text-sm sm:text-base tracking-[0.15em] text-white truncate">{chrome.companyName}</span>
+              {chrome.brandSubtitle && (
+                <span className="text-xs uppercase tracking-widest text-white/70 hidden sm:inline-block">{chrome.brandSubtitle}</span>
+              )}
             </div>
           </Link>
 
-          {/* Center Coordinates & Status (Desktop) */}
-          <div className="hidden lg:flex items-center gap-6 font-mono text-[11px] tracking-widest text-white/70">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>{coordinates}</span>
-            </div>
-            <span className="text-white/20">|</span>
-            <span className="text-white/60">AL-JADRIYA • MINISTERS ST</span>
-          </div>
+          {/* Main navigation (desktop) */}
+          <nav aria-label="Main" className="hidden lg:flex items-center gap-9">
+            {nav.map((link) => (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                {...linkProps(link.external)}
+                aria-current={isActive(link.href) ? 'page' : undefined}
+                className={`relative py-2 text-[15px] font-semibold tracking-wide transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-skyblue after:transition-transform after:duration-300 ${
+                  isActive(link.href) ? 'text-white after:scale-x-100' : 'text-white/80 hover:text-white after:scale-x-0 hover:after:scale-x-100'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Right Action Cluster */}
+          {/* Right */}
           <div className="flex items-center gap-3 sm:gap-5">
-            {/* Quick Contact CTA */}
-            <Link
-              href="/contact"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 hover:border-skyblue hover:text-skyblue font-mono text-[11px] tracking-widest transition-all duration-300"
-            >
-              <span>INQUIRE</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
+            {cta.label && (
+              <Link
+                href={cta.href}
+                {...linkProps(ctaExternal)}
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/30 hover:border-skyblue hover:text-skyblue text-[14px] font-semibold tracking-wide transition-all duration-300"
+              >
+                <span>{cta.label}</span>
+                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            )}
 
-            {/* Menu Button */}
+            {/* Menu button (phones and tablets) */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black font-mono text-[11px] tracking-widest hover:bg-skyblue hover:text-white transition-colors cursor-pointer font-medium"
+              className="lg:hidden flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black text-[14px] font-semibold tracking-wide hover:bg-skyblue transition-colors cursor-pointer"
               aria-expanded={isMenuOpen}
-              aria-label="Toggle navigation menu"
+              aria-controls="site-menu"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMenuOpen ? (
                 <>
-                  <span>CLOSE</span>
-                  <X className="w-3.5 h-3.5" />
+                  <span>Close</span>
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </>
               ) : (
                 <>
-                  <span>MENU</span>
-                  <Menu className="w-3.5 h-3.5" />
+                  <span>Menu</span>
+                  <Menu className="w-4 h-4" aria-hidden="true" />
                 </>
               )}
             </button>
@@ -110,81 +113,75 @@ export function Header({
         </div>
       </header>
 
-      {/* Full-Screen Architectural Navigation Overlay */}
+      {/* Full-screen menu (phones and tablets) */}
       <div
-        className={`fixed inset-0 z-[8999] bg-[#08080a]/98 backdrop-blur-2xl transition-all duration-700 flex flex-col justify-between p-8 sm:p-16 overflow-y-auto ${
+        id="site-menu"
+        aria-hidden={!isMenuOpen}
+        className={`lg:hidden fixed inset-0 z-[8999] bg-[#08080a]/[0.98] backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between px-8 pb-10 pt-28 sm:px-16 overflow-y-auto ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Decorative Grid Lines */}
-        <div className="absolute inset-0 pointer-events-none opacity-5 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]" />
-
-        {/* Top Header Placeholder */}
-        <div className="w-full flex justify-between items-center pt-4">
-          <div className="text-[11px] font-mono tracking-widest text-white/40">
-            SYSTEM INDEX • CVI ARCH
-          </div>
-          <div className="text-[11px] font-mono tracking-widest text-white/40">
-            2026 EDITION
-          </div>
-        </div>
-
-        {/* Main Navigation Links */}
-        <nav className="my-auto py-12 flex flex-col gap-4 sm:gap-6 max-w-4xl">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="group flex items-baseline gap-4 sm:gap-8 text-white focus:outline-none"
-              >
-                <span className="font-mono text-xs sm:text-sm text-skyblue tracking-widest">
-                  {link.num}
-                </span>
+        <nav aria-label="Main" className="my-auto flex max-w-3xl flex-col gap-2 py-8">
+          {nav.map((link, i) => (
+            <Link
+              key={link.href + link.label}
+              href={link.href}
+              {...linkProps(link.external)}
+              tabIndex={isMenuOpen ? 0 : -1}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              className="group flex items-baseline gap-5 border-b border-white/10 py-5 text-white sm:gap-8"
+            >
+              <span className="w-8 text-sm font-semibold tracking-widest text-skyblue">{String(i + 1).padStart(2, '0')}</span>
+              <span className="flex flex-col">
                 <span
-                  className={`font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight transition-transform duration-300 group-hover:translate-x-4 ${
-                    isActive ? 'text-skyblue' : 'text-white/90 group-hover:text-white'
+                  className={`font-display text-5xl font-medium leading-none transition-transform duration-300 group-hover:translate-x-2 sm:text-6xl ${
+                    isActive(link.href) ? 'text-skyblue' : 'text-white'
                   }`}
                 >
                   {link.label}
                 </span>
-              </Link>
-            );
-          })}
+                {link.hint && <span className="mt-2 text-base text-white/70">{link.hint}</span>}
+              </span>
+            </Link>
+          ))}
         </nav>
 
-        {/* Bottom Metadata & Coordinates */}
-        <div className="w-full border-t border-white/10 pt-8 grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs text-white/60">
+        <div className="grid w-full grid-cols-1 gap-6 border-t border-white/15 pt-8 text-[15px] text-white/80 md:grid-cols-3">
           <div>
-            <div className="text-white/40 uppercase mb-1">BAGHDAD ATELIER</div>
-            <div>Al-Wuzara St, Al-Jadriya</div>
-            <div className="text-white/40">33.2905° N, 44.3924° E</div>
+            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Our studio</div>
+            {contact.addressLines.map((l) => (
+              <div key={l}>{l}</div>
+            ))}
           </div>
           <div>
-            <div className="text-white/40 uppercase mb-1">DIRECT COMMUNICATONS</div>
-            <a href="mailto:info@cvi-iq.com" className="hover:text-white block transition-colors">
-              info@cvi-iq.com
-            </a>
-            <a href="tel:+9647819975070" className="hover:text-white block transition-colors">
-              +964 781 997 5070
-            </a>
+            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Get in touch</div>
+            {contact.email && (
+              <a href={`mailto:${contact.email}`} tabIndex={isMenuOpen ? 0 : -1} className="block transition-colors hover:text-white">
+                {contact.email}
+              </a>
+            )}
+            {contact.phone && (
+              <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} tabIndex={isMenuOpen ? 0 : -1} className="block transition-colors hover:text-white">
+                {contact.phone}
+              </a>
+            )}
           </div>
-          <div>
-            <div className="text-white/40 uppercase mb-1">SOCIAL ARCHIVE</div>
-            <div className="flex gap-4">
-              <a href="https://instagram.com/cvi.arch" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                Instagram
-              </a>
-              <a href="https://facebook.com/profile.php?id=61578697355535" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                Facebook
-              </a>
-              <a href="https://x.com/CVIarch" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                X / Twitter
-              </a>
+          {contact.socials.length > 0 && (
+            <div>
+              <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Follow us</div>
+              <div className="flex flex-wrap gap-x-5 gap-y-1">
+                {contact.socials.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={isMenuOpen ? 0 : -1} className="transition-colors hover:text-white">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
+        <Link href="/admin" tabIndex={isMenuOpen ? 0 : -1} className="mt-8 text-sm text-white/50 transition-colors hover:text-white">
+          Admin login
+        </Link>
       </div>
     </>
   );

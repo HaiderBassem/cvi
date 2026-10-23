@@ -8,30 +8,34 @@ import { ArrowUpRight, Grid, List, Search } from 'lucide-react';
 
 interface ProjectsDirectoryProps {
   initialProjects: ProjectRecord[];
+  /** Label of the filter that shows everything. */
+  allLabel?: string;
 }
 
-export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
+const tidy = (t: string) => t.trim().replace(/\s+/g, ' ');
+
+export function ProjectsDirectory({ initialProjects, allLabel = 'All types' }: ProjectsDirectoryProps) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredProject, setHoveredProject] = useState<ProjectRecord | null>(null);
 
-  const filters = [
-    { id: 'all', label: 'All Typologies' },
-    { id: 'residential', label: 'Residential & Towers' },
-    { id: 'educational', label: 'Educational & Campus' },
-    { id: 'commercial', label: 'Commercial & Banking' },
-    { id: 'religious', label: 'Religious & Sacred' },
-    { id: 'industrial', label: 'Industrial & Logistics' },
-  ];
+  // Filters come from the project types that actually exist, so adding a project of a new type
+  // (in the admin) adds its filter automatically.
+  const filters = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const p of initialProjects) {
+      const t = tidy(p.typology || '');
+      if (!t) continue;
+      const id = t.toLowerCase();
+      if (!seen.has(id)) seen.set(id, t.charAt(0).toUpperCase() + t.slice(1));
+    }
+    return [{ id: 'all', label: allLabel }, ...[...seen].map(([id, label]) => ({ id, label })).sort((a, b) => a.label.localeCompare(b.label))];
+  }, [initialProjects, allLabel]);
 
   const filteredProjects = useMemo(() => {
     return initialProjects.filter((p) => {
-      const matchesFilter =
-        activeFilter === 'all' ||
-        p.typology?.toLowerCase().includes(activeFilter.toLowerCase()) ||
-        (activeFilter === 'residential' && p.title.toLowerCase().includes('villa')) ||
-        (activeFilter === 'religious' && (p.title.toLowerCase().includes('mosque') || p.title.toLowerCase().includes('prayer')));
+      const matchesFilter = activeFilter === 'all' || tidy(p.typology || '').toLowerCase() === activeFilter;
 
       const matchesSearch =
         !searchQuery ||
@@ -57,7 +61,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
               className={`px-4 py-2 rounded-full border transition-all cursor-pointer ${
                 activeFilter === f.id
                   ? 'bg-white text-black border-white font-medium'
-                  : 'text-white/60 border-white/10 hover:border-white/40 hover:text-white'
+                  : 'text-white/76 border-white/10 hover:border-white/40 hover:text-white'
               }`}
             >
               {f.label}
@@ -69,7 +73,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
         <div className="flex items-center gap-4 w-full md:w-auto">
           {/* Search Input */}
           <div className="relative flex-1 md:w-56">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/62" />
             <input
               type="text"
               placeholder="Search projects..."
@@ -84,7 +88,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                viewMode === 'grid' ? 'bg-white text-black' : 'text-white/50 hover:text-white'
+                viewMode === 'grid' ? 'bg-white text-black' : 'text-white/70 hover:text-white'
               }`}
               title="Grid View"
               aria-label="Grid View"
@@ -94,7 +98,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
             <button
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                viewMode === 'list' ? 'bg-white text-black' : 'text-white/50 hover:text-white'
+                viewMode === 'list' ? 'bg-white text-black' : 'text-white/70 hover:text-white'
               }`}
               title="Index List View"
               aria-label="Index List View"
@@ -106,7 +110,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
       </div>
 
       {/* Results Count */}
-      <div className="font-mono text-xs text-white/40 tracking-widest uppercase mb-8">
+      <div className="font-mono text-xs text-white/62 tracking-widest uppercase mb-8">
         SHOWING {filteredProjects.length} OF {initialProjects.length} PORTFOLIO ARCHIVES
       </div>
 
@@ -128,7 +132,7 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 font-mono text-[9px] tracking-widest text-white/80 uppercase">
+                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 font-mono text-xs tracking-widest text-white/88 uppercase">
                   #{String(idx + 1).padStart(2, '0')} • {p.typology || 'Architecture'}
                 </div>
               </div>
@@ -139,12 +143,12 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
                   <h3 className="card-title text-white font-display mb-2 group-hover:text-skyblue transition-colors">
                     {p.title}
                   </h3>
-                  <p className="text-white/60 text-xs font-light line-clamp-2 leading-relaxed">
+                  <p className="text-white/76 text-xs font-normal line-clamp-2 leading-relaxed">
                     {p.summary || p.description}
                   </p>
                 </div>
 
-                <div className="border-t border-white/10 mt-6 pt-4 flex items-center justify-between font-mono text-[11px] text-white/40">
+                <div className="border-t border-white/10 mt-6 pt-4 flex items-center justify-between font-mono text-[13px] text-white/62">
                   <span>{p.location || 'Iraq'}</span>
                   <span>{p.year || '2025'}</span>
                 </div>
@@ -171,17 +175,17 @@ export function ProjectsDirectory({ initialProjects }: ProjectsDirectoryProps) {
                   <h3 className="text-xl sm:text-2xl font-display font-medium text-white group-hover:text-skyblue transition-colors">
                     {p.title}
                   </h3>
-                  <div className="font-mono text-xs text-white/40 mt-1 md:hidden">
+                  <div className="font-mono text-xs text-white/62 mt-1 md:hidden">
                     {p.typology} • {p.location} • {p.year}
                   </div>
                 </div>
               </div>
 
-              <div className="hidden md:flex items-center gap-12 font-mono text-xs text-white/50">
+              <div className="hidden md:flex items-center gap-12 font-mono text-xs text-white/70">
                 <span className="w-36 truncate">{p.typology || 'Architecture'}</span>
                 <span className="w-32">{p.location || 'Iraq'}</span>
                 <span className="w-20">{p.year || '2025'}</span>
-                <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/70 group-hover:border-skyblue group-hover:bg-skyblue group-hover:text-black transition-all">
+                <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/82 group-hover:border-skyblue group-hover:bg-skyblue group-hover:text-black transition-all">
                   <ArrowUpRight className="w-4 h-4" />
                 </div>
               </div>

@@ -50,14 +50,14 @@ function StatCard({
       href={href}
       className="group rounded-lg border border-white/10 bg-[#111116] p-4 sm:p-5 hover:border-white/20 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-skyblue"
     >
-      <div className="flex items-center justify-between text-white/45">
-        <span className="font-mono text-[10px] uppercase tracking-widest">{label}</span>
+      <div className="flex items-center justify-between text-white/60">
+        <span className="font-mono text-xs uppercase tracking-widest">{label}</span>
         <span className="text-skyblue" aria-hidden="true">
           {icon}
         </span>
       </div>
       <div className="mt-3 text-3xl font-display font-bold text-white tabular-nums">{value}</div>
-      <div className={`mt-1 text-xs ${highlight ? 'text-skyblue' : 'text-white/45'}`}>{hint}</div>
+      <div className={`mt-1 text-xs ${highlight ? 'text-skyblue' : 'text-white/60'}`}>{hint}</div>
     </Link>
   );
 }
@@ -153,7 +153,7 @@ export default function AdminOverviewPage() {
           </div>
           {recentMessages.length === 0 ? (
             <div className="px-5 py-12 text-center">
-              <Inbox className="w-6 h-6 mx-auto mb-3 text-white/35" aria-hidden="true" />
+              <Inbox className="w-6 h-6 mx-auto mb-3 text-white/52" aria-hidden="true" />
               <p className="text-sm font-medium text-white">No messages yet</p>
               <p className="mt-1 text-sm text-white/50">Briefs sent from the contact page appear here.</p>
             </div>
@@ -171,9 +171,9 @@ export default function AdminOverviewPage() {
                         {m.name}
                         {m.status === 'new' && <span className="sr-only"> (new)</span>}
                       </span>
-                      <span className="block text-xs text-white/45 truncate">{m.message}</span>
+                      <span className="block text-xs text-white/60 truncate">{m.message}</span>
                     </span>
-                    <time dateTime={m.created_at} className="text-xs text-white/40 shrink-0">
+                    <time dateTime={m.created_at} className="text-xs text-white/56 shrink-0">
                       {timeAgo(m.created_at)}
                     </time>
                   </Link>
@@ -189,7 +189,7 @@ export default function AdminOverviewPage() {
             <h2 id="checklist" className="text-sm font-semibold text-white">
               Before you share the site
             </h2>
-            <p className="text-xs text-white/45 mt-0.5">{remaining === 0 ? 'All set.' : `${remaining} of ${checklist.length} left`}</p>
+            <p className="text-xs text-white/60 mt-0.5">{remaining === 0 ? 'All set.' : `${remaining} of ${checklist.length} left`}</p>
           </div>
           <ul className="p-2">
             {checklist.map((c) => (
@@ -198,7 +198,7 @@ export default function AdminOverviewPage() {
                   {c.done ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" aria-label="Done" />
                   ) : (
-                    <Circle className="w-4 h-4 text-white/30 shrink-0" aria-label="To do" />
+                    <Circle className="w-4 h-4 text-white/48 shrink-0" aria-label="To do" />
                   )}
                   <span className={c.done ? 'text-white/50' : 'text-white'}>{c.label}</span>
                 </Link>
@@ -228,12 +228,12 @@ export default function AdminOverviewPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-white truncate">{p.title}</div>
-                <div className="text-xs text-white/45 truncate">
+                <div className="text-xs text-white/60 truncate">
                   {p.typology || 'Architecture'} · {p.location || 'Iraq'} · edited {timeAgo(p.updated_at)}
                 </div>
               </div>
               <span
-                className={`hidden sm:inline-flex px-2 py-0.5 rounded-full border font-mono text-[10px] uppercase tracking-wider ${
+                className={`hidden sm:inline-flex px-2 py-0.5 rounded-full border font-mono text-xs uppercase tracking-wider ${
                   p.status_state === 'published'
                     ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
                     : 'border-white/15 bg-white/[0.04] text-white/60'

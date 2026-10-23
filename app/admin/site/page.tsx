@@ -10,15 +10,18 @@ import { FormBanner, ListSkeleton, LoadFailed } from '@/components/admin/AdminSt
 import { FormSection, TextArea, TextField } from '@/components/admin/Field';
 import ImageUpload from '@/components/admin/ImageUpload';
 import SaveBar from '@/components/admin/SaveBar';
+import { COPY_GROUPS, type CopyGroup, type CopyKey, type SiteStat } from '@/lib/content/copy';
 import { useUnsavedGuard } from '@/components/admin/useUnsavedGuard';
 
-type Tab = 'home' | 'about' | 'disciplines';
+type Tab = 'home' | 'pages' | 'about' | 'footer' | 'disciplines';
 type DisciplineDraft = { id?: string; title: string; tagline: string; description: string; image_url: string };
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'home', label: 'Homepage' },
-  { id: 'about', label: 'About & pillars' },
-  { id: 'disciplines', label: 'Disciplines' },
+  { id: 'pages', label: 'Projects & contact pages' },
+  { id: 'about', label: 'About page' },
+  { id: 'footer', label: 'Menu, footer & opening screen' },
+  { id: 'disciplines', label: 'Services (disciplines)' },
 ];
 
 function move<T>(list: T[], from: number, to: number): T[] {
@@ -37,24 +40,86 @@ function toDrafts(items: DisciplineRecord[]): DisciplineDraft[] {
 function HeroPreview({ c }: { c: SiteContent }) {
   return (
     <div className="rounded-md border border-white/10 bg-[#07070a] p-5 overflow-hidden" aria-label="Homepage preview">
-      <div className="font-mono text-[9px] text-skyblue tracking-[0.25em] uppercase mb-3 flex items-center gap-2">
+      <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-3 flex items-center gap-2">
         <span className="w-5 h-px bg-skyblue" />
         {c.heroEyebrow || '—'}
       </div>
       <div className="font-display font-bold text-white text-2xl leading-[0.95] tracking-tight">
-        {c.heroTitle || 'Headline'} <span className="text-white/40">{c.heroTitleMuted}</span>
+        {c.heroTitle || 'Headline'} <span className="text-white/56">{c.heroTitleMuted}</span>
       </div>
-      <p className="mt-3 text-[11px] text-white/70 leading-relaxed line-clamp-4">{c.heroBody}</p>
+      <p className="mt-3 text-xs text-white/70 leading-relaxed line-clamp-4">{c.heroBody}</p>
       <div className="mt-5 pt-4 border-t border-white/10 text-center">
         <p className="font-display text-sm text-white leading-snug line-clamp-3">&ldquo;{c.manifestoQuote}&rdquo;</p>
-        <p className="mt-2 font-mono text-[9px] text-white/45 tracking-widest">{c.manifestoAttribution}</p>
+        <p className="mt-2 font-mono text-xs text-white/60 tracking-widest">{c.manifestoAttribution}</p>
       </div>
       <div className="mt-5 pt-4 border-t border-white/10">
-        <div className="font-mono text-[9px] text-skyblue tracking-widest uppercase">{c.teamEyebrow}</div>
+        <div className="font-mono text-xs text-skyblue tracking-widest uppercase">{c.teamEyebrow}</div>
         <div className="font-display text-white text-base">{c.teamTitle}</div>
-        <p className="text-[11px] text-white/55 line-clamp-2">{c.teamIntro}</p>
+        <p className="text-xs text-white/55 line-clamp-2">{c.teamIntro}</p>
       </div>
     </div>
+  );
+}
+
+/** Renders every declared copy field of a tab (see lib/content/copy.ts), grouped, with the right control. */
+function CopyGroupsView({
+  tab,
+  content,
+  errors,
+  onChange,
+  onBusy,
+}: {
+  tab: 'home' | 'pages' | 'about' | 'footer';
+  content: SiteContent;
+  errors: Record<string, string>;
+  onChange: (key: CopyKey, value: string) => void;
+  onBusy: (busy: boolean) => void;
+}) {
+  return (
+    <>
+      {(COPY_GROUPS as readonly CopyGroup[]).filter((g) => g.tab === tab).map((g) => (
+        <FormSection key={g.title} title={g.title} description={g.description}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {g.fields.map((f) => {
+              const value = content[f.key as CopyKey] ?? '';
+              if (f.kind === 'image') {
+                return (
+                  <div key={f.key} className="sm:col-span-2 max-w-md">
+                    <ImageUpload label={f.label} required value={value} onChange={(url) => onChange(f.key as CopyKey, url)} onBusyChange={onBusy} error={errors[f.key]} aspect="aspect-[16/9]" />
+                  </div>
+                );
+              }
+              if (f.kind === 'textarea') {
+                return (
+                  <TextArea
+                    key={f.key}
+                    className="sm:col-span-2"
+                    label={f.label}
+                    hint={f.hint}
+                    maxLength={f.max}
+                    rows={3}
+                    value={value}
+                    onChange={(v) => onChange(f.key as CopyKey, v)}
+                    error={errors[f.key]}
+                  />
+                );
+              }
+              return (
+                <TextField
+                  key={f.key}
+                  label={f.label}
+                  hint={f.hint}
+                  maxLength={f.max}
+                  value={value}
+                  onChange={(v) => onChange(f.key as CopyKey, v)}
+                  error={errors[f.key]}
+                />
+              );
+            })}
+          </div>
+        </FormSection>
+      ))}
+    </>
   );
 }
 
@@ -123,6 +188,14 @@ export default function SiteContentPage() {
     setNotice(null);
   };
 
+  const patchCopy = (key: CopyKey, value: string) => patch({ [key]: value } as Partial<SiteContent>);
+
+  const patchStat = (i: number, p: Partial<SiteStat>) => {
+    setContent((c) => (c ? { ...c, heroStats: c.heroStats.map((x, j) => (j === i ? { ...x, ...p } : x)) } : c));
+    clearErrors(Object.keys(p).map((k) => `heroStats.${i}.${k}`));
+    setNotice(null);
+  };
+
   const trackUpload = (busy: boolean) => setUploads((n) => Math.max(0, n + (busy ? 1 : -1)));
 
   // Which tab holds the first error, so a failed save shows it.
@@ -130,6 +203,12 @@ export default function SiteContentPage() {
     const keys = Object.keys(errors);
     if (!keys.length) return null;
     if (keys.some((k) => k.startsWith('items.'))) return 'disciplines';
+    const tabOfKey = (k: string): Tab | null => {
+      const g = (COPY_GROUPS as readonly CopyGroup[]).find((grp) => grp.fields.some((f) => f.key === k));
+      return g ? (g.tab as Tab) : null;
+    };
+    const copyTab = keys.map(tabOfKey).find(Boolean);
+    if (copyTab) return copyTab;
     if (keys.some((k) => k.startsWith('about') || k.startsWith('pillars'))) return 'about';
     return 'home';
   }, [errors]);
@@ -190,10 +269,10 @@ export default function SiteContentPage() {
     <div className="space-y-6">
       <PageHeader
         title="Site content"
-        description="Words and images on the public homepage and About page."
+        description="All the words and pictures on the public pages. Pick a tab, change what you need, then Save."
         action={
           <a
-            href={tab === 'about' ? '/about' : '/'}
+            href={tab === 'about' ? '/about' : tab === 'pages' ? '/projects' : '/'}
             target="_blank"
             rel="noopener"
             className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-skyblue"
@@ -269,9 +348,27 @@ export default function SiteContentPage() {
               </div>
               <TextArea label="Intro" maxLength={400} rows={3} value={content.teamIntro} onChange={(v) => patch({ teamIntro: v })} error={e.teamIntro} />
             </FormSection>
+            <FormSection title="Key facts under the hero" description="Big numbers or words with a caption. Type {projects} to show the live number of projects.">
+              <div className="space-y-3">
+                {content.heroStats.map((st, i) => (
+                  <div key={i} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1.4fr_auto] sm:items-end">
+                    <TextField label="Number or word" maxLength={30} value={st.value} onChange={(v) => patchStat(i, { value: v })} error={e[`heroStats.${i}.value`]} />
+                    <TextField label="Caption" maxLength={60} value={st.label} onChange={(v) => patchStat(i, { label: v })} error={e[`heroStats.${i}.label`]} />
+                    <IconButton label={`Remove fact ${i + 1}`} tone="danger" className="self-end sm:mb-0.5" onClick={() => patch({ heroStats: content.heroStats.filter((_, j) => j !== i) })}>
+                      <Trash2 className="w-4 h-4" />
+                    </IconButton>
+                  </div>
+                ))}
+                {e.heroStats && <p className="text-xs text-red-300">{e.heroStats}</p>}
+                <Button variant="secondary" size="sm" disabled={content.heroStats.length >= 4} onClick={() => patch({ heroStats: [...content.heroStats, { value: '', label: '' }] })}>
+                  <Plus className="w-4 h-4" aria-hidden="true" /> Add a fact
+                </Button>
+              </div>
+            </FormSection>
+            <CopyGroupsView tab="home" content={content} errors={e} onChange={patchCopy} onBusy={trackUpload} />
           </Card>
           <div className="xl:sticky xl:top-24 self-start space-y-2">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">Preview</div>
+            <div className="font-mono text-xs uppercase tracking-widest text-white/56">Preview</div>
             <HeroPreview c={content} />
           </div>
         </div>
@@ -290,8 +387,8 @@ export default function SiteContentPage() {
           <Card className="p-5 sm:p-6 space-y-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="font-mono text-[11px] uppercase tracking-widest text-skyblue">Design pillars ({content.pillars.length}/8)</h3>
-                <p className="text-xs text-white/45 mt-1">The &ldquo;What sets us apart&rdquo; cards on the About page.</p>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-skyblue">Design pillars ({content.pillars.length}/8)</h3>
+                <p className="text-xs text-white/60 mt-1">The &ldquo;What sets us apart&rdquo; cards on the About page.</p>
               </div>
               <Button
                 variant="secondary"
@@ -307,7 +404,7 @@ export default function SiteContentPage() {
               {content.pillars.map((p, i) => (
                 <li key={i} className="rounded-md border border-white/10 bg-black/20 p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="font-mono text-[11px] text-white/45">Pillar {i + 1}</span>
+                    <span className="font-mono text-xs text-white/60">Pillar {i + 1}</span>
                     <div className="flex items-center">
                       <IconButton label={`Move pillar ${i + 1} up`} disabled={i === 0} onClick={() => patch({ pillars: move(content.pillars, i, i - 1) })}>
                         <ArrowUp className="w-4 h-4" />
@@ -355,6 +452,25 @@ export default function SiteContentPage() {
               ))}
             </ol>
           </Card>
+          <Card className="p-5 sm:p-6 space-y-8">
+            <CopyGroupsView tab="about" content={content} errors={e} onChange={patchCopy} onBusy={trackUpload} />
+          </Card>
+        </div>
+      )}
+
+      {tab === 'pages' && (
+        <div role="tabpanel" id="panel-pages" aria-labelledby="tab-pages">
+          <Card className="p-5 sm:p-6 space-y-8">
+            <CopyGroupsView tab="pages" content={content} errors={e} onChange={patchCopy} onBusy={trackUpload} />
+          </Card>
+        </div>
+      )}
+
+      {tab === 'footer' && (
+        <div role="tabpanel" id="panel-footer" aria-labelledby="tab-footer">
+          <Card className="p-5 sm:p-6 space-y-8">
+            <CopyGroupsView tab="footer" content={content} errors={e} onChange={patchCopy} onBusy={trackUpload} />
+          </Card>
         </div>
       )}
 
@@ -363,8 +479,8 @@ export default function SiteContentPage() {
           <Card className="p-5 sm:p-6 space-y-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="font-mono text-[11px] uppercase tracking-widest text-skyblue">Disciplines ({disciplines.length})</h3>
-                <p className="text-xs text-white/45 mt-1">Services shown on the homepage and About page, in this order.</p>
+                <h3 className="font-mono text-xs uppercase tracking-widest text-skyblue">Disciplines ({disciplines.length})</h3>
+                <p className="text-xs text-white/60 mt-1">Services shown on the homepage and About page, in this order.</p>
               </div>
               <Button
                 variant="secondary"
@@ -379,7 +495,7 @@ export default function SiteContentPage() {
               {disciplines.map((d, i) => (
                 <li key={d.id ?? `new-${i}`} className="rounded-md border border-white/10 bg-black/20 p-4">
                   <div className="flex items-center justify-between mb-3 gap-3">
-                    <span className="text-sm text-white truncate">{d.title || <span className="text-white/40">Untitled discipline</span>}</span>
+                    <span className="text-sm text-white truncate">{d.title || <span className="text-white/56">Untitled discipline</span>}</span>
                     <div className="flex items-center shrink-0">
                       <IconButton label={`Move ${d.title || 'discipline'} up`} disabled={i === 0} onClick={() => setDisciplines((l) => move(l, i, i - 1))}>
                         <ArrowUp className="w-4 h-4" />

@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
             <div className="font-display font-semibold text-lg text-white">
               CVI STUDIO CMS
             </div>
-            <div className="font-mono text-[10px] text-white/50 tracking-widest uppercase">
+            <div className="font-mono text-xs text-white/50 tracking-widest uppercase">
               Authenticated Session Guard
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Security Notice */}
-        <div className="mt-8 pt-6 border-t border-white/10 flex items-start gap-2.5 text-[11px] font-mono text-white/40">
+        <div className="mt-8 pt-6 border-t border-white/10 flex items-start gap-2.5 text-xs font-mono text-white/56">
           <ShieldCheck className="w-4 h-4 text-skyblue flex-shrink-0 mt-0.5" />
           <span>
             Studio administrative console. Authorized personnel only. Contact system administrator for credentials.

@@ -1,11 +1,80 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ProjectRecord, DisciplineRecord, GlobalSettings, SiteContent, TeamMemberRecord } from '@/lib/db/types';
-import { ArrowUpRight, ArrowDown, ChevronRight, Rotate3d, Compass } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, ChevronRight } from 'lucide-react';
 import Card3DTilt from '@/components/ui/Card3DTilt';
+import { fillCount } from '@/lib/content/copy';
+
+/** Featured work in an arched frame, slowly cross-fading between projects. */
+function HeroShowcase({ projects }: { projects: ProjectRecord[] }) {
+  const shown = projects.filter((p) => p.thumbnail_url || p.hero_image_url).slice(0, 5);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (shown.length < 2) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden) setIndex((i) => (i + 1) % shown.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [shown.length]);
+
+  if (!shown.length) return null;
+  const current = shown[index % shown.length];
+
+  return (
+    <div className="mx-auto w-full max-w-[22rem] lg:ml-auto lg:mr-0">
+      <div className="relative">
+        {/* Offset hairline arch behind the frame */}
+        <div aria-hidden="true" className="arch-frame absolute -right-4 -top-4 h-full w-full border border-skyblue/40 sm:-right-6 sm:-top-6" />
+        <Link
+          href={`/projects/${current.slug}`}
+          data-cursor="view"
+          aria-label={`View ${current.title}`}
+          className="arch-frame relative block aspect-[3/3.7] w-full bg-neutral-900 shadow-2xl"
+        >
+          {shown.map((p, i) => (
+            <Image
+              key={p.id}
+              src={(p.thumbnail_url || p.hero_image_url) as string}
+              alt={i === index ? p.title : ''}
+              fill
+              priority={i === 0}
+              sizes="(max-width: 1024px) 90vw, 32vw"
+              className={`object-cover transition-opacity duration-[1600ms] ease-in-out ${i === index ? 'opacity-100' : 'opacity-0'}`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        </Link>
+      </div>
+
+      <div className="mt-7 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-skyblue">Now showing</div>
+          <div className="truncate font-display text-2xl font-medium text-white">{current.title}</div>
+          <div className="text-sm text-white/70">
+            {current.location} · {current.year}
+          </div>
+        </div>
+        <div className="flex items-center gap-2" role="group" aria-label="Choose featured project">
+          {shown.map((p, i) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Show ${p.title}`}
+              aria-current={i === index}
+              className={`h-1.5 cursor-pointer rounded-full transition-all ${i === index ? 'w-8 bg-skyblue' : 'w-3 bg-white/35 hover:bg-white/60'}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface HomeClientProps {
   featuredProjects: ProjectRecord[];
@@ -31,68 +100,59 @@ export function HomeClient({
       {/* ========================================================================= */}
       {/* 01 — HERO EXPERIENCE                                                      */}
       {/* ========================================================================= */}
-      <section className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-between px-6 sm:px-12 pt-32 pb-12 max-w-[1800px] mx-auto w-full">
-        {/* Top CAD Meta Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono text-xs text-white/50 border-b border-white/10 pb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-skyblue">[ CVI ATELIER ]</span>
-            <span>BAGHDAD • 33°17&apos;25.9&quot;N 44°23&apos;32.6&quot;E</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <span>DISCIPLINES: ARCHITECTURE • BIM • URBANISM</span>
-            <span className="hidden md:inline-block">2026 ARCHIVE</span>
-          </div>
-        </div>
+      <section className="relative mx-auto flex min-h-[100svh] w-full max-w-[112.5rem] flex-col justify-between px-6 pb-10 pt-32 sm:px-12">
+        <div className="grid flex-1 grid-cols-1 items-center gap-14 py-10 lg:grid-cols-12 lg:gap-10">
+          {/* Statement */}
+          <div className="lg:col-span-7">
+            <div className="rise eyebrow mb-8" style={{ ['--d' as string]: '60ms' }}>
+              <span>{content.heroEyebrow || 'CVI Architects · Baghdad'}</span>
+            </div>
 
-        {/* Hero Central Statement */}
-        <div className="my-auto py-12 max-w-5xl">
-          <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-6 flex items-center gap-3">
-            <span className="w-8 h-[1px] bg-skyblue" />
-            <span>{content.heroEyebrow}</span>
-          </div>
+            <h1 className="rise hero-title mb-8 text-white" style={{ ['--d' as string]: '180ms' }}>
+              {content.heroTitle}{' '}
+              {content.heroTitleMuted && <span className="display-italic block sm:inline">{content.heroTitleMuted}</span>}
+            </h1>
 
-          <h1 className="hero-title font-display text-white mb-8 tracking-tight">
-            {content.heroTitle}{' '}
-            {content.heroTitleMuted && <span className="text-white/40 block sm:inline">{content.heroTitleMuted}</span>}
-          </h1>
+            <p className="rise editorial-body mb-11 max-w-2xl" style={{ ['--d' as string]: '320ms' }}>
+              {content.heroBody}
+            </p>
 
-          <p className="editorial-body text-white/80 max-w-2xl font-light leading-relaxed mb-10">
-            {content.heroBody}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 font-mono text-xs">
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-semibold hover:bg-skyblue hover:text-white transition-colors"
-            >
-              <span>EXPLORE PORTFOLIO</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </Link>
-
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white transition-colors"
-            >
-              <span>ATELIER STORY</span>
-            </Link>
-
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-skyblue/30 bg-skyblue/5 text-skyblue text-[11px]">
-              <Rotate3d className="w-3.5 h-3.5 animate-spin-slow" />
-              <span>REAL 3D CITY · AL-JADRIYA, BAGHDAD</span>
+            <div className="rise flex flex-wrap items-center gap-4" style={{ ['--d' as string]: '460ms' }}>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-black transition-colors hover:bg-skyblue"
+              >
+                <span>{content.heroPrimaryCta}</span>
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center gap-3 rounded-full border border-white/30 px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-white hover:bg-white/5"
+              >
+                <span>{content.heroSecondaryCta}</span>
+              </Link>
             </div>
           </div>
+
+          {/* Featured work, framed in an arch */}
+          <div className="rise lg:col-span-5" style={{ ['--d' as string]: '300ms' }}>
+            <HeroShowcase projects={featuredProjects} />
+          </div>
         </div>
 
-        {/* Bottom Hero HUD */}
-        <div className="flex justify-between items-end border-t border-white/10 pt-6 font-mono text-xs text-white/50">
-          <div className="flex items-center gap-2">
-            <ArrowDown className="w-3.5 h-3.5 animate-bounce text-skyblue" />
-            <span className="tracking-widest uppercase">SCROLL FOR MASTERWORKS</span>
-          </div>
-
-          <div className="hidden sm:flex gap-8 text-[11px]">
-            <div>SCALE: 500,000+ M² MASTERPLANNED</div>
-            <div>STATUS: ATELIER ACTIVE</div>
+        {/* Facts */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-6 border-t border-white/15 pt-7 sm:grid-cols-4">
+          {content.heroStats.map((st, i) => (
+            <div key={i}>
+              <div className="font-display text-4xl font-medium leading-none text-white sm:text-5xl">{fillCount(st.value, allProjects.length)}</div>
+              <div className="mt-2 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">{fillCount(st.label, allProjects.length)}</div>
+            </div>
+          ))}
+          <div className="flex items-end">
+            <span className="inline-flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">
+              <ArrowDown className="h-4 w-4 animate-bounce text-skyblue" aria-hidden="true" />
+              {content.heroScrollCue}
+            </span>
           </div>
         </div>
       </section>
@@ -100,18 +160,18 @@ export function HomeClient({
       {/* ========================================================================= */}
       {/* 02 — FLAGSHIP MASTERWORKS (SELECTED PROJECTS)                              */}
       {/* ========================================================================= */}
-      <section className="w-full py-24 sm:py-36 max-w-[1800px] mx-auto px-6 sm:px-12">
+      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-white/10 pb-8">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-              01 • SELECTED MASTERWORKS
+              {content.featuredEyebrow}
             </div>
             <h2 className="section-title font-display text-white">
-              Flagship Interventions
+              {content.featuredTitle}
             </h2>
           </div>
-          <p className="font-mono text-xs text-white/40 max-w-xs text-left sm:text-right">
-            Curated architectural case studies with high-density visual narratives.
+          <p className="font-mono text-xs text-white/62 max-w-xs text-left sm:text-right">
+            {content.featuredIntro}
           </p>
         </div>
 
@@ -137,7 +197,7 @@ export function HomeClient({
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
                       
                       {/* Floating Micro Tag */}
-                      <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 font-mono text-[10px] tracking-widest text-white/90">
+                      <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 font-mono text-xs tracking-widest text-white/90">
                         #{String(idx + 1).padStart(2, '0')} • {p.typology || 'Masterplan'}
                       </div>
                     </Link>
@@ -161,18 +221,18 @@ export function HomeClient({
                   </Link>
                 </h3>
 
-                <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed mb-6">
+                <p className="text-white/82 text-sm sm:text-base font-normal leading-relaxed mb-6">
                   {p.summary || p.description}
                 </p>
 
                 {/* Technical Metric Row */}
                 <div className="grid grid-cols-2 gap-4 py-4 border-t border-b border-white/10 font-mono text-xs mb-8">
                   <div>
-                    <span className="text-white/40 block text-[10px] uppercase mb-0.5">BUILT SCALE</span>
+                    <span className="text-white/62 block text-xs uppercase mb-0.5">{content.cardScaleLabel}</span>
                     <span className="text-white font-medium">{p.size || 'Confidential'}</span>
                   </div>
                   <div>
-                    <span className="text-white/40 block text-[10px] uppercase mb-0.5">STATUS PHASE</span>
+                    <span className="text-white/62 block text-xs uppercase mb-0.5">{content.cardPhaseLabel}</span>
                     <span className="text-white font-medium">{p.status || 'Active'}</span>
                   </div>
                 </div>
@@ -181,7 +241,7 @@ export function HomeClient({
                   href={`/projects/${p.slug}`}
                   className="inline-flex items-center gap-3 font-mono text-xs text-white tracking-widest group-hover:text-skyblue transition-colors"
                 >
-                  <span>ENTER CASE STUDY</span>
+                  <span>{content.cardCta}</span>
                   <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </Link>
               </div>
@@ -194,16 +254,16 @@ export function HomeClient({
       {/* 03 — STUDIO MANIFESTO                                                     */}
       {/* ========================================================================= */}
       <section className="w-full py-24 sm:py-36 bg-[#060608] border-t border-b border-white/10">
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-12 text-center">
+        <div className="max-w-[87.5rem] mx-auto px-6 sm:px-12 text-center">
           <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-6">
-            ATELIER THESIS & COMMITMENT
+            {content.manifestoEyebrow}
           </div>
 
           <blockquote className="section-title font-display text-white font-medium leading-tight max-w-4xl mx-auto mb-10">
             &ldquo;{content.manifestoQuote}&rdquo;
           </blockquote>
 
-          <div className="font-mono text-xs tracking-widest text-white/50 uppercase">
+          <div className="font-mono text-xs tracking-widest text-white/70 uppercase">
             {content.manifestoAttribution}
           </div>
         </div>
@@ -212,18 +272,18 @@ export function HomeClient({
       {/* ========================================================================= */}
       {/* 04 — INTEGRATED DISCIPLINES                                               */}
       {/* ========================================================================= */}
-      <section className="w-full py-24 sm:py-36 max-w-[1800px] mx-auto px-6 sm:px-12">
+      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-white/10 pb-8">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-              02 • CORE DISCIPLINES
+              {content.servicesEyebrow}
             </div>
             <h2 className="section-title font-display text-white">
-              Spatial Engineering
+              {content.servicesTitle}
             </h2>
           </div>
-          <p className="font-mono text-xs text-white/40 max-w-xs text-left sm:text-right">
-            Full-spectrum architectural delivery from schematic inception to structural coordination.
+          <p className="font-mono text-xs text-white/62 max-w-xs text-left sm:text-right">
+            {content.servicesIntro}
           </p>
         </div>
 
@@ -243,13 +303,13 @@ export function HomeClient({
                     sizes="(max-width: 768px) 100vw, 25vw"
                   />
                 </div>
-                <span className="font-mono text-[10px] text-skyblue tracking-widest block mb-2">
+                <span className="font-mono text-xs text-skyblue tracking-widest block mb-2">
                   0{i + 1}
                 </span>
                 <h3 className="card-title font-display text-white mb-2 group-hover:text-skyblue transition-colors">
                   {d.title}
                 </h3>
-                <p className="text-white/60 text-xs font-light leading-relaxed">
+                <p className="text-white/76 text-xs font-normal leading-relaxed">
                   {d.description}
                 </p>
               </div>
@@ -262,7 +322,7 @@ export function HomeClient({
       {/* 04b — STUDIO TEAM                                                         */}
       {/* ========================================================================= */}
       {team.length > 0 && (
-        <section className="w-full py-24 sm:py-36 max-w-[1800px] mx-auto px-6 sm:px-12 border-t border-white/10" aria-labelledby="home-team-title">
+        <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10" aria-labelledby="home-team-title">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
             <div>
               <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
@@ -273,7 +333,7 @@ export function HomeClient({
               </h2>
             </div>
             {content.teamIntro && (
-              <p className="font-mono text-xs text-white/50 max-w-sm text-left sm:text-right leading-relaxed">{content.teamIntro}</p>
+              <p className="font-mono text-xs text-white/70 max-w-sm text-left sm:text-right leading-relaxed">{content.teamIntro}</p>
             )}
           </div>
 
@@ -291,15 +351,15 @@ export function HomeClient({
                 </div>
                 <h3 className="text-xl font-display font-semibold text-white">{m.name}</h3>
                 <div className="font-mono text-xs text-skyblue mt-1 tracking-wider">{m.role}</div>
-                {m.department && <div className="font-mono text-[11px] text-white/40 mt-0.5">{m.department}</div>}
-                {m.bio && <p className="text-white/60 text-sm font-light leading-relaxed mt-3 line-clamp-4">{m.bio}</p>}
+                {m.department && <div className="font-mono text-[13px] text-white/62 mt-0.5">{m.department}</div>}
+                {m.bio && <p className="text-white/76 text-sm font-normal leading-relaxed mt-3 line-clamp-4">{m.bio}</p>}
               </li>
             ))}
           </ul>
 
           <div className="mt-12">
-            <Link href="/about" className="inline-flex items-center gap-2 font-mono text-xs text-white/70 hover:text-skyblue transition-colors">
-              <span>MORE ABOUT THE STUDIO</span>
+            <Link href="/about" className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-skyblue transition-colors">
+              <span>More about us</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
@@ -309,21 +369,21 @@ export function HomeClient({
       {/* ========================================================================= */}
       {/* 05 — ARCHITECTURAL ARCHIVE (MORE WORKS)                                   */}
       {/* ========================================================================= */}
-      <section className="w-full py-24 sm:py-36 max-w-[1800px] mx-auto px-6 sm:px-12 border-t border-white/10">
+      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-white/10">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
-              04 • ARCHIVAL REPOSITORY
+              {content.archiveEyebrow}
             </div>
             <h2 className="section-title font-display text-white">
-              Further Interventions
+              {content.archiveTitle}
             </h2>
           </div>
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 font-mono text-xs text-white/70 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-white transition-colors"
           >
-            <span>VIEW ALL {allProjects.length} WORKS</span>
+            <span>{fillCount(content.archiveLink, allProjects.length)}</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -345,71 +405,17 @@ export function HomeClient({
                 </span>
               </div>
 
-              <div className="flex items-center gap-8 font-mono text-xs text-white/50">
-                <span className="hidden sm:inline-block w-40 truncate">{p.typology || 'Architecture'}</span>
-                <span className="w-32">{p.location || 'Iraq'}</span>
-                <span className="w-16">{p.year || '2025'}</span>
-                <ArrowUpRight className="w-4 h-4 text-white/30 group-hover:text-skyblue transition-colors" />
+              <div className="flex min-w-0 items-center gap-4 text-xs text-white/70 lg:gap-8">
+                <span className="hidden w-40 truncate lg:inline-block">{p.typology || 'Architecture'}</span>
+                <span className="w-32 truncate">{p.location || 'Iraq'}</span>
+                <span className="w-12 shrink-0 lg:w-16">{p.year || '2025'}</span>
+                <ArrowUpRight className="w-4 h-4 text-white/55 group-hover:text-skyblue transition-colors" />
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 06 — ARCHITECTURAL DRAFTING FOOTER                                        */}
-      {/* ========================================================================= */}
-      <footer className="w-full border-t border-white/15 pt-20 pb-12 bg-[#060608] max-w-[1800px] mx-auto px-6 sm:px-12 font-mono text-xs">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="md:col-span-2">
-            {/* SVG Logo Mark */}
-            <div className="w-44 mb-6">
-              <svg viewBox="0 0 248.16 74.16" className="w-full h-auto text-white" fill="currentColor">
-                <use href="/cvi-arch-logo.svg#cvi-arch-logo" />
-              </svg>
-            </div>
-            <p className="text-white/60 text-sm font-sans font-light max-w-sm mb-6 leading-relaxed">
-              International architectural, computational, and structural practice headquartered in Baghdad, Iraq.
-            </p>
-            <div className="text-[11px] text-white/40 tracking-wider">
-              CAD COORDINATE: 248.16 × 74.16 MM • 33°17&apos;25.9&quot;N 44°23&apos;32.6&quot;E
-            </div>
-          </div>
-
-          <div>
-            <div className="text-white/40 uppercase mb-4 tracking-widest">NAVIGATION</div>
-            <ul className="flex flex-col gap-2.5 text-white/80">
-              <li><Link href="/" className="hover:text-skyblue transition-colors">Index Overview</Link></li>
-              <li><Link href="/projects" className="hover:text-skyblue transition-colors">Architecture Archive</Link></li>
-              <li><Link href="/about" className="hover:text-skyblue transition-colors">Studio Philosophy</Link></li>
-              <li><Link href="/contact" className="hover:text-skyblue transition-colors">Direct Dialogue</Link></li>
-              <li><Link href="/admin" className="hover:text-skyblue transition-colors">Studio CMS Studio</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <div className="text-white/40 uppercase mb-4 tracking-widest">BAGHDAD ATELIER</div>
-            <p className="text-white/70 mb-4 leading-relaxed font-sans text-xs">
-              Al-Wuzara Street (Ministers St)<br />
-              Al-Jadriya, Baghdad, Iraq
-            </p>
-            <div className="flex flex-col gap-1 text-white/80">
-              <a href={`tel:${settings.phone}`} className="hover:text-skyblue transition-colors">{settings.phone}</a>
-              <a href={`mailto:${settings.email}`} className="hover:text-skyblue transition-colors">{settings.email}</a>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-white/40 text-[11px]">
-          <div>{settings.copyrightText}</div>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="hover:text-white transition-colors cursor-pointer"
-          >
-            BACK TO ELEVATION TOP ↑
-          </button>
-        </div>
-      </footer>
     </div>
   );
 }

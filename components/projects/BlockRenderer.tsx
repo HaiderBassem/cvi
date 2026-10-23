@@ -24,12 +24,12 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
             return (
               <section key={block.id} className="max-w-4xl mx-auto px-6 py-8 sm:py-12 w-full">
                 {content.leadParagraph && (
-                  <p className="editorial-body text-white/90 leading-relaxed font-light mb-6">
+                  <p className="editorial-body text-white/90 leading-relaxed font-normal mb-6">
                     {content.leadParagraph}
                   </p>
                 )}
                 {content.body && (
-                  <div className="text-base text-white/70 leading-relaxed font-normal whitespace-pre-line">
+                  <div className="text-base text-white/82 leading-relaxed font-normal whitespace-pre-line">
                     {content.body}
                   </div>
                 )}
@@ -48,7 +48,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                   {content.title || content.heading}
                 </h3>
                 {content.subtitle && (
-                  <p className="text-white/60 text-lg font-light mt-2 max-w-2xl">
+                  <p className="text-white/76 text-lg font-normal mt-2 max-w-2xl">
                     {content.subtitle}
                   </p>
                 )}
@@ -69,7 +69,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                   />
                 </div>
                 {content.caption && (
-                  <div className="max-w-6xl mx-auto px-6 mt-3 text-right font-mono text-[11px] text-white/40 tracking-wider">
+                  <div className="max-w-6xl mx-auto px-6 mt-3 text-right font-mono text-[13px] text-white/62 tracking-wider">
                     {content.caption}
                   </div>
                 )}
@@ -89,7 +89,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                   />
                 </div>
                 {content.caption && (
-                  <div className="mt-2 text-left font-mono text-[11px] text-white/50 tracking-wider">
+                  <div className="mt-2 text-left font-mono text-[13px] text-white/70 tracking-wider">
                     {content.caption}
                   </div>
                 )}
@@ -106,7 +106,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         {content.heading}
                       </h4>
                     )}
-                    <p className="text-white/70 text-base leading-relaxed whitespace-pre-line font-light">
+                    <p className="text-white/82 text-base leading-relaxed whitespace-pre-line font-normal">
                       {content.text}
                     </p>
                   </div>
@@ -131,7 +131,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
             return (
               <section key={block.id} className="max-w-7xl mx-auto px-6 my-16 w-full">
                 {content.title && (
-                  <div className="font-mono text-xs text-white/50 uppercase tracking-widest mb-8 border-b border-white/10 pb-4">
+                  <div className="font-mono text-xs text-white/70 uppercase tracking-widest mb-8 border-b border-white/10 pb-4">
                     {content.title}
                   </div>
                 )}
@@ -148,7 +148,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         />
                       </div>
                       {img.caption && (
-                        <p className="text-[11px] font-mono text-white/50 line-clamp-2">
+                        <p className="text-[13px] font-mono text-white/70 line-clamp-2">
                           {img.caption}
                         </p>
                       )}
@@ -183,7 +183,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 p-8 border border-white/10 bg-white/[0.02] backdrop-blur-sm">
                   {(content.items || []).map((item: any, i: number) => (
                     <div key={i} className="flex flex-col">
-                      <span className="font-mono text-xs tracking-widest text-white/50 uppercase mb-2">
+                      <span className="font-mono text-xs tracking-widest text-white/70 uppercase mb-2">
                         {item.label}
                       </span>
                       <span className="font-display text-2xl sm:text-3xl font-semibold text-white">
@@ -237,7 +237,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                   />
                 </div>
                 {content.caption && (
-                  <div className="mt-2 font-mono text-[11px] text-white/40 tracking-wider">
+                  <div className="mt-2 font-mono text-[13px] text-white/62 tracking-wider">
                     {content.caption}
                   </div>
                 )}

@@ -9,13 +9,15 @@
     "lint": "next lint",
     "test": "vitest run",
     "db:seed": "node scripts/seed.mjs",
-    "geo:setup": "python3 -m venv .geo-venv && .geo-venv/bin/pip install -r scripts/geo/requirements.txt",
-    "geo:build": ".geo-venv/bin/python scripts/geo/build_city_context.py"
+    "models:build": "node --max-old-space-size=12288 scripts/models/convert-fbx.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
     "@studio-freight/lenis": "^1.0.42",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
@@ -23,6 +25,7 @@
     "jose": "^6.0.8",
     "lenis": "^1.1.20",
     "lucide-react": "^0.475.0",
+    "meshoptimizer": "^1.3.0",
     "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

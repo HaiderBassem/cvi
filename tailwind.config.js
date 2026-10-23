@@ -34,8 +34,14 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
-        display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
+        // Labels used to be tiny monospace; they now use the readable sans (the class name is kept
+        // so existing markup, including the admin, picks it up).
+        mono: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        // Nothing on the public site should be smaller than 13px.
+        xs: ['0.8125rem', { lineHeight: '1.3rem' }],
       },
       letterSpacing: {
         widest: '0.2em',

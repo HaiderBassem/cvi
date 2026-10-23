@@ -79,7 +79,7 @@ function MemberRow({
         {...attributes}
         {...listeners}
         aria-label={`Reorder ${member.name}. Press space, then use the arrow keys.`}
-        className="p-1.5 rounded text-white/35 hover:text-white cursor-grab active:cursor-grabbing touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-skyblue"
+        className="p-1.5 rounded text-white/52 hover:text-white cursor-grab active:cursor-grabbing touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-skyblue"
       >
         <GripVertical className="w-4 h-4" aria-hidden="true" />
       </button>
@@ -89,8 +89,8 @@ function MemberRow({
       </div>
 
       <button type="button" onClick={onEdit} className="flex-1 min-w-0 text-left cursor-pointer group">
-        <span className={cx('block text-sm font-medium truncate group-hover:text-skyblue', hidden ? 'text-white/45' : 'text-white')}>{member.name}</span>
-        <span className="block text-xs text-white/45 truncate">
+        <span className={cx('block text-sm font-medium truncate group-hover:text-skyblue', hidden ? 'text-white/60' : 'text-white')}>{member.name}</span>
+        <span className="block text-xs text-white/60 truncate">
           {member.role}
           {member.department ? ` · ${member.department}` : ''}
         </span>

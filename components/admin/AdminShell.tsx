@@ -69,7 +69,7 @@ export function AdminShell({
       {NAV_GROUPS.map((group, gi) => (
         <div key={gi}>
           {group.label && (
-            <div className="px-3 mb-1.5 font-mono text-[10px] uppercase tracking-widest text-white/35">{group.label}</div>
+            <div className="px-3 mb-1.5 font-mono text-xs uppercase tracking-widest text-white/52">{group.label}</div>
           )}
           <ul className="space-y-0.5">
             {group.items.map((item) => {
@@ -87,10 +87,10 @@ export function AdminShell({
                     )}
                   >
                     {active && <span aria-hidden="true" className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-skyblue" />}
-                    <Icon className={cx('w-4 h-4 shrink-0', active ? 'text-skyblue' : 'text-white/45')} />
+                    <Icon className={cx('w-4 h-4 shrink-0', active ? 'text-skyblue' : 'text-white/60')} />
                     <span className="flex-1 truncate">{item.label}</span>
                     {item.icon === 'messages' && unread > 0 && (
-                      <span className="min-w-5 h-5 px-1.5 rounded-full bg-skyblue text-black text-[11px] font-semibold flex items-center justify-center tabular-nums">
+                      <span className="min-w-5 h-5 px-1.5 rounded-full bg-skyblue text-black text-xs font-semibold flex items-center justify-center tabular-nums">
                         <span className="sr-only">{unread} unread</span>
                         <span aria-hidden="true">{unread > 99 ? '99+' : unread}</span>
                       </span>
@@ -109,7 +109,7 @@ export function AdminShell({
     <div className="h-16 px-5 flex items-center justify-between border-b border-white/10">
       <Link href="/admin" className="min-w-0">
         <div className="font-display font-bold text-sm text-white tracking-wider">CVI STUDIO</div>
-        <div className="font-mono text-[9px] text-skyblue tracking-widest uppercase">Content manager</div>
+        <div className="font-mono text-xs text-skyblue tracking-widest uppercase">Content manager</div>
       </Link>
     </div>
   );
@@ -118,7 +118,7 @@ export function AdminShell({
     <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between gap-2">
       <div className="min-w-0">
         <div className="text-sm text-white truncate">{name}</div>
-        <div className="font-mono text-[10px] text-white/40 uppercase">{role}</div>
+        <div className="font-mono text-xs text-white/56 uppercase">{role}</div>
       </div>
       <AdminLogoutButton />
     </div>
@@ -170,13 +170,13 @@ export function AdminShell({
                   const last = i === crumbs.length - 1;
                   return (
                     <li key={i} className="flex items-center gap-1.5 min-w-0">
-                      {i > 0 && <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-white/25 shrink-0" />}
+                      {i > 0 && <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-white/45 shrink-0" />}
                       {c.to ? (
                         <Link href={c.to} className="text-white/50 hover:text-white truncate">
                           {c.label}
                         </Link>
                       ) : (
-                        <span className={cx('truncate', last ? 'text-white font-medium' : 'text-white/40')} aria-current={last ? 'page' : undefined}>
+                        <span className={cx('truncate', last ? 'text-white font-medium' : 'text-white/56')} aria-current={last ? 'page' : undefined}>
                           {c.label}
                         </span>
                       )}

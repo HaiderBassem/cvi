@@ -72,7 +72,7 @@ export default function ArchitecturalPlanViewer({
       {/* Header Bar */}
       <div className="flex flex-wrap items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02] gap-4">
         <div>
-          <div className="font-mono text-[10px] text-skyblue uppercase tracking-widest mb-1 flex items-center gap-2">
+          <div className="font-mono text-xs text-skyblue uppercase tracking-widest mb-1 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-skyblue animate-pulse" />
             <span>{subtitle}</span>
           </div>
@@ -82,22 +82,22 @@ export default function ArchitecturalPlanViewer({
         </div>
 
         {/* Verified Technical Facts (Real Data Only) */}
-        <div className="flex items-center gap-6 font-mono text-[11px] text-white/60">
+        <div className="flex items-center gap-6 font-mono text-[13px] text-white/76">
           {verifiedArea && (
             <div>
-              <span className="text-white/30 block text-[9px] uppercase">VERIFIED SCOPE</span>
+              <span className="text-white/55 block text-xs uppercase">VERIFIED SCOPE</span>
               <span className="text-white font-medium">{verifiedArea}</span>
             </div>
           )}
           {verifiedLocation && (
             <div>
-              <span className="text-white/30 block text-[9px] uppercase">TERRITORY</span>
+              <span className="text-white/55 block text-xs uppercase">TERRITORY</span>
               <span className="text-white font-medium">{verifiedLocation}</span>
             </div>
           )}
           {verifiedClient && (
             <div>
-              <span className="text-white/30 block text-[9px] uppercase">COMMISSION</span>
+              <span className="text-white/55 block text-xs uppercase">COMMISSION</span>
               <span className="text-white font-medium">{verifiedClient}</span>
             </div>
           )}
@@ -107,7 +107,7 @@ export default function ArchitecturalPlanViewer({
       {/* Drawing Tabs (if multiple drawings available) */}
       {drawings.length > 1 && (
         <div className="flex items-center gap-2 px-6 py-2.5 bg-black/40 border-b border-white/5 font-mono text-xs overflow-x-auto">
-          <span className="text-white/40 text-[10px] uppercase mr-2 flex items-center gap-1.5">
+          <span className="text-white/62 text-xs uppercase mr-2 flex items-center gap-1.5">
             <Layers className="w-3 h-3 text-skyblue" />
             <span>DRAWING:</span>
           </span>
@@ -118,15 +118,15 @@ export default function ArchitecturalPlanViewer({
                 setActiveIndex(idx);
                 resetTransform();
               }}
-              className={`px-3 py-1 rounded-xs transition-colors cursor-pointer text-[11px] whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-xs transition-colors cursor-pointer text-[13px] whitespace-nowrap flex items-center gap-1.5 ${
                 activeIndex === idx
                   ? 'bg-skyblue text-black font-semibold'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70'
+                  : 'bg-white/5 hover:bg-white/10 text-white/82'
               }`}
             >
               <span>{d.label}</span>
               {d.type && (
-                <span className="text-[9px] opacity-60 uppercase">[{d.type}]</span>
+                <span className="text-xs opacity-60 uppercase">[{d.type}]</span>
               )}
             </button>
           ))}
@@ -177,7 +177,7 @@ export default function ArchitecturalPlanViewer({
         </div>
 
         {/* Viewport Floating Info */}
-        <div className="absolute top-4 left-4 pointer-events-none font-mono text-[10px] text-white/50 tracking-wider bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10">
+        <div className="absolute top-4 left-4 pointer-events-none font-mono text-xs text-white/70 tracking-wider bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-sm border border-white/10">
           PAN: CLICK + DRAG · ZOOM: {(zoom * 100).toFixed(0)}%
         </div>
 
@@ -208,8 +208,8 @@ export default function ArchitecturalPlanViewer({
           <button
             onClick={() => setShowCadGrid(!showCadGrid)}
             title="Toggle CAD Grid"
-            className={`px-2 py-1 rounded-xs transition-colors cursor-pointer text-[10px] ${
-              showCadGrid ? 'bg-skyblue text-black font-semibold' : 'bg-white/5 text-white/60 hover:text-white'
+            className={`px-2 py-1 rounded-xs transition-colors cursor-pointer text-xs ${
+              showCadGrid ? 'bg-skyblue text-black font-semibold' : 'bg-white/5 text-white/76 hover:text-white'
             }`}
           >
             CAD GRID
@@ -219,11 +219,11 @@ export default function ArchitecturalPlanViewer({
 
       {/* Caption & Drawing Context */}
       {currentDrawing.caption && (
-        <div className="px-6 py-3 bg-black/60 border-t border-white/10 font-mono text-xs text-white/60 flex items-start gap-2">
-          <span className="text-skyblue font-semibold uppercase text-[10px] flex-shrink-0 mt-0.5">
+        <div className="px-6 py-3 bg-black/60 border-t border-white/10 font-mono text-xs text-white/76 flex items-start gap-2">
+          <span className="text-skyblue font-semibold uppercase text-xs flex-shrink-0 mt-0.5">
             ARCHITECTURAL NOTE:
           </span>
-          <p className="text-[11px] leading-relaxed font-light text-white/75">
+          <p className="text-[13px] leading-relaxed font-normal text-white/75">
             {currentDrawing.caption}
           </p>
         </div>

@@ -17,7 +17,7 @@ export function AdminLogoutButton() {
     <button
       onClick={handleLogout}
       title="Sign Out"
-      className="p-2 text-white/40 hover:text-red-400 transition-colors cursor-pointer"
+      className="p-2 text-white/56 hover:text-red-400 transition-colors cursor-pointer"
       aria-label="Sign Out"
     >
       <LogOut className="w-4 h-4" />

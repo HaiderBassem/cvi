@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { getAllProjects, getSettings } from '@/lib/db';
+import { getAllProjects, getSiteContent } from '@/lib/db';
 import { ProjectsDirectory } from '@/components/projects/ProjectsDirectory';
 
 export const metadata: Metadata = {
@@ -10,25 +10,25 @@ export const metadata: Metadata = {
 
 export default function ProjectsIndexPage() {
   const projects = getAllProjects();
-  const settings = getSettings();
+  const content = getSiteContent();
 
   return (
-    <div className="w-full pt-32 pb-24 px-6 sm:px-12 max-w-[1800px] mx-auto text-white">
+    <div className="w-full pt-32 pb-24 px-6 sm:px-12 max-w-[112.5rem] mx-auto text-white">
       {/* Editorial Header */}
       <header className="max-w-4xl mb-16 sm:mb-20">
         <div className="font-mono text-xs tracking-widest text-skyblue uppercase mb-4">
-          PORTFOLIO ARCHIVE • 2023 — 2026
+          {content.projectsEyebrow}
         </div>
         <h1 className="hero-title font-display text-white mb-6">
-          Architectural Works
+          {content.projectsTitle}
         </h1>
-        <p className="editorial-body text-white/70 max-w-2xl font-light">
-          A curated compendium of computational masterplanning, high-density residential towers, educational ecosystems, and tectonic spatial interventions across the Mesopotamian river basin.
+        <p className="editorial-body text-white/82 max-w-2xl font-normal">
+          {content.projectsIntro}
         </p>
       </header>
 
       {/* Interactive Directory */}
-      <ProjectsDirectory initialProjects={projects} />
+      <ProjectsDirectory initialProjects={projects} allLabel={content.projectsAllLabel} />
     </div>
   );
 }

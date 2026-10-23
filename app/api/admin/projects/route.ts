@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getAllProjects, createProject } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
     }
 
     const newProject = createProject(body);
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true, data: newProject }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to create project' }, { status: 500 });

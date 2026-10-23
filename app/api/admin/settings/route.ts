@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSettings, updateSettings } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -20,7 +21,11 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const updated = updateSettings(body);
+    // Only known settings are stored; anything else in the request is ignored.
+    const known = Object.keys(getSettings());
+    const clean = Object.fromEntries(Object.entries(body ?? {}).filter(([k]) => known.includes(k)));
+    const updated = updateSettings(clean);
+    revalidatePath('/', 'layout');
     return NextResponse.json({ success: true, data: updated });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to update settings' }, { status: 500 });

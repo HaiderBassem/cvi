@@ -189,7 +189,7 @@ function MessagesInbox() {
           ))}
         </div>
         <div className="relative sm:w-72">
-          <Search aria-hidden="true" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/35" />
+          <Search aria-hidden="true" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/52" />
           <input
             type="search"
             value={query}
@@ -252,12 +252,12 @@ function MessagesInbox() {
                               {m.name}
                               {m.status === 'new' && <span className="sr-only"> (unread)</span>}
                             </span>
-                            <time dateTime={m.created_at} className="text-[11px] text-white/40 shrink-0">
+                            <time dateTime={m.created_at} className="text-xs text-white/56 shrink-0">
                               {shortDate(m.created_at)}
                             </time>
                           </span>
                           {m.typology && <span className="block text-xs text-skyblue/80 truncate">{m.typology}</span>}
-                          <span className="block text-xs text-white/45 truncate">{m.message}</span>
+                          <span className="block text-xs text-white/60 truncate">{m.message}</span>
                         </span>
                       </button>
                     </li>
@@ -318,7 +318,7 @@ function MessagesInbox() {
                         <Copy className="w-3.5 h-3.5" aria-hidden="true" /> Copy
                       </button>
                     </div>
-                    <p className="text-xs text-white/40">
+                    <p className="text-xs text-white/56">
                       Received <time dateTime={selected.created_at}>{formatDate(selected.created_at)}</time>
                     </p>
                   </header>
@@ -327,13 +327,13 @@ function MessagesInbox() {
                     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {selected.typology && (
                         <div className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
-                          <dt className="font-mono text-[10px] uppercase tracking-widest text-white/40">Project type</dt>
+                          <dt className="font-mono text-xs uppercase tracking-widest text-white/56">Project type</dt>
                           <dd className="text-sm text-white mt-0.5">{selected.typology}</dd>
                         </div>
                       )}
                       {selected.scale && (
                         <div className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
-                          <dt className="font-mono text-[10px] uppercase tracking-widest text-white/40">Scale / budget</dt>
+                          <dt className="font-mono text-xs uppercase tracking-widest text-white/56">Scale / budget</dt>
                           <dd className="text-sm text-white mt-0.5">{selected.scale}</dd>
                         </div>
                       )}
