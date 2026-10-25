@@ -307,6 +307,19 @@ export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
             </svg>
           </div>
         </div>
+      {/* Photo credit (the hand photo is free to use with attribution) */}
+      <p className="pointer-events-none absolute bottom-5 right-6 z-30 text-[13px] text-[#6d675b] sm:right-10">
+        Hand photo by{' '}
+        <a
+          href="https://www.magnific.com/free-photo/high-angle-shot-person-drawing-white-paper-with-blue-pencil_9283552.htm"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto underline decoration-[#6d675b]/40 underline-offset-2 hover:decoration-[#6d675b]"
+        >
+          wirestock on Magnific
+        </a>
+      </p>
+
       </div>
 
       {/* The sheet melts into the dark page below */}
