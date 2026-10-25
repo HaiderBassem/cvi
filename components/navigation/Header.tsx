@@ -116,6 +116,7 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
       {/* Full-screen menu (phones and tablets) */}
       <div
         id="site-menu"
+        data-lenis-prevent
         aria-hidden={!isMenuOpen}
         className={`lg:hidden fixed inset-0 z-[8999] bg-[#08080a]/[0.98] backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between px-8 pb-10 pt-28 sm:px-16 overflow-y-auto ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'

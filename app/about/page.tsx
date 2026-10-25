@@ -33,7 +33,7 @@ export default function AboutPage() {
       </section>
 
       {/* Main Studio Atelier Image */}
-      <section className="max-w-[112.5rem] mx-auto px-4 sm:px-8 mb-24 sm:mb-36">
+      <section data-reveal className="max-w-[112.5rem] mx-auto px-4 sm:px-8 mb-24 sm:mb-36">
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 shadow-2xl">
           <Image
             src={content.aboutImage}
@@ -50,7 +50,7 @@ export default function AboutPage() {
 
       {/* Four Studio Pillars */}
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
-        <div className="border-t border-white/10 pt-12 mb-16">
+        <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
             {content.pillarsEyebrow}
           </div>
@@ -59,7 +59,7 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {pillars.map((pillar, i) => (
             <div key={i} className="flex flex-col border border-white/10 bg-white/[0.01] p-6 rounded-sm">
               <div className="relative aspect-[4/3] overflow-hidden mb-6 bg-neutral-900 rounded-sm">
@@ -83,7 +83,7 @@ export default function AboutPage() {
 
       {/* 8 Core Disciplines */}
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
-        <div className="border-t border-white/10 pt-12 mb-16">
+        <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
             {content.aboutServicesEyebrow}
           </div>
@@ -92,7 +92,7 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div data-reveal-group className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {disciplines.map((d, i) => (
             <div
               key={d.id}
@@ -126,7 +126,7 @@ export default function AboutPage() {
       {/* Leadership Team */}
       {team.length > 0 && (
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
-        <div className="border-t border-white/10 pt-12 mb-16">
+        <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
             {content.leadershipEyebrow}
           </div>
@@ -135,7 +135,7 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {team.map((member) => (
             <div key={member.id} className="flex flex-col border border-white/10 p-6 bg-white/[0.01]">
               <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-neutral-900 rounded-sm">
@@ -163,7 +163,7 @@ export default function AboutPage() {
       )}
 
       {/* Direct Contact Teaser */}
-      <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 text-center py-20 border-t border-white/10">
+      <section data-reveal className="max-w-[112.5rem] mx-auto px-6 sm:px-12 text-center py-20 border-t border-white/10">
         <h2 className="section-title font-display text-white mb-6">
           {content.aboutCtaTitle}
         </h2>

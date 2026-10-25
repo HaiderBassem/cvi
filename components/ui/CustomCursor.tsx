@@ -86,7 +86,7 @@ export function CustomCursor() {
   return (
     <div
       ref={dotRef}
-      className={`custom-cursor fixed z-[99999] pointer-events-none flex items-center justify-center transition-all duration-200 ${
+      className={`custom-cursor fixed z-[99999] pointer-events-none flex items-center justify-center transition-[width,height,background-color,border-color,opacity,box-shadow] duration-200 ${
         isExpanded
           ? 'w-20 h-20 rounded-full bg-white text-black text-[11px] font-mono tracking-widest font-semibold backdrop-blur-md shadow-2xl scale-100'
           : cursorVariant === 'pointer'

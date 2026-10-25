@@ -7,6 +7,7 @@ import { Footer } from '@/components/site/Footer';
 import { Preloader } from '@/components/ui/Preloader';
 import { CustomCursor } from '@/components/ui/CustomCursor';
 import { SmoothScroll } from '@/components/ui/SmoothScroll';
+import { RevealOnScroll } from '@/components/ui/RevealOnScroll';
 import type { SiteChromeData } from '@/lib/site/chrome';
 
 /**
@@ -22,6 +23,7 @@ export function SiteChrome({ chrome, children }: { chrome: SiteChromeData; child
   return (
     <SmoothScroll>
       <Preloader text={chrome.loader.text} />
+      <RevealOnScroll />
       <CustomCursor />
       <div className="film-grain" aria-hidden="true" />
       <Header chrome={chrome} />

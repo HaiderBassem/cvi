@@ -128,7 +128,7 @@ export function HomeClient({
       {/* Studio at a glance: intro paragraph, figures and featured work */}
       <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-24 pt-10 sm:px-12 sm:pb-32 sm:pt-16">
         <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-10">
-          <div className="lg:col-span-7">
+          <div data-reveal className="lg:col-span-7">
             <p className="editorial-body mb-14 max-w-2xl">{content.heroBody}</p>
             <div className="grid grid-cols-2 gap-x-8 gap-y-10 border-t border-white/15 pt-8">
               {content.heroStats.map((st, i) => (
@@ -139,7 +139,7 @@ export function HomeClient({
               ))}
             </div>
           </div>
-          <div className="lg:col-span-5">
+          <div data-reveal className="lg:col-span-5">
             <HeroShowcase projects={featuredProjects} />
           </div>
         </div>
@@ -149,7 +149,7 @@ export function HomeClient({
       {/* 02 — FLAGSHIP MASTERWORKS (SELECTED PROJECTS)                              */}
       {/* ========================================================================= */}
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-white/10 pb-8">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-white/10 pb-8">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
               {content.featuredEyebrow}
@@ -168,6 +168,7 @@ export function HomeClient({
           {featuredProjects.map((p, idx) => (
             <article
               key={p.id}
+              data-reveal
               className="group relative flex flex-col lg:flex-row gap-10 lg:gap-16 items-start lg:items-center"
             >
               {/* Media Portal (Left on even, Right on odd) with 3D Perspective Tilt */}
@@ -242,7 +243,7 @@ export function HomeClient({
       {/* 03 — STUDIO MANIFESTO                                                     */}
       {/* ========================================================================= */}
       <section className="w-full py-24 sm:py-36 bg-[#060608] border-t border-b border-white/10">
-        <div className="max-w-[87.5rem] mx-auto px-6 sm:px-12 text-center">
+        <div data-reveal className="max-w-[87.5rem] mx-auto px-6 sm:px-12 text-center">
           <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-6">
             {content.manifestoEyebrow}
           </div>
@@ -261,7 +262,7 @@ export function HomeClient({
       {/* 04 — INTEGRATED DISCIPLINES                                               */}
       {/* ========================================================================= */}
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-white/10 pb-8">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-white/10 pb-8">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
               {content.servicesEyebrow}
@@ -275,7 +276,7 @@ export function HomeClient({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div data-reveal-group className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {disciplines.map((d, i) => (
             <div
               key={d.id}
@@ -311,7 +312,7 @@ export function HomeClient({
       {/* ========================================================================= */}
       {team.length > 0 && (
         <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10" aria-labelledby="home-team-title">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
+          <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
             <div>
               <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
                 03 • {content.teamEyebrow}
@@ -325,7 +326,7 @@ export function HomeClient({
             )}
           </div>
 
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ul data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((m) => (
               <li key={m.id} className="group flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 mb-5">
@@ -358,7 +359,7 @@ export function HomeClient({
       {/* 05 — ARCHITECTURAL ARCHIVE (MORE WORKS)                                   */}
       {/* ========================================================================= */}
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-white/10">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-white/10">
           <div>
             <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
               {content.archiveEyebrow}
@@ -377,7 +378,7 @@ export function HomeClient({
         </div>
 
         {/* Minimalist Tabular Index */}
-        <div className="flex flex-col divide-y divide-white/10">
+        <div data-reveal className="flex flex-col divide-y divide-white/10">
           {allProjects.slice(0, 8).map((p, idx) => (
             <Link
               key={p.id}

@@ -31,7 +31,7 @@ export default function ContactPage() {
       {/* Grid: Details Left, Interactive Form Right */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
         {/* Left Column: Coordinates & Information */}
-        <div className="lg:col-span-5 flex flex-col gap-10 font-mono text-xs">
+        <div data-reveal className="lg:col-span-5 flex flex-col gap-10 font-mono text-xs">
           {/* Physical Address */}
           <div className="border border-white/10 p-8 rounded-sm bg-white/[0.01]">
             <div className="flex items-center gap-3 text-skyblue mb-3">
@@ -126,7 +126,7 @@ export default function ContactPage() {
         </div>
 
         {/* Right Column: Google Maps & Interactive Inquiry Form */}
-        <div className="lg:col-span-7 flex flex-col gap-10">
+        <div data-reveal className="lg:col-span-7 flex flex-col gap-10">
           {/* Embedded Baghdad Location Map */}
           <div className="w-full aspect-[16/9] rounded-sm overflow-hidden border border-white/10 bg-neutral-900 relative">
             <iframe
