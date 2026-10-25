@@ -1,0 +1,6 @@
+hand-pencil.png / hand-pencil-shadow.png
+
+Derived from "Taking notes with a pencil (Unsplash).jpg" on Wikimedia Commons,
+released under CC0 1.0 (public domain dedication): no attribution required.
+https://commons.wikimedia.org/wiki/File:Taking_notes_with_a_pencil_(Unsplash).jpg
+Background removed, cropped and mirrored; shadow image generated from the cut-out.

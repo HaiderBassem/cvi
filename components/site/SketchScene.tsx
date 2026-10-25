@@ -3,7 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SketchHand } from '@/components/site/SketchHand';
+import { SketchHandPhoto } from '@/components/site/SketchHandPhoto';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -109,8 +109,8 @@ const TONES: Record<Tone, { stroke: string; width: number; opacity: number }> = 
 /** Where the pencil waits before it starts and where it goes when the drawing is finished (drawing units). */
 const AWAY_START = { x: 1180, y: 760 };
 const AWAY_END = { x: 1240, y: 340 };
-/** The hand is drawn life-size next to its pencil; this keeps it from hiding the drawing. */
-const HAND_SCALE = 0.64;
+/** Extra scale for the whole hand. */
+const HAND_SCALE = 1; // the photo hand carries its own scale (see SketchHandPhoto)
 const GAP = 0.12; // pen lifted between strokes
 const HOLD = 1.3; // time left at the end for the hand to leave
 
@@ -302,7 +302,7 @@ export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
               </g>
 
               <g ref={handRef} opacity={0} pointerEvents="none">
-                <SketchHand />
+                <SketchHandPhoto />
               </g>
             </svg>
           </div>
