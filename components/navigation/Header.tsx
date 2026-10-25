@@ -41,11 +41,11 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-[9000] px-6 sm:px-10 py-5 transition-all duration-500 pointer-events-none ${
+        className={`header-bar fixed top-0 left-0 w-full z-[9000] px-6 sm:px-10 py-5 transition-all duration-500 pointer-events-none ${
           scrolled ? 'backdrop-blur-md bg-black/30 py-4' : 'py-6'
         }`}
       >
-        <div className="max-w-[112.5rem] mx-auto flex items-center justify-between gap-4 text-white pointer-events-auto">
+        <div className="header-ink max-w-[112.5rem] mx-auto flex items-center justify-between gap-4 text-white pointer-events-auto">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-3 group focus:outline-none" aria-label={`${chrome.companyName} homepage`}>
             <div className="w-8 h-8 shrink-0 rounded-full border border-white/20 flex items-center justify-center text-xs tracking-widest text-white group-hover:border-skyblue group-hover:text-skyblue transition-colors">

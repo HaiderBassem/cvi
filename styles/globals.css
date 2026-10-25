@@ -281,3 +281,75 @@ body {
     display: none !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Intro sheet (home hero) — blueprint grid, outlined + inked headline  */
+/* ------------------------------------------------------------------ */
+.blueprint-grid {
+  background-color: #eadfc9;
+  background-image:
+    linear-gradient(90deg, #d3c9b5 1px, transparent 0),
+    linear-gradient(#e3d9c3 1px, transparent 0);
+  background-size: 1rem 1rem;
+  background-position: 0 0;
+}
+
+.intro-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(3rem, 8.6vw, 9.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+  user-select: none;
+}
+.intro-title-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px #1b1b1f;
+}
+.intro-title-fill {
+  color: #1b1b1f;
+}
+.intro-title .intro-muted {
+  font-style: italic;
+  font-weight: 400;
+}
+.intro-title-outline .intro-muted {
+  -webkit-text-stroke-color: #283f7d;
+}
+.intro-title-fill .intro-muted {
+  color: #283f7d;
+}
+
+.hand-note {
+  font-family: var(--font-hand), 'Comic Sans MS', cursive;
+  font-weight: 500;
+  line-height: 1;
+  color: #6d675b;
+  white-space: nowrap;
+}
+
+/* Header sits dark-on-cream while the intro sheet is behind it */
+html[data-header-tone='light'] .header-bar {
+  background-color: rgba(234, 223, 201, 0.6) !important;
+}
+html[data-header-tone='light'] .header-ink,
+html[data-header-tone='light'] .header-ink [class*='text-white'] {
+  color: #1b1b1f !important;
+}
+html[data-header-tone='light'] .header-ink [class*='border-white'] {
+  border-color: rgba(27, 27, 31, 0.3) !important;
+}
+html[data-header-tone='light'] .header-ink [class*='text-white\/70'] {
+  color: #4a463d !important;
+}
+html[data-header-tone='light'] .header-ink button.bg-white {
+  background-color: #1b1b1f !important;
+  color: #f5f3ef !important;
+}
+.header-bar,
+.header-bar * {
+  transition-property: color, background-color, border-color, backdrop-filter, padding;
+  transition-duration: 500ms;
+}

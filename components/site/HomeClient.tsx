@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ProjectRecord, DisciplineRecord, GlobalSettings, SiteContent, TeamMemberRecord } from '@/lib/db/types';
-import { ArrowUpRight, ArrowDown, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ChevronRight } from 'lucide-react';
 import Card3DTilt from '@/components/ui/Card3DTilt';
+import { IntroHero } from '@/components/site/IntroHero';
 import { fillCount } from '@/lib/content/copy';
 
 /** Featured work in an arched frame, slowly cross-fading between projects. */
@@ -98,61 +99,34 @@ export function HomeClient({
   return (
     <div className="flex flex-col w-full text-white">
       {/* ========================================================================= */}
-      {/* 01 — HERO EXPERIENCE                                                      */}
+      {/* 01 — INTRO SHEET (after the loader)                                        */}
       {/* ========================================================================= */}
-      <section className="relative mx-auto flex min-h-[100svh] w-full max-w-[112.5rem] flex-col justify-between px-6 pb-10 pt-32 sm:px-12">
-        <div className="grid flex-1 grid-cols-1 items-center gap-14 py-10 lg:grid-cols-12 lg:gap-10">
-          {/* Statement */}
+      <IntroHero
+        eyebrow={content.heroEyebrow || 'CVI Architects · Baghdad'}
+        title={content.heroTitle}
+        titleMuted={content.heroTitleMuted}
+        body={content.heroBody}
+        primaryCta={content.heroPrimaryCta}
+        secondaryCta={content.heroSecondaryCta}
+        scrollCue={content.heroScrollCue}
+      />
+
+      {/* Studio at a glance: intro paragraph, figures and featured work */}
+      <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-24 pt-10 sm:px-12 sm:pb-32 sm:pt-16">
+        <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-10">
           <div className="lg:col-span-7">
-            <div className="rise eyebrow mb-8" style={{ ['--d' as string]: '60ms' }}>
-              <span>{content.heroEyebrow || 'CVI Architects · Baghdad'}</span>
-            </div>
-
-            <h1 className="rise hero-title mb-8 text-white" style={{ ['--d' as string]: '180ms' }}>
-              {content.heroTitle}{' '}
-              {content.heroTitleMuted && <span className="display-italic block sm:inline">{content.heroTitleMuted}</span>}
-            </h1>
-
-            <p className="rise editorial-body mb-11 max-w-2xl" style={{ ['--d' as string]: '320ms' }}>
-              {content.heroBody}
-            </p>
-
-            <div className="rise flex flex-wrap items-center gap-4" style={{ ['--d' as string]: '460ms' }}>
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-black transition-colors hover:bg-skyblue"
-              >
-                <span>{content.heroPrimaryCta}</span>
-                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-3 rounded-full border border-white/30 px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-white hover:bg-white/5"
-              >
-                <span>{content.heroSecondaryCta}</span>
-              </Link>
+            <p className="editorial-body mb-14 max-w-2xl">{content.heroBody}</p>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 border-t border-white/15 pt-8">
+              {content.heroStats.map((st, i) => (
+                <div key={i} className="min-w-0">
+                  <div className="font-display text-5xl font-medium leading-none text-white sm:text-6xl">{fillCount(st.value, allProjects.length)}</div>
+                  <div className="mt-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">{fillCount(st.label, allProjects.length)}</div>
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Featured work, framed in an arch */}
-          <div className="rise lg:col-span-5" style={{ ['--d' as string]: '300ms' }}>
+          <div className="lg:col-span-5">
             <HeroShowcase projects={featuredProjects} />
-          </div>
-        </div>
-
-        {/* Facts */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-6 border-t border-white/15 pt-7 sm:grid-cols-4">
-          {content.heroStats.map((st, i) => (
-            <div key={i}>
-              <div className="font-display text-4xl font-medium leading-none text-white sm:text-5xl">{fillCount(st.value, allProjects.length)}</div>
-              <div className="mt-2 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">{fillCount(st.label, allProjects.length)}</div>
-            </div>
-          ))}
-          <div className="flex items-end">
-            <span className="inline-flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">
-              <ArrowDown className="h-4 w-4 animate-bounce text-skyblue" aria-hidden="true" />
-              {content.heroScrollCue}
-            </span>
           </div>
         </div>
       </section>

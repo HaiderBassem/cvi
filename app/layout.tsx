@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Manrope, Cormorant_Garamond } from 'next/font/google';
+import { Manrope, Cormorant_Garamond, Caveat } from 'next/font/google';
 import '@/styles/globals.css';
 import { SiteChrome } from '@/components/site/SiteChrome';
 import { getSettings } from '@/lib/db';
@@ -18,6 +18,14 @@ const cormorant = Cormorant_Garamond({
   weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-display',
+  display: 'swap',
+});
+
+// Caveat: the handwritten margin notes on the intro sheet.
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['500'],
+  variable: '--font-hand',
   display: 'swap',
 });
 
@@ -87,7 +95,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${cormorant.variable} dark`}
+      className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} dark`}
     >
       <body className="text-[#f4f4f6] selection:bg-[#4cb8f5] selection:text-black">
         <SiteChrome chrome={chrome}>

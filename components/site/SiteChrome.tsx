@@ -21,7 +21,7 @@ export function SiteChrome({ chrome, children }: { chrome: SiteChromeData; child
 
   return (
     <SmoothScroll>
-      <Preloader text={chrome.loader.text} image={chrome.loader.image} />
+      <Preloader text={chrome.loader.text} />
       <CustomCursor />
       <div className="film-grain" aria-hidden="true" />
       <Header chrome={chrome} />
