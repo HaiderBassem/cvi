@@ -57,6 +57,9 @@ export const ProjectInputSchema = z.object({
   is_featured: z.coerce.number().int().min(0).max(1).default(0),
   status_state: z.enum(PROJECT_STATES).default('draft'),
   model_id: z.string().max(100).nullable().default(null),
+  bg_mode: z.enum(['auto', 'picture', 'color']).default('auto'),
+  bg_image_url: optionalImage.default(''),
+  bg_dim: z.coerce.number().int().min(0, 'Between 0 and 90.').max(90, 'Between 0 and 90.').default(50),
   custom_metadata: z
     .record(z.string().trim().min(1).max(80), z.string().trim().max(300))
     .refine((m) => Object.keys(m).length <= 30, 'Up to 30 extra facts.')

@@ -17,7 +17,7 @@ import {
   Save,
   Trash2,
 } from 'lucide-react';
-import type { ProjectBlockRecord, ProjectRecord, ProjectStatusState } from '@/lib/db/types';
+import type { ProjectBackgroundMode, ProjectBlockRecord, ProjectRecord, ProjectStatusState } from '@/lib/db/types';
 import { adminFetch, ApiError } from './adminFetch';
 import { Button, Card, CardHeader, ConfirmDialog, IconButton, StatusChip, cx } from './ui';
 import { TextArea, TextField, Toggle } from './Field';
@@ -62,6 +62,9 @@ interface Draft {
   thumbnail_url: string;
   theme_bg_color: string;
   model_id: string | null;
+  bg_mode: ProjectBackgroundMode;
+  bg_image_url: string;
+  bg_dim: number;
   client: string;
   location: string;
   year: string;
@@ -112,6 +115,9 @@ function toDraft(p: ProjectRecord | null): Draft {
     thumbnail_url: p?.thumbnail_url ?? '',
     theme_bg_color: p && /^#[0-9a-f]{6}$/i.test(p.theme_bg_color ?? '') ? p.theme_bg_color : '#0a0a0c',
     model_id: p?.model_id ?? null,
+    bg_mode: p?.bg_mode ?? 'auto',
+    bg_image_url: p?.bg_image_url ?? '',
+    bg_dim: p?.bg_dim ?? 50,
     client: p?.client ?? '',
     location: p?.location ?? '',
     year: p ? (p.year ?? '') : String(new Date().getFullYear()),
@@ -146,9 +152,16 @@ const STATES: { value: ProjectStatusState; label: string; hint: string }[] = [
   { value: 'archived', label: 'Archived', hint: 'Hidden and kept for later.' },
 ];
 
+const BG_MODES: { id: ProjectBackgroundMode; label: string; hint: string }[] = [
+  { id: 'auto', label: 'Automatic', hint: 'The 3D model if you chose one below; otherwise the picture.' },
+  { id: 'picture', label: 'Picture only', hint: 'Always the picture. The 3D model is not used on this project.' },
+  { id: 'color', label: 'Plain colour', hint: 'Just the page colour: no picture, no 3D.' },
+];
+
 const SECTIONS = [
   { id: 'basics', label: 'Basics' },
   { id: 'cover', label: 'Cover' },
+  { id: 'background', label: 'Background' },
   { id: '3d', label: '3D model' },
   { id: 'facts', label: 'Facts' },
   { id: 'story', label: 'Story' },
@@ -262,6 +275,9 @@ export default function ProjectEditor({ initialProject, initialBlocks, models: i
             is_featured: draft.is_featured ? 1 : 0,
             status_state: draft.status_state,
             model_id: draft.model_id,
+            bg_mode: draft.bg_mode,
+            bg_image_url: draft.bg_image_url,
+            bg_dim: draft.bg_dim,
             custom_metadata: metadata,
             description: initialProject?.description ?? '',
           },
@@ -522,7 +538,63 @@ export default function ProjectEditor({ initialProject, initialBlocks, models: i
             onBusyChange={trackUpload}
             aspect="aspect-[16/9]"
           />
-          <div className="md:col-span-2">
+        </div>
+      </Card>
+
+      {/* 2b. Background */}
+      <Card id="section-background" className="scroll-mt-44">
+        <CardHeader title="Background" description="What fills the page behind this project's title and story." />
+        <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-6">
+            <fieldset>
+              <legend className="mb-2 text-xs font-medium text-white/80">What to show</legend>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {BG_MODES.map((m) => (
+                  <label
+                    key={m.id}
+                    className={cx(
+                      'flex cursor-pointer flex-col gap-0.5 rounded-md border px-3 py-2.5 transition-colors',
+                      draft.bg_mode === m.id ? 'border-skyblue/60 bg-skyblue/10' : 'border-white/10 bg-black/20 hover:border-white/25'
+                    )}
+                  >
+                    <input type="radio" name="bg-mode" className="sr-only" checked={draft.bg_mode === m.id} onChange={() => patch({ bg_mode: m.id })} />
+                    <span className="text-sm font-medium text-white">{m.label}</span>
+                    <span className="text-xs text-white/55">{m.hint}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {draft.bg_mode !== 'color' && (
+              <>
+                <ImageUpload
+                  label="Background picture"
+                  hint="Its own picture behind the page. Leave empty to use the cover image (or the studio's default background from Site content)."
+                  value={draft.bg_image_url}
+                  onChange={(url) => patch({ bg_image_url: url })}
+                  onBusyChange={trackUpload}
+                  aspect="aspect-[16/9]"
+                />
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="bg-dim" className="flex items-center justify-between text-xs font-medium text-white/80">
+                    <span>Darkness of the picture</span>
+                    <span className="tabular-nums text-white/60">{draft.bg_dim}%</span>
+                  </label>
+                  <input
+                    id="bg-dim"
+                    type="range"
+                    min={0}
+                    max={90}
+                    step={5}
+                    value={draft.bg_dim}
+                    onChange={(e) => patch({ bg_dim: Number(e.target.value) })}
+                    className="w-full cursor-pointer accent-[#4cb8f5]"
+                  />
+                  <p className="text-xs text-white/55">Darker keeps the white page text easy to read. The studio&apos;s default is 50%.</p>
+                </div>
+              </>
+            )}
+
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="theme-colour" className="text-xs font-medium text-white/80">
@@ -540,6 +612,27 @@ export default function ProjectEditor({ initialProject, initialBlocks, models: i
                 </div>
               </div>
               <p className="max-w-md pb-1 text-xs text-white/60">Keep it dark — the page text is white. The studio&apos;s default is #0a0a0c.</p>
+            </div>
+          </div>
+
+          {/* Live preview of what visitors will see behind the title */}
+          <div>
+            <div className="mb-2 text-xs font-medium text-white/80">Preview</div>
+            <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-white/10" style={{ background: draft.theme_bg_color }}>
+              {draft.bg_mode !== 'color' && (draft.bg_image_url || draft.hero_image_url) && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={draft.bg_image_url || draft.hero_image_url}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ opacity: 1 - draft.bg_dim / 100 }}
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3">
+                <div className="font-display text-xl leading-tight text-white">{draft.title || 'Project title'}</div>
+                <div className="text-[11px] uppercase tracking-widest text-skyblue">{draft.bg_mode === 'color' ? 'Plain colour' : draft.bg_mode === 'picture' ? 'Picture only' : draft.model_id ? '3D model, picture while loading' : 'Picture'}</div>
+              </div>
             </div>
           </div>
         </div>

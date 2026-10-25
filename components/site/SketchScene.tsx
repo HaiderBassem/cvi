@@ -321,12 +321,6 @@ export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
       </p>
 
       </div>
-
-      {/* The sheet melts into the dark page below */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-b from-transparent to-[#0a0a0c] sm:h-32"
-      />
     </section>
   );
 }

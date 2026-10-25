@@ -9,6 +9,7 @@ import Card3DTilt from '@/components/ui/Card3DTilt';
 import { IntroHero } from '@/components/site/IntroHero';
 import { BlueprintSheet } from '@/components/site/BlueprintSheet';
 import { SketchScene } from '@/components/site/SketchScene';
+import { visibleIds, type HomeSectionId, type LayoutEntry } from '@/lib/content/layout';
 import { fillCount } from '@/lib/content/copy';
 
 /** Featured work in an arched frame, slowly cross-fading between projects. */
@@ -86,6 +87,8 @@ interface HomeClientProps {
   settings: GlobalSettings;
   content: SiteContent;
   team: TeamMemberRecord[];
+  /** Order and visibility of the sections (Admin → Page layout). */
+  layout: LayoutEntry<HomeSectionId>[];
 }
 
 export function HomeClient({
@@ -95,15 +98,13 @@ export function HomeClient({
   settings,
   content,
   team,
+  layout,
 }: HomeClientProps) {
   const [activeDiscipline, setActiveDiscipline] = useState<DisciplineRecord | null>(disciplines[0] || null);
 
-  return (
-    <div className="flex flex-col w-full text-white">
-      {/* ========================================================================= */}
-      {/* 01 — INTRO SHEET (after the loader)                                        */}
-      {/* ========================================================================= */}
-      <BlueprintSheet>
+  /** Every section of the page, keyed by id; the order and visibility come from the admin. */
+  const sections: Record<HomeSectionId, React.ReactNode> = {
+    intro: (
         <IntroHero
           eyebrow={content.heroEyebrow || 'CVI Architects · Baghdad'}
           title={content.heroTitle}
@@ -113,6 +114,8 @@ export function HomeClient({
           secondaryCta={content.heroSecondaryCta}
           scrollCue={content.heroScrollCue}
         />
+    ),
+    drawing: (
         <SketchScene
           eyebrow={content.sketchEyebrow}
           title={content.sketchTitle}
@@ -123,9 +126,8 @@ export function HomeClient({
             { title: content.sketchStep3Title, text: content.sketchStep3Text },
           ]}
         />
-      </BlueprintSheet>
-
-      {/* Studio at a glance: intro paragraph, figures and featured work */}
+    ),
+    glance: (
       <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-24 pt-10 sm:px-12 sm:pb-32 sm:pt-16">
         <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-10">
           <div data-reveal className="lg:col-span-7">
@@ -144,10 +146,8 @@ export function HomeClient({
           </div>
         </div>
       </section>
-
-      {/* ========================================================================= */}
-      {/* 02 — FLAGSHIP MASTERWORKS (SELECTED PROJECTS)                              */}
-      {/* ========================================================================= */}
+    ),
+    featured: (
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
         <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-white/10 pb-8">
           <div>
@@ -238,10 +238,8 @@ export function HomeClient({
           ))}
         </div>
       </section>
-
-      {/* ========================================================================= */}
-      {/* 03 — STUDIO MANIFESTO                                                     */}
-      {/* ========================================================================= */}
+    ),
+    manifesto: (
       <section className="w-full py-24 sm:py-36 bg-[#060608] border-t border-b border-white/10">
         <div data-reveal className="max-w-[87.5rem] mx-auto px-6 sm:px-12 text-center">
           <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-6">
@@ -257,10 +255,8 @@ export function HomeClient({
           </div>
         </div>
       </section>
-
-      {/* ========================================================================= */}
-      {/* 04 — INTEGRATED DISCIPLINES                                               */}
-      {/* ========================================================================= */}
+    ),
+    services: (
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
         <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-white/10 pb-8">
           <div>
@@ -306,11 +302,8 @@ export function HomeClient({
           ))}
         </div>
       </section>
-
-      {/* ========================================================================= */}
-      {/* 04b — STUDIO TEAM                                                         */}
-      {/* ========================================================================= */}
-      {team.length > 0 && (
+    ),
+    team: team.length > 0 && (
         <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10" aria-labelledby="home-team-title">
           <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
             <div>
@@ -353,11 +346,8 @@ export function HomeClient({
             </Link>
           </div>
         </section>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 05 — ARCHITECTURAL ARCHIVE (MORE WORKS)                                   */}
-      {/* ========================================================================= */}
+      ),
+    archive: (
       <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10">
         <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-white/10">
           <div>
@@ -404,7 +394,34 @@ export function HomeClient({
           ))}
         </div>
       </section>
+    ),
+  };
 
-    </div>
-  );
+  // The two sections that live on the cream blueprint sheet are grouped when they sit side by side,
+  // so the grid, header colour and fades behave like one continuous sheet.
+  const CREAM = new Set<HomeSectionId>(['intro', 'drawing']);
+  const order = visibleIds(layout);
+  const blocks: React.ReactNode[] = [];
+  for (let i = 0; i < order.length; ) {
+    const first = i;
+    if (CREAM.has(order[i])) {
+      const group: HomeSectionId[] = [];
+      while (i < order.length && CREAM.has(order[i])) group.push(order[i++]);
+      blocks.push(
+        <BlueprintSheet key={`sheet-${first}`} fadeTop={first > 0} fadeBottom>
+          {group.map((id) => (
+            <React.Fragment key={id}>{sections[id]}</React.Fragment>
+          ))}
+        </BlueprintSheet>,
+      );
+    } else {
+      const id = order[i++];
+      // a dark section at the very top still has to clear the fixed header
+      blocks.push(
+        <React.Fragment key={id}>{first === 0 ? <div className="pt-24">{sections[id]}</div> : sections[id]}</React.Fragment>,
+      );
+    }
+  }
+
+  return <div className="flex flex-col w-full text-white">{blocks}</div>;
 }

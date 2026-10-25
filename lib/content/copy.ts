@@ -114,6 +114,7 @@ export const COPY_GROUPS = [
     title: 'Individual project pages',
     description: 'Small texts that appear on every project page.',
     fields: [
+      { key: 'projectBgDefault', label: 'Default background picture', kind: 'image', max: 500, default: '/baghdad-urban-map.jpg', hint: 'Used behind every project that has no background or cover picture of its own.' },
       { key: 'projectBackLabel', label: 'Link back to the list', kind: 'text', max: 40, default: 'All projects' },
       { key: 'projectReadCue', label: 'Hint under the title', kind: 'text', max: 40, default: 'Read the project' },
       { key: 'projectNextTitle', label: 'Heading before the next project', kind: 'text', max: 40, default: 'Continue exploring' },

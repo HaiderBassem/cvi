@@ -39,12 +39,15 @@ describe('schema migrations', () => {
   it('rolls back to a target version and can re-apply', () => {
     const db = freshDb();
     runMigrations(db);
-    expect(rollbackTo(db, 1)).toEqual([5, 4, 3, 2]);
+    const later = MIGRATIONS.map((m) => m.version).filter((v) => v > 1);
+    expect(rollbackTo(db, 1)).toEqual([...later].reverse());
     expect(columns(db, 'projects')).not.toContain('site_lat');
     expect(columns(db, 'projects')).not.toContain('model_id');
     expect(columns(db, 'team_members')).not.toContain('is_visible');
     expect(columns(db, 'contact_messages').length).toBeGreaterThan(0);
-    expect(runMigrations(db)).toEqual([2, 3, 4, 5]);
+    expect(columns(db, 'projects')).not.toContain('bg_mode');
+    expect(runMigrations(db)).toEqual(later);
+    expect(columns(db, 'projects')).toEqual(expect.arrayContaining(['bg_mode', 'bg_image_url', 'bg_dim']));
   });
 
   it('links a project to its 3D model, only where the slug matches', () => {

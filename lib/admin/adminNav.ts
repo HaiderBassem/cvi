@@ -8,6 +8,7 @@ export type NavIconName =
   | 'projects'
   | 'media'
   | 'site'
+  | 'layout'
   | 'team'
   | 'messages'
   | 'navigation'
@@ -39,6 +40,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Website',
     items: [
       { label: 'Site content', path: '/admin/site', icon: 'site' },
+      { label: 'Page layout', path: '/admin/layout', icon: 'layout' },
       { label: 'Team', path: '/admin/team', icon: 'team' },
       { label: 'Messages', path: '/admin/messages', icon: 'messages' },
     ],
@@ -63,6 +65,7 @@ const SECTIONS: Record<string, { label: string; group: string | null }> = {
   projects: { label: 'Projects', group: 'Portfolio' },
   media: { label: 'Media library', group: 'Portfolio' },
   site: { label: 'Site content', group: 'Website' },
+  layout: { label: 'Page layout', group: 'Website' },
   team: { label: 'Team', group: 'Website' },
   messages: { label: 'Messages', group: 'Website' },
   navigation: { label: 'Menu & navigation', group: 'Settings' },

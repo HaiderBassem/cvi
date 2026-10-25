@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAllProjects, getDisciplines, getSettings, getSiteContent, getTeamMembers } from '@/lib/db';
+import { getAllProjects, getDisciplines, getPageLayout, getSettings, getSiteContent, getTeamMembers } from '@/lib/db';
 import { HomeClient } from '@/components/site/HomeClient';
 
 export default function HomePage() {
@@ -16,6 +16,7 @@ export default function HomePage() {
       settings={settings}
       content={getSiteContent()}
       team={getTeamMembers(true)}
+      layout={getPageLayout().home}
     />
   );
 }

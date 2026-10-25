@@ -64,13 +64,17 @@ export default async function ProjectCaseStudyPage({ params }: ProjectPageProps)
   const currentIndex = allProjects.findIndex((p) => p.id === project.id);
   const nextProject = allProjects[(currentIndex + 1) % allProjects.length];
 
-  const info = getModel(project.model_id);
+  // Background: 'auto' shows the 3D model when there is one; 'picture' and 'color' never load it.
+  const bgMode = project.bg_mode ?? 'auto';
+  const info = bgMode === 'auto' ? getModel(project.model_id) : null;
   const model = info ? { id: info.id, label: info.label, bytes: info.bytes, url: info.url } : null;
   // Start downloading this project's model (and only this one) alongside the page itself.
   if (model) preload(model.url, { as: 'fetch', crossOrigin: 'anonymous' });
 
   const copy = getSiteContent();
   const heroImage = project.hero_image_url || FALLBACK_IMAGE;
+  // The project's own background picture, then its cover, then the studio-wide default (Admin → Site content).
+  const bgPicture = project.bg_image_url || project.hero_image_url || copy.projectBgDefault || FALLBACK_IMAGE;
   const pageBg = safeColor(project.theme_bg_color);
   const veil = `color-mix(in srgb, ${pageBg} 90%, transparent)`;
 
@@ -96,7 +100,14 @@ export default async function ProjectCaseStudyPage({ params }: ProjectPageProps)
       {/* HERO — the project's own 3D model is the stage                         */}
       {/* ===================================================================== */}
       <section className="relative flex min-h-[100svh] flex-col justify-between">
-        <ProjectBackdrop model={model} poster={heroImage} title={project.title} background={pageBg} />
+        <ProjectBackdrop
+          model={model}
+          poster={bgPicture}
+          showPicture={bgMode !== 'color'}
+          pictureOpacity={1 - (project.bg_dim ?? 50) / 100}
+          title={project.title}
+          background={pageBg}
+        />
 
         {/* Copy sits above the drag surface but lets the pointer through */}
         <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-[112.5rem] items-center justify-between px-6 pt-28 sm:px-12">

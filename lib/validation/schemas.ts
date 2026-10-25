@@ -128,3 +128,12 @@ export const NavigationItemSchema = z.object({
 export const NavigationSchema = z.object({
   items: z.array(NavigationItemSchema).min(1, 'Keep at least one link.').max(10, 'Up to 10 links.'),
 });
+
+
+const LayoutEntrySchema = z.object({ id: z.string().max(40), visible: z.boolean() });
+
+/** Order + visibility of the sections on the Home and About pages (ids are checked and completed on save). */
+export const PageLayoutSchema = z.object({
+  home: z.array(LayoutEntrySchema).max(40),
+  about: z.array(LayoutEntrySchema).max(40),
+});

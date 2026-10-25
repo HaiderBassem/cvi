@@ -17,6 +17,7 @@ import type {
 import { runMigrations } from './migrations';
 import { getModel } from '../models/catalog';
 import { COPY_DEFAULTS, DEFAULT_HERO_STATS } from '../content/copy';
+import { DEFAULT_PAGE_LAYOUT, normalizeLayout, type PageLayout } from '../content/layout';
 
 function newId(prefix: string) {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
@@ -100,6 +101,12 @@ export function getProjectById(id: string): ProjectRecord | null {
   return toPlain((res as unknown as ProjectRecord) || null);
 }
 
+/** The picture's darkening is a whole percentage between 0 and 90; anything else falls back to the default 50. */
+function clampDim(v: unknown): number {
+  const n = typeof v === 'number' && Number.isFinite(v) ? Math.round(v) : 50;
+  return Math.min(90, Math.max(0, n));
+}
+
 export function createProject(p: Partial<ProjectRecord> & { title: string; slug: string }): ProjectRecord {
   const db = getDb();
   const now = new Date().toISOString();
@@ -109,11 +116,11 @@ export function createProject(p: Partial<ProjectRecord> & { title: string; slug:
     INSERT INTO projects (
       id, slug, title, subtitle, client, year, location, typology, size, status,
       hero_image_url, thumbnail_url, summary, description, theme_bg_color, theme_accent_color,
-      is_featured, status_state, sort_order, custom_metadata_json, model_id, created_at, updated_at
+      is_featured, status_state, sort_order, custom_metadata_json, model_id, bg_mode, bg_image_url, bg_dim, created_at, updated_at
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?, ?,
-      ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `);
 
@@ -139,6 +146,9 @@ export function createProject(p: Partial<ProjectRecord> & { title: string; slug:
     p.sort_order ?? 0,
     p.custom_metadata_json || '{}',
     getModel(p.model_id) ? p.model_id! : null,
+    p.bg_mode || 'auto',
+    p.bg_image_url || null,
+    clampDim(p.bg_dim),
     p.created_at || now,
     p.updated_at || now
   );
@@ -183,6 +193,9 @@ export function updateProject(id: string, updates: Partial<ProjectRecord>): Proj
       site_lat = ?,
       site_lng = ?,
       model_id = ?,
+      bg_mode = ?,
+      bg_image_url = ?,
+      bg_dim = ?,
       updated_at = ?
     WHERE id = ?
   `);
@@ -211,6 +224,9 @@ export function updateProject(id: string, updates: Partial<ProjectRecord>): Proj
     updated.site_lng ?? null,
     // Only ever store an id the catalog knows, so a stale or hand-edited value cannot 404 the viewer.
     getModel(updated.model_id) ? updated.model_id : null,
+    updated.bg_mode || 'auto',
+    updated.bg_image_url || null,
+    clampDim(updated.bg_dim),
     updated.updated_at,
     id
   );
@@ -265,6 +281,9 @@ export function saveProjectBundle(input: {
     is_featured: number;
     status_state: ProjectRecord['status_state'];
     model_id: string | null;
+    bg_mode: ProjectRecord['bg_mode'];
+    bg_image_url: string;
+    bg_dim: number;
     custom_metadata: Record<string, string>;
   };
   blocks: { id?: string; block_type: ProjectBlockRecord['block_type']; is_hidden: number; content: Record<string, unknown> }[];
@@ -293,6 +312,9 @@ export function saveProjectBundle(input: {
     is_featured: p.is_featured,
     status_state: p.status_state,
     model_id: p.model_id,
+    bg_mode: p.bg_mode,
+    bg_image_url: p.bg_image_url || null,
+    bg_dim: p.bg_dim,
     custom_metadata_json: JSON.stringify(p.custom_metadata),
   };
 
@@ -643,6 +665,31 @@ export function updateSiteContent(updates: Partial<SiteContent>): SiteContent {
     `)
     .run(JSON.stringify(merged), new Date().toISOString());
   return merged;
+}
+
+// ----------------- PAGE LAYOUT (order + visibility of page sections) -----------------
+
+export function getPageLayout(): PageLayout {
+  const row = getDb().prepare('SELECT value_json FROM global_settings WHERE key = ?').get('page_layout') as
+    | { value_json: string }
+    | undefined;
+  if (!row) return DEFAULT_PAGE_LAYOUT;
+  try {
+    return normalizeLayout(JSON.parse(row.value_json));
+  } catch {
+    return DEFAULT_PAGE_LAYOUT;
+  }
+}
+
+export function updatePageLayout(layout: unknown): PageLayout {
+  const clean = normalizeLayout(layout);
+  getDb()
+    .prepare(`
+      INSERT INTO global_settings (key, value_json, updated_at) VALUES ('page_layout', ?, ?)
+      ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json, updated_at = excluded.updated_at
+    `)
+    .run(JSON.stringify(clean), new Date().toISOString());
+  return clean;
 }
 
 // ----------------- CONTACT MESSAGES -----------------

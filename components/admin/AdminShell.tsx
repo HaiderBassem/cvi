@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  ListOrdered,
 } from 'lucide-react';
 import { NAV_GROUPS, breadcrumbsFor, isActivePath, pageTitleFor, type NavIconName } from '@/lib/admin/adminNav';
 import { AdminLogoutButton } from './AdminLogoutButton';
@@ -27,6 +28,7 @@ const ICONS: Record<NavIconName, React.ComponentType<{ className?: string }>> = 
   projects: FolderKanban,
   media: ImageIcon,
   site: PanelsTopLeft,
+  layout: ListOrdered,
   team: Users,
   messages: Mail,
   navigation: Compass,

@@ -3,6 +3,7 @@
 import type { CopyKey, SiteStat } from '../content/copy';
 
 export type ProjectStatusState = 'draft' | 'published' | 'archived';
+export type ProjectBackgroundMode = 'auto' | 'picture' | 'color';
 
 export interface ProjectRecord {
   id: string;
@@ -30,6 +31,12 @@ export interface ProjectRecord {
   site_lng: number | null;
   /** Id of the 3D model shown behind the project page (lib/models/catalog.ts). Null = none. */
   model_id: string | null;
+  /** What fills the page behind the project: 3D model (auto), the picture only, or a plain colour. */
+  bg_mode: ProjectBackgroundMode;
+  /** The project's own background picture; null = use the cover image, then the site default. */
+  bg_image_url: string | null;
+  /** How much the picture is darkened, 0-90 (%). */
+  bg_dim: number;
   created_at: string;
   updated_at: string;
 }

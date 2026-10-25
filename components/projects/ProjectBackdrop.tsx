@@ -20,6 +20,10 @@ interface ProjectBackdropProps {
   title: string;
   /** Page background colour (project theme). */
   background: string;
+  /** False = plain colour only (no picture behind the page). */
+  showPicture?: boolean;
+  /** How visible the picture is, 0-1 (the admin's darkness setting inverted). */
+  pictureOpacity?: number;
 }
 
 type Phase = 'idle' | 'loading' | 'ready' | 'error' | 'unsupported' | 'saver';
@@ -44,7 +48,7 @@ function webglAvailable() {
  * fixed full-viewport layer behind the whole page, and an invisible drag surface over the hero.
  * three.js and the model are fetched only when this mounts, i.e. when a project page is opened.
  */
-export function ProjectBackdrop({ model, poster, title, background }: ProjectBackdropProps) {
+export function ProjectBackdrop({ model, poster, title, background, showPicture = true, pictureOpacity = 0.5 }: ProjectBackdropProps) {
   const layerRef = useRef<HTMLDivElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -183,13 +187,15 @@ export function ProjectBackdrop({ model, poster, title, background }: ProjectBac
         }}
       >
         {/* Hero image: instant backdrop while the model streams, and the fallback when 3D is unavailable */}
-        <div
-          className="absolute inset-0 transition-opacity duration-[1400ms] ease-out"
-          style={{ opacity: showPoster ? 0.5 : 0 }}
-        >
-          <Image src={poster} alt="" fill priority sizes="100vw" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0c] via-[#0a0a0c]/70 to-[#0a0a0c]/25" />
-        </div>
+        {showPicture && poster && (
+          <div
+            className="absolute inset-0 transition-opacity duration-[1400ms] ease-out"
+            style={{ opacity: showPoster ? pictureOpacity : 0 }}
+          >
+            <Image src={poster} alt="" fill priority sizes="100vw" className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0c] via-[#0a0a0c]/70 to-[#0a0a0c]/25" />
+          </div>
+        )}
 
         <div
           ref={canvasHostRef}

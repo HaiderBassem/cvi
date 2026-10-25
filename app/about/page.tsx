@@ -2,7 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getSettings, getTeamMembers, getDisciplines, getSiteContent } from '@/lib/db';
+import { getSettings, getTeamMembers, getDisciplines, getSiteContent, getPageLayout } from '@/lib/db';
+import { visibleIds, type AboutSectionId } from '@/lib/content/layout';
 import { ArrowUpRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -16,10 +17,11 @@ export default function AboutPage() {
   const disciplines = getDisciplines();
   const content = getSiteContent();
   const pillars = content.pillars;
+  const order = visibleIds(getPageLayout().about);
 
-  return (
-    <div className="w-full pt-32 pb-24 text-white">
-      {/* Hero Statement */}
+  /** Every section, keyed by id; the order and visibility come from Admin → Page layout. */
+  const sections: Record<AboutSectionId, React.ReactNode> = {
+    statement: (
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-20 sm:mb-32">
         <div className="font-mono text-xs tracking-widest text-skyblue uppercase mb-4">
           {content.aboutEyebrow}
@@ -31,8 +33,8 @@ export default function AboutPage() {
           {content.aboutBody}
         </p>
       </section>
-
-      {/* Main Studio Atelier Image */}
+    ),
+    image: (
       <section data-reveal className="max-w-[112.5rem] mx-auto px-4 sm:px-8 mb-24 sm:mb-36">
         <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 shadow-2xl">
           <Image
@@ -47,8 +49,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* Four Studio Pillars */}
+    ),
+    pillars: (
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
@@ -80,8 +82,8 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-
-      {/* 8 Core Disciplines */}
+    ),
+    services: (
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
@@ -122,9 +124,8 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-
-      {/* Leadership Team */}
-      {team.length > 0 && (
+    ),
+    team: team.length > 0 && (
       <section className="max-w-[112.5rem] mx-auto px-6 sm:px-12 mb-24 sm:mb-36">
         <div data-reveal className="border-t border-white/10 pt-12 mb-16">
           <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
@@ -160,9 +161,8 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-      )}
-
-      {/* Direct Contact Teaser */}
+      ),
+    cta: (
       <section data-reveal className="max-w-[112.5rem] mx-auto px-6 sm:px-12 text-center py-20 border-t border-white/10">
         <h2 className="section-title font-display text-white mb-6">
           {content.aboutCtaTitle}
@@ -178,6 +178,14 @@ export default function AboutPage() {
           <ArrowUpRight className="w-4 h-4" />
         </Link>
       </section>
+    ),
+  };
+
+  return (
+    <div className="w-full pt-32 pb-24 text-white">
+      {order.map((id) => (
+        <React.Fragment key={id}>{sections[id]}</React.Fragment>
+      ))}
     </div>
   );
 }

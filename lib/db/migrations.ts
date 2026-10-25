@@ -89,6 +89,22 @@ export const MIGRATIONS: Migration[] = [
     ],
     down: [`ALTER TABLE navigation_items DROP COLUMN hint`],
   },
+  {
+    version: 6,
+    name: 'add_project_background_settings',
+    // What fills the page behind a project: 'auto' = the 3D model if there is one, else the picture;
+    // 'picture' = the picture only; 'color' = a plain colour. `bg_dim` darkens the picture (0-90 %).
+    up: [
+      `ALTER TABLE projects ADD COLUMN bg_mode TEXT NOT NULL DEFAULT 'auto'`,
+      `ALTER TABLE projects ADD COLUMN bg_image_url TEXT`,
+      `ALTER TABLE projects ADD COLUMN bg_dim INTEGER NOT NULL DEFAULT 50`,
+    ],
+    down: [
+      `ALTER TABLE projects DROP COLUMN bg_dim`,
+      `ALTER TABLE projects DROP COLUMN bg_image_url`,
+      `ALTER TABLE projects DROP COLUMN bg_mode`,
+    ],
+  },
 ];
 
 function ensureLedger(db: DatabaseSync) {

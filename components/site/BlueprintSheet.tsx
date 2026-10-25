@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
  * runs behind both, and while any part of it sits under the header the header switches to
  * dark ink (`html[data-header-tone="light"]`, styled in globals.css).
  */
-export function BlueprintSheet({ children }: { children: React.ReactNode }) {
+export function BlueprintSheet({ children, fadeTop = false, fadeBottom = true }: { children: React.ReactNode; fadeTop?: boolean; fadeBottom?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +37,13 @@ export function BlueprintSheet({ children }: { children: React.ReactNode }) {
   return (
     <div ref={ref} className="blueprint-grid relative">
       {children}
+      {/* the sheet melts into the dark page around it */}
+      {fadeTop && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-20 h-24 bg-gradient-to-b from-[#0a0a0c] to-transparent sm:h-32" />
+      )}
+      {fadeBottom && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-b from-transparent to-[#0a0a0c] sm:h-32" />
+      )}
     </div>
   );
 }
