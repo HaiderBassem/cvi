@@ -18,12 +18,21 @@ const TIP_Y = 208;
 const SCALE = 1.0; // asset px → drawing units
 const TILT = 16; // degrees counter-clockwise: lifts the forearm up to the right, so it never covers finished work
 
-export function SketchHandPhoto() {
-  const place = `rotate(${-TILT}) scale(${SCALE}) translate(${-TIP_X} ${-TIP_Y})`;
+interface SketchHandPhotoProps {
+  /** Asset pixels → drawing units. The drawing scene uses 1; the opening screen draws in logo units, so it uses far less. */
+  scale?: number;
+  /** Degrees counter-clockwise; lifts the forearm up to the right. */
+  tilt?: number;
+  /** Where the shadow falls, in drawing units. */
+  shadow?: [number, number];
+}
+
+export function SketchHandPhoto({ scale = SCALE, tilt = TILT, shadow = [9, 7] }: SketchHandPhotoProps = {}) {
+  const place = `rotate(${-tilt}) scale(${scale}) translate(${-TIP_X} ${-TIP_Y})`;
   return (
     <g>
       {/* soft shadow baked into an image; it falls down-right on the paper */}
-      <g transform="translate(9 7)" opacity={0.95}>
+      <g transform={`translate(${shadow[0]} ${shadow[1]})`} opacity={0.95}>
         <g transform={place}>
           <image href="/brand/hand-pencil-shadow.png" width={W} height={H} />
         </g>

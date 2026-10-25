@@ -205,9 +205,9 @@ export const COPY_GROUPS = [
   {
     tab: 'footer',
     title: 'Opening screen',
-    description: 'The screen shown for a moment when the site opens.',
+    description: 'The screen shown for a moment when the site opens: a hand draws these letters, then the sheet slides up.',
     fields: [
-      { key: 'loaderText', label: 'Letters in the middle', kind: 'text', max: 8, default: 'CVI', hint: 'Up to 8 characters; each letter is shown apart.' },
+      { key: 'loaderText', label: 'Letters in the middle', kind: 'text', max: 8, default: 'CVI', hint: 'Up to 8 characters. CVI is drawn from the real studio logo; other letters and numbers are drawn in a single-line pencil alphabet.' },
       { key: 'loaderImage', label: 'Background picture (no longer used)', kind: 'image', max: 500, default: '/brand/loader-map.jpg', hint: 'The opening screen is now a plain cream drafting sheet, so this picture is not shown.' },
     ],
   },
