@@ -3,6 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SketchHand } from '@/components/site/SketchHand';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,7 +11,6 @@ const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : use
 
 const INK = '#1b1b1f';
 const BLUE = '#283f7d';
-const PAPER = '#f1e8d3';
 
 export interface SketchStep {
   title: string;
@@ -110,64 +110,11 @@ const TONES: Record<Tone, { stroke: string; width: number; opacity: number }> = 
 const AWAY_START = { x: 1180, y: 760 };
 const AWAY_END = { x: 1240, y: 340 };
 /** The hand is drawn life-size next to its pencil; this keeps it from hiding the drawing. */
-const HAND_SCALE = 0.64;
+const HAND_SCALE = 0.5;
 const GAP = 0.12; // pen lifted between strokes
 const HOLD = 1.3; // time left at the end for the hand to leave
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
-
-/** A finger drawn as a thick stroked curve with a paper-coloured core, so overlaps keep clean outlines. */
-function Finger({ d, w }: { d: string; w: number }) {
-  return (
-    <>
-      <path d={d} stroke={INK} strokeWidth={w + 3} />
-      <path d={d} stroke={PAPER} strokeWidth={w} />
-    </>
-  );
-}
-
-function Hand() {
-  return (
-    <g transform="rotate(24)" fill="none" strokeLinecap="round" strokeLinejoin="round">
-      {/* forearm and sleeve */}
-      <path d="M205 -170 C300 -186 420 -200 560 -214 L560 -6 C420 -26 300 -42 200 -60 Z" fill={PAPER} stroke={INK} strokeWidth="2" />
-      <path d="M330 -196 C352 -199 372 -201 392 -203 L402 -14 C382 -19 360 -23 338 -26 Z" fill={BLUE} stroke={INK} strokeWidth="2" />
-      <path d="M392 -203 C460 -209 520 -214 640 -226 L640 20 C520 -2 460 -10 402 -14 Z" fill="#2f4a96" stroke={INK} strokeWidth="2" />
-      <path d="M430 -190 C480 -196 530 -200 600 -208 M430 -120 C480 -124 530 -128 610 -134 M430 -60 C480 -56 530 -50 610 -42" stroke={INK} strokeOpacity=".28" strokeWidth="1.6" />
-
-      {/* back of the hand */}
-      <path d="M96 -180 C140 -206 206 -196 226 -154 C242 -110 232 -62 196 -38 C164 -20 126 -34 124 -64 C100 -96 80 -146 96 -180 Z" fill={PAPER} stroke={INK} strokeWidth="2" />
-      <path d="M150 -170 C182 -160 204 -136 212 -108 M140 -138 C168 -128 190 -104 196 -80" stroke={INK} strokeOpacity=".25" strokeWidth="1.5" />
-
-      {/* curled little and ring fingers */}
-      <Finger d="M128 -66 C124 -48 112 -34 90 -30" w={20} />
-      <Finger d="M122 -100 C116 -76 98 -54 70 -50" w={22} />
-
-      {/* thumb, tucked under the pencil so it emerges on its left */}
-      <Finger d="M178 -46 C124 -34 54 -36 -14 -64" w={29} />
-      <path d="M40 -52 q10 2 22 -1" stroke={INK} strokeOpacity=".3" strokeWidth="1.4" />
-
-      {/* middle finger, supporting the pencil from below */}
-      <Finger d="M112 -135 C86 -104 52 -66 8 -46" w={25} />
-
-      {/* the pencil */}
-      <g>
-        <path d="M0 0 L-8 -28 Q0 -31 8 -28 Z" fill="#e8cfa0" stroke={INK} strokeWidth="1.8" />
-        <path d="M0 0 L-2.7 -9.5 Q0 -10.7 2.7 -9.5 Z" fill={INK} stroke="none" />
-        <rect x="-8" y="-272" width="16" height="244" fill={BLUE} stroke={INK} strokeWidth="1.8" />
-        <path d="M-2.6 -29 V-272 M3 -29 V-272" stroke="#fff" strokeOpacity=".3" strokeWidth="1" />
-        <rect x="-5.6" y="-268" width="2.2" height="236" fill="#fff" fillOpacity=".16" stroke="none" />
-        <rect x="-8.6" y="-288" width="17.2" height="16" fill="#cfcabd" stroke={INK} strokeWidth="1.8" />
-        <path d="M-8.6 -282 H8.6 M-8.6 -277.5 H8.6" stroke={INK} strokeOpacity=".5" strokeWidth="1" />
-        <path d="M-8 -288 V-299 Q-8 -306 0 -306 Q8 -306 8 -299 V-288 Z" fill="#b85d38" stroke={INK} strokeWidth="1.8" />
-      </g>
-
-      {/* index finger, resting on top of the pencil */}
-      <Finger d="M98 -170 C78 -150 38 -130 6 -100" w={24} />
-      <path d="M70 -142 q8 -3 14 1 M44 -122 q6 -2 12 2" stroke={INK} strokeOpacity=".35" strokeWidth="1.4" />
-    </g>
-  );
-}
 
 /**
  * Scroll-driven drawing board. The section is tall and its content sticks to the screen; scroll
@@ -355,7 +302,7 @@ export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
               </g>
 
               <g ref={handRef} opacity={0} pointerEvents="none">
-                <Hand />
+                <SketchHand />
               </g>
             </svg>
           </div>
