@@ -13,7 +13,7 @@ import { visibleIds, type HomeSectionId, type LayoutEntry } from '@/lib/content/
 import { fillCount } from '@/lib/content/copy';
 
 /** Featured work in an arched frame, slowly cross-fading between projects. */
-function HeroShowcase({ projects }: { projects: ProjectRecord[] }) {
+function HeroShowcase({ projects, label }: { projects: ProjectRecord[]; label: string }) {
   const shown = projects.filter((p) => p.thumbnail_url || p.hero_image_url).slice(0, 5);
   const [index, setIndex] = useState(0);
 
@@ -57,7 +57,7 @@ function HeroShowcase({ projects }: { projects: ProjectRecord[] }) {
 
       <div className="mt-7 flex items-end justify-between gap-4">
         <div className="min-w-0">
-          <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-skyblue">Now showing</div>
+          <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-skyblue">{label}</div>
           <div className="truncate font-display text-2xl font-medium text-white">{current.title}</div>
           <div className="text-sm text-white/70">
             {current.location} · {current.year}
@@ -111,7 +111,9 @@ export function HomeClient({
           titleMuted={content.heroTitleMuted}
           body={content.heroBody}
           primaryCta={content.heroPrimaryCta}
+          primaryHref={content.heroPrimaryHref}
           secondaryCta={content.heroSecondaryCta}
+          secondaryHref={content.heroSecondaryHref}
           scrollCue={content.heroScrollCue}
         />
     ),
@@ -120,6 +122,8 @@ export function HomeClient({
           eyebrow={content.sketchEyebrow}
           title={content.sketchTitle}
           note={content.sketchNote}
+          heightLabel={content.sketchHeightLabel}
+          widthLabel={content.sketchWidthLabel}
           steps={[
             { title: content.sketchStep1Title, text: content.sketchStep1Text },
             { title: content.sketchStep2Title, text: content.sketchStep2Text },
@@ -142,7 +146,7 @@ export function HomeClient({
             </div>
           </div>
           <div data-reveal className="lg:col-span-5">
-            <HeroShowcase projects={featuredProjects} />
+            <HeroShowcase projects={featuredProjects} label={content.showcaseLabel} />
           </div>
         </div>
       </section>
@@ -340,8 +344,8 @@ export function HomeClient({
           </ul>
 
           <div className="mt-12">
-            <Link href="/about" className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-skyblue transition-colors">
-              <span>More about us</span>
+            <Link href={content.teamMoreHref || '/about'} className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-skyblue transition-colors">
+              <span>{content.teamMoreLink}</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>

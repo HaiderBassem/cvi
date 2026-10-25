@@ -28,7 +28,7 @@ export default function ProjectsIndexPage() {
       </header>
 
       {/* Interactive Directory */}
-      <ProjectsDirectory initialProjects={projects} allLabel={content.projectsAllLabel} />
+      <ProjectsDirectory initialProjects={projects} allLabel={content.projectsAllLabel} searchPlaceholder={content.projectsSearchPlaceholder} />
     </div>
   );
 }

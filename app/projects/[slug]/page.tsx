@@ -86,12 +86,12 @@ export default async function ProjectCaseStudyPage({ params }: ProjectPageProps)
   }
 
   const facts: { label: string; value: string }[] = [
-    { label: 'Client', value: project.client || 'Private' },
-    { label: 'Location', value: project.location || 'Iraq' },
-    { label: 'Year', value: project.year || '2025' },
-    { label: 'Scale / Area', value: project.size || 'Confidential' },
-    { label: 'Phase', value: project.status || 'In Design' },
-    { label: 'Typology', value: project.typology || 'Residential' },
+    { label: copy.factClientLabel, value: project.client || 'Private' },
+    { label: copy.factLocationLabel, value: project.location || 'Iraq' },
+    { label: copy.factYearLabel, value: project.year || '2025' },
+    { label: copy.factScaleLabel, value: project.size || 'Confidential' },
+    { label: copy.factPhaseLabel, value: project.status || 'In Design' },
+    { label: copy.factTypologyLabel, value: project.typology || 'Residential' },
   ];
 
   return (

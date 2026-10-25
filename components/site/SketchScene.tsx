@@ -21,6 +21,8 @@ interface SketchSceneProps {
   eyebrow: string;
   title: string;
   note: string;
+  heightLabel: string;
+  widthLabel: string;
   steps: [SketchStep, SketchStep, SketchStep];
 }
 
@@ -121,7 +123,7 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
  * progress runs a timeline that draws the building stroke by stroke while an architect's hand
  * holds a pencil at the end of the line. Everything is transforms, opacity and dash offsets.
  */
-export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
+export function SketchScene({ eyebrow, title, note, heightLabel, widthLabel, steps }: SketchSceneProps) {
   const rootRef = useRef<HTMLElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const handRef = useRef<SVGGElement>(null);
@@ -289,10 +291,10 @@ export function SketchScene({ eyebrow, title, note, steps }: SketchSceneProps) {
 
               <g ref={labelsRef} fill={BLUE} style={{ fontFamily: 'var(--font-hand), cursive' }}>
                 <text x="938" y="296" fontSize="24" textAnchor="middle" transform="rotate(-90 938 296)">
-                  142.50
+                  {heightLabel}
                 </text>
                 <text x="500" y="624" fontSize="24" textAnchor="middle">
-                  58.40 m
+                  {widthLabel}
                 </text>
                 {note && (
                   <text x="70" y="64" fontSize="26" fill="#6d675b" transform="rotate(-3 70 64)">

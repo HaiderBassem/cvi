@@ -16,7 +16,9 @@ interface IntroHeroProps {
   titleMuted: string;
   body: string;
   primaryCta: string;
+  primaryHref: string;
   secondaryCta: string;
+  secondaryHref: string;
   scrollCue: string;
 }
 
@@ -28,7 +30,7 @@ interface IntroHeroProps {
  * Everything animated is a transform or opacity (GPU-composited), the entrance waits for the
  * loader to leave (`cvi:intro`), and the scroll-out is scrubbed so it follows the smooth scroller.
  */
-export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, secondaryCta, scrollCue }: IntroHeroProps) {
+export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, primaryHref, secondaryCta, secondaryHref, scrollCue }: IntroHeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -193,7 +195,7 @@ export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, second
         <div className="mx-auto flex max-w-[112.5rem] flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
           <div className="order-2 flex flex-wrap items-center gap-x-6 gap-y-3 sm:order-1">
             <Link
-              href="/projects"
+              href={primaryHref || '/projects'}
               className="inline-flex items-center gap-3 rounded-full bg-[#1b1b1f] px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#f5f3ef] transition-colors duration-300 hover:bg-[#283f7d]"
             >
               <span>{primaryCta}</span>
@@ -201,7 +203,7 @@ export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, second
             </Link>
             {secondaryCta && (
               <Link
-                href="/about"
+                href={secondaryHref || '/about'}
                 className="text-[13px] font-semibold uppercase tracking-[0.16em] text-[#1b1b1f] underline decoration-[#1b1b1f]/30 underline-offset-[6px] transition-colors hover:decoration-[#1b1b1f]"
               >
                 {secondaryCta}

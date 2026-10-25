@@ -10,11 +10,12 @@ interface ProjectsDirectoryProps {
   initialProjects: ProjectRecord[];
   /** Label of the filter that shows everything. */
   allLabel?: string;
+  searchPlaceholder?: string;
 }
 
 const tidy = (t: string) => t.trim().replace(/\s+/g, ' ');
 
-export function ProjectsDirectory({ initialProjects, allLabel = 'All types' }: ProjectsDirectoryProps) {
+export function ProjectsDirectory({ initialProjects, allLabel = 'All types', searchPlaceholder = 'Search projects...' }: ProjectsDirectoryProps) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,7 +77,7 @@ export function ProjectsDirectory({ initialProjects, allLabel = 'All types' }: P
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/62" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-full pl-9 pr-4 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-skyblue"

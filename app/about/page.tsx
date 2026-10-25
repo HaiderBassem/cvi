@@ -111,7 +111,7 @@ export default function AboutPage() {
                   />
                 </div>
                 <span className="font-mono text-xs text-white/62 tracking-widest block mb-2">
-                  DISCIPLINE #{String(i + 1).padStart(2, '0')}
+                  {content.aboutDisciplineLabel} #{String(i + 1).padStart(2, '0')}
                 </span>
                 <h3 className="text-lg font-display font-medium text-white mb-2 group-hover:text-skyblue transition-colors">
                   {d.title}

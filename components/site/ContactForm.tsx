@@ -1,30 +1,47 @@
 'use client';
 
-import React, { useId, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import { AlertCircle, ArrowUpRight, CheckCircle2, Loader2 } from 'lucide-react';
 
-const TYPOLOGIES = [
-  'Masterplanning & Urban Design',
-  'Residential High-Rise / Tower',
-  'Educational or Academic Campus',
-  'Commercial / Corporate HQ',
-  'Cultural or Religious Architecture',
-  'Bespoke Private Villa',
-  'Other',
-];
+/** Every word of the form, edited in Admin → Site content → Contact form. */
+export interface ContactFormCopy {
+  title: string;
+  subtitle: string;
+  nameLabel: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  typeLabel: string;
+  /** One project type per line. */
+  types: string;
+  scaleLabel: string;
+  scalePlaceholder: string;
+  messageLabel: string;
+  messagePlaceholder: string;
+  send: string;
+  sending: string;
+  sentEyebrow: string;
+  /** `{name}` is replaced by the sender's name. */
+  sentTitle: string;
+  sentBody: string;
+  sentAgain: string;
+  errName: string;
+  errEmail: string;
+  errMessage: string;
+}
 
-const EMPTY = { name: '', email: '', typology: TYPOLOGIES[0], scale: '', message: '', website: '' };
+const blankForm = (typology: string) => ({ name: '', email: '', typology, scale: '', message: '', website: '' });
 
-type Key = keyof typeof EMPTY;
+type Key = keyof ReturnType<typeof blankForm>;
 type FieldErrors = Partial<Record<Key, string>>;
 
 const inputBase =
   'w-full bg-white/5 border rounded-sm px-4 py-3 text-sm text-white placeholder:text-white/55 focus:outline-none focus:border-skyblue transition-colors';
 const labelClass = 'block font-mono text-[13px] text-white/76 mb-2 uppercase';
 
-export default function ContactForm() {
+export default function ContactForm({ copy }: { copy: ContactFormCopy }) {
   const uid = useId();
-  const [form, setForm] = useState(EMPTY);
+  const types = useMemo(() => copy.types.split('\n').map((t) => t.trim()).filter(Boolean), [copy.types]);
+  const [form, setForm] = useState(() => blankForm(types[0] ?? ''));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,9 +56,9 @@ export default function ContactForm() {
 
   const validate = (): FieldErrors => {
     const e: FieldErrors = {};
-    if (!form.name.trim()) e.name = 'Please tell us your name.';
-    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = 'Enter a valid email address so we can reply.';
-    if (form.message.trim().length < 10) e.message = 'Tell us a little more about the project (at least 10 characters).';
+    if (!form.name.trim()) e.name = copy.errName;
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = copy.errEmail;
+    if (form.message.trim().length < 10) e.message = copy.errMessage;
     return e;
   };
 
@@ -69,7 +86,7 @@ export default function ContactForm() {
         return;
       }
       setSent({ name: form.name.trim() });
-      setForm(EMPTY);
+      setForm(blankForm(types[0] ?? ''));
     } catch {
       setFormError('We could not reach the server. Check your connection and try again — nothing you typed was lost.');
     } finally {
@@ -83,17 +100,17 @@ export default function ContactForm() {
         <div className="w-12 h-12 rounded-full border border-skyblue/40 bg-skyblue/10 flex items-center justify-center text-skyblue mb-6">
           <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
         </div>
-        <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">Brief received</div>
-        <h4 className="text-xl sm:text-2xl font-display text-white mb-3">Thank you, {sent.name}.</h4>
+        <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">{copy.sentEyebrow}</div>
+        <h4 className="text-xl sm:text-2xl font-display text-white mb-3">{copy.sentTitle.replace('{name}', sent.name)}</h4>
         <p className="text-white/82 text-sm font-normal max-w-md mx-auto mb-8 leading-relaxed">
-          Your project brief has reached the CVI studio. We&apos;ll reply to the email address you gave us.
+          {copy.sentBody}
         </p>
         <button
           type="button"
           onClick={() => setSent(null)}
           className="font-mono text-xs uppercase tracking-widest text-white/76 hover:text-skyblue transition-colors underline underline-offset-4 cursor-pointer"
         >
-          Send another brief
+          {copy.sentAgain}
         </button>
       </div>
     );
@@ -114,8 +131,8 @@ export default function ContactForm() {
 
   return (
     <div className="border border-white/10 p-8 sm:p-12 rounded-sm bg-white/[0.01]">
-      <h3 className="card-title font-display text-white mb-2">Send an Architectural Brief</h3>
-      <p className="text-white/76 text-xs font-mono mb-8 tracking-wider uppercase">Read by the studio directors</p>
+      <h3 className="card-title font-display text-white mb-2">{copy.title}</h3>
+      <p className="text-white/76 text-xs font-mono mb-8 tracking-wider uppercase">{copy.subtitle}</p>
 
       <form onSubmit={handleSubmit} noValidate data-contact-form className="relative flex flex-col gap-6">
         {formError && (
@@ -128,7 +145,7 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <label htmlFor={id('name')} className={labelClass}>
-              Full name *
+              {copy.nameLabel}
             </label>
             <input
               {...field('name')}
@@ -143,7 +160,7 @@ export default function ContactForm() {
           </div>
           <div>
             <label htmlFor={id('email')} className={labelClass}>
-              Email address *
+              {copy.emailLabel}
             </label>
             <input
               {...field('email')}
@@ -153,7 +170,7 @@ export default function ContactForm() {
               maxLength={200}
               value={form.email}
               onChange={(e) => set('email', e.target.value)}
-              placeholder="name@organization.com"
+              placeholder={copy.emailPlaceholder}
               className={`${inputBase} ${errors.email ? 'border-red-400/60' : 'border-white/10'}`}
             />
             {errorFor('email')}
@@ -163,7 +180,7 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <label htmlFor={id('typology')} className={labelClass}>
-              Project type
+              {copy.typeLabel}
             </label>
             <select
               {...field('typology')}
@@ -171,14 +188,14 @@ export default function ContactForm() {
               onChange={(e) => set('typology', e.target.value)}
               className="w-full bg-[#121216] border border-white/10 rounded-sm px-4 py-3 text-sm text-white focus:outline-none focus:border-skyblue transition-colors"
             >
-              {TYPOLOGIES.map((t) => (
+              {types.map((t) => (
                 <option key={t}>{t}</option>
               ))}
             </select>
           </div>
           <div>
             <label htmlFor={id('scale')} className={labelClass}>
-              Estimated scale / location
+              {copy.scaleLabel}
             </label>
             <input
               {...field('scale')}
@@ -186,7 +203,7 @@ export default function ContactForm() {
               maxLength={120}
               value={form.scale}
               onChange={(e) => set('scale', e.target.value)}
-              placeholder="e.g. 25,000 m² / Najaf"
+              placeholder={copy.scalePlaceholder}
               className={`${inputBase} border-white/10`}
             />
           </div>
@@ -194,7 +211,7 @@ export default function ContactForm() {
 
         <div>
           <label htmlFor={id('message')} className={labelClass}>
-            Project description &amp; requirements *
+            {copy.messageLabel}
           </label>
           <textarea
             {...field('message')}
@@ -202,7 +219,7 @@ export default function ContactForm() {
             maxLength={5000}
             value={form.message}
             onChange={(e) => set('message', e.target.value)}
-            placeholder="Site conditions, vision, programme and target timeline…"
+            placeholder={copy.messagePlaceholder}
             className={`${inputBase} ${errors.message ? 'border-red-400/60' : 'border-white/10'}`}
           />
           {errorFor('message')}
@@ -222,11 +239,11 @@ export default function ContactForm() {
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
-              <span>SENDING…</span>
+              <span>{copy.sending}</span>
             </>
           ) : (
             <>
-              <span>SEND BRIEF</span>
+              <span>{copy.send}</span>
               <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
             </>
           )}

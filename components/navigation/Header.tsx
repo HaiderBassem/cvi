@@ -14,7 +14,7 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { nav, cta, contact } = chrome;
+  const { nav, cta, contact, labels } = chrome;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -99,12 +99,12 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
             >
               {isMenuOpen ? (
                 <>
-                  <span>Close</span>
+                  <span>{labels.menuClose}</span>
                   <X className="w-4 h-4" aria-hidden="true" />
                 </>
               ) : (
                 <>
-                  <span>Menu</span>
+                  <span>{labels.menuOpen}</span>
                   <Menu className="w-4 h-4" aria-hidden="true" />
                 </>
               )}
@@ -149,13 +149,13 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
 
         <div className="grid w-full grid-cols-1 gap-6 border-t border-white/15 pt-8 text-[15px] text-white/80 md:grid-cols-3">
           <div>
-            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Our studio</div>
+            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">{labels.studioHeading}</div>
             {contact.addressLines.map((l) => (
               <div key={l}>{l}</div>
             ))}
           </div>
           <div>
-            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Get in touch</div>
+            <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">{labels.contactHeading}</div>
             {contact.email && (
               <a href={`mailto:${contact.email}`} tabIndex={isMenuOpen ? 0 : -1} className="block transition-colors hover:text-white">
                 {contact.email}
@@ -169,7 +169,7 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
           </div>
           {contact.socials.length > 0 && (
             <div>
-              <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">Follow us</div>
+              <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/60">{labels.followHeading}</div>
               <div className="flex flex-wrap gap-x-5 gap-y-1">
                 {contact.socials.map((s) => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" tabIndex={isMenuOpen ? 0 : -1} className="transition-colors hover:text-white">

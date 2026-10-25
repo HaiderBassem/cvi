@@ -36,7 +36,7 @@ export default function ContactPage() {
           <div className="border border-white/10 p-8 rounded-sm bg-white/[0.01]">
             <div className="flex items-center gap-3 text-skyblue mb-3">
               <MapPin className="w-4 h-4" />
-              <span className="tracking-widest uppercase">PHYSICAL ATELIER</span>
+              <span className="tracking-widest uppercase">{content.contactAddressLabel}</span>
             </div>
             <div className="text-base font-display text-white mb-2">
               {settings.companyName}
@@ -47,7 +47,7 @@ export default function ContactPage() {
               {settings.addressLine2}
             </p>
             <div className="text-[13px] text-white/62 tracking-wider">
-              COORDINATES: {settings.latitude}° N, {settings.longitude}° E
+              {content.contactCoordsLabel}: {settings.latitude}° N, {settings.longitude}° E
             </div>
           </div>
 
@@ -55,11 +55,11 @@ export default function ContactPage() {
           <div className="border border-white/10 p-8 rounded-sm bg-white/[0.01]">
             <div className="flex items-center gap-3 text-skyblue mb-3">
               <Phone className="w-4 h-4" />
-              <span className="tracking-widest uppercase">DIRECT CHANNELS</span>
+              <span className="tracking-widest uppercase">{content.contactChannelsLabel}</span>
             </div>
             <div className="flex flex-col gap-4 text-sm font-sans">
               <div>
-                <span className="text-white/62 block text-xs font-mono mb-1">TELEPHONE / WHATSAPP</span>
+                <span className="text-white/62 block text-xs font-mono mb-1 uppercase">{content.contactPhoneLabel}</span>
                 <a
                   href={`tel:${settings.phone.replace(/\s+/g, '')}`}
                   className="text-white hover:text-skyblue transition-colors font-mono text-base"
@@ -68,7 +68,7 @@ export default function ContactPage() {
                 </a>
               </div>
               <div>
-                <span className="text-white/62 block text-xs font-mono mb-1">ELECTRONIC MAIL</span>
+                <span className="text-white/62 block text-xs font-mono mb-1 uppercase">{content.contactEmailLabel}</span>
                 <a
                   href={`mailto:${settings.email}`}
                   className="text-white hover:text-skyblue transition-colors font-mono text-base"
@@ -91,7 +91,7 @@ export default function ContactPage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
-                <span>Instagram (@cvi.arch)</span>
+                <span>{content.contactInstagramLabel}</span>
                 <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
@@ -100,7 +100,7 @@ export default function ContactPage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
-                <span>Facebook (CVI Architects)</span>
+                <span>{content.contactFacebookLabel}</span>
                 <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
@@ -109,7 +109,7 @@ export default function ContactPage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between text-white/88 hover:text-white group border-b border-white/5 pb-2"
               >
-                <span>X / Twitter (@CVIarch)</span>
+                <span>{content.contactTwitterLabel}</span>
                 <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
               <a
@@ -118,7 +118,7 @@ export default function ContactPage() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-between text-white/88 hover:text-white group"
               >
-                <span>LinkedIn</span>
+                <span>{content.contactLinkedinLabel}</span>
                 <ArrowUpRight className="w-4 h-4 text-white/62 group-hover:text-skyblue transition-colors" />
               </a>
             </div>
@@ -137,12 +137,35 @@ export default function ContactPage() {
               allowFullScreen={false}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="CVI Architects Location"
+              title={content.contactMapTitle}
             />
           </div>
 
           {/* Inquiry Form */}
-          <ContactForm />
+          <ContactForm
+            copy={{
+              title: content.formTitle,
+              subtitle: content.formSubtitle,
+              nameLabel: content.formNameLabel,
+              emailLabel: content.formEmailLabel,
+              emailPlaceholder: content.formEmailPlaceholder,
+              typeLabel: content.formTypeLabel,
+              types: content.formTypes,
+              scaleLabel: content.formScaleLabel,
+              scalePlaceholder: content.formScalePlaceholder,
+              messageLabel: content.formMessageLabel,
+              messagePlaceholder: content.formMessagePlaceholder,
+              send: content.formSend,
+              sending: content.formSending,
+              sentEyebrow: content.formSentEyebrow,
+              sentTitle: content.formSentTitle,
+              sentBody: content.formSentBody,
+              sentAgain: content.formSentAgain,
+              errName: content.formErrName,
+              errEmail: content.formErrEmail,
+              errMessage: content.formErrMessage,
+            }}
+          />
         </div>
       </div>
     </div>

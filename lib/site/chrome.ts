@@ -16,6 +16,7 @@ export interface SiteChromeData {
     socials: { label: string; href: string }[];
   };
   loader: { text: string; image: string };
+  labels: { menuOpen: string; menuClose: string; studioHeading: string; contactHeading: string; followHeading: string };
   footer: { blurb: string; menuTitle: string; studioTitle: string; backToTop: string; copyright: string };
 }
 
@@ -48,6 +49,13 @@ export function getChromeData(): SiteChromeData {
       socials,
     },
     loader: { text: content.loaderText, image: content.loaderImage },
+    labels: {
+      menuOpen: content.menuOpenLabel,
+      menuClose: content.menuCloseLabel,
+      studioHeading: content.menuStudioHeading,
+      contactHeading: content.menuContactHeading,
+      followHeading: content.menuFollowHeading,
+    },
     footer: {
       blurb: content.footerBlurb,
       menuTitle: content.footerMenuTitle,
