@@ -353,3 +353,38 @@ html[data-header-tone='light'] .header-ink button.bg-white {
   transition-property: color, background-color, border-color, backdrop-filter, padding;
   transition-duration: 500ms;
 }
+
+/* Drawing section (scroll scene with the sketching hand) */
+.sketch-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2.3rem, 4.2vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  user-select: none;
+}
+.sketch-step {
+  opacity: 0.32;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sketch-step[data-active='true'] {
+  opacity: 1;
+}
+/* On narrow screens only the current step is shown, all stacked in one spot */
+@media (max-width: 1023px) {
+  .sketch-step {
+    grid-area: 1 / 1;
+    opacity: 0;
+  }
+  .sketch-step[data-active='true'] {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sketch-step {
+    opacity: 1 !important;
+    grid-area: auto !important;
+    padding-bottom: 1.25rem;
+  }
+}

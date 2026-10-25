@@ -48,22 +48,6 @@ export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, second
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const cleanups: Array<() => void> = [];
 
-    // The header turns dark while it sits over the cream sheet.
-    const tone = ScrollTrigger.create({
-      trigger: root,
-      start: 'top top+=64',
-      end: 'bottom top+=64',
-      onToggle: (self) => {
-        if (self.isActive) document.documentElement.dataset.headerTone = 'light';
-        else delete document.documentElement.dataset.headerTone;
-      },
-    });
-    if (tone.isActive) document.documentElement.dataset.headerTone = 'light';
-    cleanups.push(() => {
-      tone.kill();
-      delete document.documentElement.dataset.headerTone;
-    });
-
     if (reduce) return () => cleanups.forEach((fn) => fn());
 
     const ctx = gsap.context(() => {
@@ -155,7 +139,7 @@ export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, second
     <section
       ref={rootRef}
       aria-label="Introduction"
-      className="blueprint-grid relative isolate h-[100svh] min-h-[38rem] w-full overflow-hidden text-[#1b1b1f]"
+      className="relative isolate h-[100svh] min-h-[38rem] w-full overflow-hidden text-[#1b1b1f]"
     >
       {/* Cursor crosshair */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden [@media(hover:hover)_and_(pointer:fine)]:block">
@@ -231,12 +215,6 @@ export function IntroHero({ eyebrow, title, titleMuted, body, primaryCta, second
           )}
         </div>
       </div>
-
-      {/* The sheet melts into the dark page below */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-[#0a0a0c] sm:h-24"
-      />
     </section>
   );
 }

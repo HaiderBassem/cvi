@@ -7,6 +7,8 @@ import type { ProjectRecord, DisciplineRecord, GlobalSettings, SiteContent, Team
 import { ArrowUpRight, ChevronRight } from 'lucide-react';
 import Card3DTilt from '@/components/ui/Card3DTilt';
 import { IntroHero } from '@/components/site/IntroHero';
+import { BlueprintSheet } from '@/components/site/BlueprintSheet';
+import { SketchScene } from '@/components/site/SketchScene';
 import { fillCount } from '@/lib/content/copy';
 
 /** Featured work in an arched frame, slowly cross-fading between projects. */
@@ -101,15 +103,27 @@ export function HomeClient({
       {/* ========================================================================= */}
       {/* 01 — INTRO SHEET (after the loader)                                        */}
       {/* ========================================================================= */}
-      <IntroHero
-        eyebrow={content.heroEyebrow || 'CVI Architects · Baghdad'}
-        title={content.heroTitle}
-        titleMuted={content.heroTitleMuted}
-        body={content.heroBody}
-        primaryCta={content.heroPrimaryCta}
-        secondaryCta={content.heroSecondaryCta}
-        scrollCue={content.heroScrollCue}
-      />
+      <BlueprintSheet>
+        <IntroHero
+          eyebrow={content.heroEyebrow || 'CVI Architects · Baghdad'}
+          title={content.heroTitle}
+          titleMuted={content.heroTitleMuted}
+          body={content.heroBody}
+          primaryCta={content.heroPrimaryCta}
+          secondaryCta={content.heroSecondaryCta}
+          scrollCue={content.heroScrollCue}
+        />
+        <SketchScene
+          eyebrow={content.sketchEyebrow}
+          title={content.sketchTitle}
+          note={content.sketchNote}
+          steps={[
+            { title: content.sketchStep1Title, text: content.sketchStep1Text },
+            { title: content.sketchStep2Title, text: content.sketchStep2Text },
+            { title: content.sketchStep3Title, text: content.sketchStep3Text },
+          ]}
+        />
+      </BlueprintSheet>
 
       {/* Studio at a glance: intro paragraph, figures and featured work */}
       <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-24 pt-10 sm:px-12 sm:pb-32 sm:pt-16">

@@ -40,6 +40,22 @@ export const COPY_GROUPS = [
   },
   {
     tab: 'home',
+    title: 'Drawing section',
+    description: 'The scroll scene where a hand draws a building, shown right after the introduction.',
+    fields: [
+      { key: 'sketchEyebrow', label: 'Handwritten note above the heading', kind: 'text', max: 50, default: 'The drawing board' },
+      { key: 'sketchTitle', label: 'Heading', kind: 'text', max: 70, default: 'Drawn by hand. Built with precision.' },
+      { key: 'sketchNote', label: 'Handwritten note on the drawing', kind: 'text', max: 30, default: 'scale 1 : 200' },
+      { key: 'sketchStep1Title', label: 'Step 1 — title', kind: 'text', max: 40, default: 'Sketch the idea' },
+      { key: 'sketchStep1Text', label: 'Step 1 — text', kind: 'textarea', max: 200, default: 'Every project starts as a few lines on paper: the site, the axis, the proportions.' },
+      { key: 'sketchStep2Title', label: 'Step 2 — title', kind: 'text', max: 40, default: 'Draw the structure' },
+      { key: 'sketchStep2Text', label: 'Step 2 — text', kind: 'textarea', max: 200, default: 'Arches, floors and fins take their place, line by line, long before any model exists.' },
+      { key: 'sketchStep3Title', label: 'Step 3 — title', kind: 'text', max: 40, default: 'Detail and dimension' },
+      { key: 'sketchStep3Text', label: 'Step 3 — text', kind: 'textarea', max: 200, default: 'Shade, people and measurements turn a drawing into something that can be built.' },
+    ],
+  },
+  {
+    tab: 'home',
     title: 'Featured projects section',
     fields: [
       { key: 'featuredEyebrow', label: 'Small label', kind: 'text', max: 60, default: '01 • Featured projects' },
@@ -192,7 +208,7 @@ export const COPY_GROUPS = [
     description: 'The screen shown for a moment when the site opens.',
     fields: [
       { key: 'loaderText', label: 'Letters in the middle', kind: 'text', max: 8, default: 'CVI', hint: 'Up to 8 characters; each letter is shown apart.' },
-      { key: 'loaderImage', label: 'Background picture', kind: 'image', max: 500, default: '/brand/loader-map.jpg' },
+      { key: 'loaderImage', label: 'Background picture (no longer used)', kind: 'image', max: 500, default: '/brand/loader-map.jpg', hint: 'The opening screen is now a plain cream drafting sheet, so this picture is not shown.' },
     ],
   },
 ] as const satisfies readonly CopyGroup[];
