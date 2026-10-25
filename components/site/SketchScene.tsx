@@ -110,7 +110,7 @@ const TONES: Record<Tone, { stroke: string; width: number; opacity: number }> = 
 const AWAY_START = { x: 1180, y: 760 };
 const AWAY_END = { x: 1240, y: 340 };
 /** The hand is drawn life-size next to its pencil; this keeps it from hiding the drawing. */
-const HAND_SCALE = 0.5;
+const HAND_SCALE = 0.64;
 const GAP = 0.12; // pen lifted between strokes
 const HOLD = 1.3; // time left at the end for the hand to leave
 

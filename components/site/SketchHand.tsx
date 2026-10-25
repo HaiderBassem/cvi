@@ -126,17 +126,20 @@ const crease = (f: FingerSpec, t: number, half = 0.3, bow = 1.6): string => {
 
 /* ---- the hand's geometry (units: roughly 1.7 per millimetre; pencil is 12 wide) --------- */
 
-const INDEX: FingerSpec = { c: [[138, -172], [102, -180], [50, -148], [5, -104]], w0: 34, w1: 24 };
-const MIDDLE: FingerSpec = { c: [[148, -140], [110, -136], [54, -102], [8, -58]], w0: 35, w1: 25 };
-const RING: FingerSpec = { c: [[156, -108], [118, -114], [82, -94], [86, -58]], w0: 32, w1: 23 };
-const PINKY: FingerSpec = { c: [[162, -78], [130, -82], [102, -66], [106, -40]], w0: 27, w1: 20 };
-const THUMB: FingerSpec = { c: [[212, -46], [150, -28], [70, -38], [-16, -76]], w0: 44, w1: 30 };
+// Tripod grip, seen from above: the index finger runs along the pencil and presses its top,
+// the thumb pad presses its left side, the pencil rests on the side of the middle finger and
+// lies back across the web between thumb and index. Ring and little fingers curl into the palm.
+const INDEX: FingerSpec = { c: [[44, -192], [24, -158], [7, -124], [4, -72]], w0: 30, w1: 21 };
+const MIDDLE: FingerSpec = { c: [[74, -170], [68, -112], [42, -62], [9, -50]], w0: 31, w1: 22 };
+const RING: FingerSpec = { c: [[97, -150], [100, -104], [84, -76], [64, -72]], w0: 28, w1: 20 };
+const PINKY: FingerSpec = { c: [[115, -128], [120, -98], [106, -80], [90, -77]], w0: 24, w1: 17 };
+const THUMB: FingerSpec = { c: [[122, -120], [82, -110], [26, -102], [-13, -86]], w0: 40, w1: 27 };
 
 const BACK =
-  'M118 -190 C180 -214 270 -218 350 -200 C356 -170 356 -120 350 -92 C330 -62 296 -34 250 -30 C214 -28 178 -40 168 -62 C150 -95 120 -150 118 -190 Z';
-const FOREARM = 'M338 -198 C420 -206 500 -214 640 -232 L640 12 C500 -8 420 -22 340 -84 Z';
-const CUFF = 'M418 -210 C446 -214 470 -217 494 -220 L504 -2 C478 -8 452 -13 426 -20 Z';
-const SLEEVE = 'M494 -220 C560 -226 610 -232 700 -244 L700 28 C610 8 560 0 504 -2 Z';
+  'M16 -204 C40 -224 150 -228 256 -216 C263 -182 263 -142 257 -112 C222 -98 162 -98 124 -110 C96 -126 60 -158 30 -182 C22 -189 14 -197 16 -204 Z';
+const FOREARM = 'M250 -216 C340 -222 460 -226 600 -232 L600 -58 C460 -78 340 -96 254 -112 Z';
+const CUFF = 'M330 -220 C350 -221 370 -222 392 -224 L396 -84 C374 -88 352 -91 332 -95 Z';
+const SLEEVE = 'M392 -224 C470 -228 550 -232 660 -238 L660 -30 C550 -52 470 -70 396 -84 Z';
 
 const SILHOUETTE = [BACK, FOREARM, fingerPath(INDEX), fingerPath(MIDDLE), fingerPath(RING), fingerPath(PINKY), fingerPath(THUMB)];
 
@@ -216,16 +219,16 @@ export function SketchHand() {
 
       {/* forearm, shirt cuff and sleeve */}
       <path d={FOREARM} fill="url(#cvi-hand-forearm)" {...stroke} />
-      <path d="M352 -190 C400 -194 410 -150 410 -110" stroke={SKIN.crease} strokeWidth={1.2} opacity={0.35} />
+      <path d="M266 -206 C300 -204 312 -172 310 -140" stroke={SKIN.crease} strokeWidth={1.2} opacity={0.35} />
       <path d={SLEEVE} fill="url(#cvi-hand-sleeve)" stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
-      <path d="M520 -206 C560 -212 600 -216 690 -226 M512 -130 C560 -132 610 -134 696 -140 M510 -56 C560 -52 610 -46 696 -36" stroke="#fff" strokeOpacity={0.14} strokeWidth={2.2} strokeLinecap="round" />
-      <path d="M540 -216 C548 -150 548 -80 538 -6" stroke="#10204a" strokeOpacity={0.35} strokeWidth={2} />
+      <path d="M410 -212 C480 -216 560 -220 650 -226 M406 -150 C480 -152 560 -154 652 -158 M402 -96 C480 -90 560 -80 652 -66" stroke="#fff" strokeOpacity={0.14} strokeWidth={2.2} strokeLinecap="round" />
+      <path d="M470 -222 C478 -170 476 -110 466 -70" stroke="#10204a" strokeOpacity={0.35} strokeWidth={2} />
       <path d={CUFF} fill="#e9e4d6" stroke={INK} strokeWidth={1.6} strokeLinejoin="round" />
-      <path d="M440 -213 C448 -150 448 -80 438 -16" stroke={INK} strokeOpacity={0.18} strokeWidth={1.4} />
-      <path d="M418 -210 C446 -214 470 -217 494 -220 L496 -190 C470 -188 444 -186 418 -182 Z" fill="#000" opacity={0.08} />
+      <path d="M352 -219 C358 -170 358 -120 350 -92" stroke={INK} strokeOpacity={0.18} strokeWidth={1.4} />
+      <path d="M330 -220 C350 -221 370 -222 392 -224 L393 -200 C372 -198 350 -197 330 -196 Z" fill="#000" opacity={0.08} />
 
       {/* wrist bone */}
-      <ellipse cx="338" cy="-94" rx="9" ry="6" fill={SKIN.light} opacity={0.5} transform="rotate(-20 338 -94)" />
+      <ellipse cx="252" cy="-118" rx="9" ry="6" fill={SKIN.light} opacity={0.5} transform="rotate(-10 252 -118)" />
 
       {/* thumb, drawn before the pencil so it tucks underneath */}
       <Digit f={THUMB} lit={-1} />
@@ -241,20 +244,20 @@ export function SketchHand() {
       <path d={BACK} fill="url(#cvi-hand-back)" {...stroke} />
       <g fill="none" strokeLinecap="round">
         {/* extensor tendons running to the knuckles */}
-        <path d="M196 -176 C230 -178 262 -184 322 -186" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.2} />
-        <path d="M176 -150 C226 -154 270 -162 330 -166" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.22} />
-        <path d="M168 -122 C222 -126 268 -134 332 -140" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.22} />
-        <path d="M168 -92 C214 -96 262 -106 330 -112" stroke={SKIN.shade} strokeWidth={2.2} opacity={0.2} />
+        <path d="M58 -198 C120 -206 190 -210 248 -210" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.2} />
+        <path d="M84 -176 C140 -184 196 -190 250 -190" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.22} />
+        <path d="M104 -154 C156 -162 204 -168 252 -166" stroke={SKIN.shade} strokeWidth={2.4} opacity={0.22} />
+        <path d="M122 -130 C168 -136 212 -140 252 -138" stroke={SKIN.shade} strokeWidth={2.2} opacity={0.2} />
         {/* faint veins */}
-        <path d="M230 -168 C262 -150 286 -140 330 -146 M240 -108 C268 -120 290 -122 330 -122" stroke="#7d86a8" strokeWidth={1.8} opacity={0.2} />
+        <path d="M150 -196 C190 -178 216 -172 250 -176 M170 -128 C200 -146 222 -150 252 -150" stroke="#7d86a8" strokeWidth={1.8} opacity={0.2} />
       </g>
       {/* knuckles */}
       <g stroke="none">
         {[
-          [148, -172],
-          [158, -140],
-          [166, -108],
-          [172, -78],
+          [48, -190],
+          [76, -172],
+          [99, -152],
+          [117, -130],
         ].map(([x, y], i) => (
           <g key={i}>
             <ellipse cx={x + 6} cy={y + 4} rx="14" ry="11" fill={SKIN.shade} opacity={0.2} />
@@ -262,7 +265,7 @@ export function SketchHand() {
           </g>
         ))}
       </g>
-      <path d="M244 -12 C204 -10 172 -36 164 -66" stroke={SKIN.shade} strokeWidth={5} opacity={0.2} strokeLinecap="round" />
+      <path d="M256 -112 C222 -100 162 -100 124 -110" stroke={SKIN.shade} strokeWidth={5} opacity={0.2} strokeLinecap="round" />
 
       {/* pencil */}
       <g>
@@ -280,8 +283,12 @@ export function SketchHand() {
 
       {/* index finger, resting on the pencil */}
       <Digit f={INDEX} lit={1} />
+      {/* blend the index finger into its knuckle so there is no hard seam */}
+      <path d="M22 -206 C36 -214 58 -214 70 -200 C64 -186 50 -176 36 -178 C26 -186 20 -196 22 -206 Z" fill={SKIN.base} stroke="none" />
+      <ellipse cx="48" cy="-196" rx="12" ry="9" fill={SKIN.light} opacity={0.6} stroke="none" />
+      <path d="M16 -204 C30 -216 52 -219 68 -214" stroke={SKIN.line} strokeWidth={1.3} strokeLinecap="round" />
       {/* pad shadow where finger and thumb press the wood */}
-      <ellipse cx="2" cy="-86" rx="9" ry="5" fill="#000" opacity={0.08} transform="rotate(-20 2 -86)" />
+      <ellipse cx="-3" cy="-80" rx="8" ry="5" fill="#000" opacity={0.08} transform="rotate(-20 2 -86)" />
     </g>
   );
 }
