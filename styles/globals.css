@@ -304,6 +304,19 @@ html {
   }
 }
 
+/* The team photo's info card: a short fade and lift when a person is chosen. */
+@media (prefers-reduced-motion: no-preference) {
+  .team-card-in {
+    animation: team-card-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes team-card-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+}
+
 .animate-spin-slow {
   animation: spin-slow 14s linear infinite;
 }

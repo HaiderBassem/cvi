@@ -9,12 +9,20 @@ const trimmed = (max: number, label: string) =>
 const required = (max: number, label: string) => trimmed(max, label).min(1, `${label} is required.`);
 
 /** Site-relative path (/uploads/…, /brand/…) or an https URL. */
-export const imageUrl = z
+const isImageUrl = (v: string) => /^\/(?!\/)[\w\-./ %()]+$/.test(v) || /^https:\/\/[^\s]+$/.test(v);
+const IMAGE_URL_MESSAGE = 'Use an uploaded image or an https:// link.';
+
+export const imageUrl = z.string().trim().min(1, 'Add an image.').max(500).refine(isImageUrl, IMAGE_URL_MESSAGE);
+
+/** Like `imageUrl`, but an empty value is fine (the picture is optional). */
+const optionalImageUrl = z
   .string()
   .trim()
-  .min(1, 'Add an image.')
   .max(500)
-  .refine((v) => /^\/(?!\/)[\w\-./ %()]+$/.test(v) || /^https:\/\/[^\s]+$/.test(v), 'Use an uploaded image or an https:// link.');
+  .refine((v) => v === '' || isImageUrl(v), IMAGE_URL_MESSAGE);
+
+/** One side of a person's rectangle on the group photo, in % of the photo. */
+const photoPercent = z.number().min(0, 'Draw the box inside the photo.').max(100, 'Draw the box inside the photo.').nullable().optional();
 
 export const ContactSchema = z.object({
   name: required(120, 'Name'),
@@ -39,10 +47,18 @@ export const TeamMemberSchema = z.object({
   role: required(120, 'Role'),
   department: trimmed(120, 'Department').default(''),
   bio: trimmed(1200, 'Bio').default(''),
-  avatar_url: imageUrl,
+  /** The person's own portrait is optional now: the group photo is what visitors see. */
+  avatar_url: optionalImageUrl.default(''),
   is_leadership: z.coerce.number().int().min(0).max(1).default(1),
   is_visible: z.coerce.number().int().min(0).max(1).default(1),
+  /** Where they stand on the group photo (all four, or all null). Tidied up on save. */
+  photo_x: photoPercent,
+  photo_y: photoPercent,
+  photo_w: photoPercent,
+  photo_h: photoPercent,
 });
+
+export const TeamPhotoSchema = z.object({ url: imageUrl });
 
 export const ReorderSchema = z.object({
   ids: z.array(z.string().min(1).max(64)).max(500),

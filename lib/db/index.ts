@@ -530,16 +530,39 @@ export function getTeamMemberById(id: string): TeamMemberRecord | null {
   return toPlain((db.prepare('SELECT * FROM team_members WHERE id = ?').get(id) as unknown as TeamMemberRecord) || null);
 }
 
-export type TeamMemberInput = Omit<TeamMemberRecord, 'id' | 'sort_order'>;
+type PhotoRegion = Pick<TeamMemberRecord, 'photo_x' | 'photo_y' | 'photo_w' | 'photo_h'>;
+
+/** What a team member is created or edited with; the photo rectangle is optional (not placed yet). */
+export type TeamMemberInput = Omit<TeamMemberRecord, 'id' | 'sort_order' | keyof PhotoRegion> & Partial<PhotoRegion>;
+
+/**
+ * A member's rectangle on the group photo, made safe: all four numbers or none, at least 2 % wide
+ * and tall, and never reaching past the photo's edges. Anything incomplete means "not placed".
+ */
+export function normalizePhotoRegion(r: Partial<PhotoRegion>): PhotoRegion {
+  const none: PhotoRegion = { photo_x: null, photo_y: null, photo_w: null, photo_h: null };
+  const { photo_x: x, photo_y: y, photo_w: w, photo_h: h } = r;
+  if (![x, y, w, h].every((v) => typeof v === 'number' && Number.isFinite(v))) return none;
+  const round = (v: number) => Math.round(v * 100) / 100;
+  const cx = Math.min(Math.max(x as number, 0), 98);
+  const cy = Math.min(Math.max(y as number, 0), 98);
+  const cw = Math.min(Math.max(w as number, 2), 100 - cx);
+  const ch = Math.min(Math.max(h as number, 2), 100 - cy);
+  return { photo_x: round(cx), photo_y: round(cy), photo_w: round(cw), photo_h: round(ch) };
+}
 
 export function createTeamMember(m: TeamMemberInput): TeamMemberRecord {
   const db = getDb();
   const id = newId('tm');
   const next = db.prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 AS n FROM team_members').get() as { n: number };
+  const r = normalizePhotoRegion(m);
   db.prepare(`
-    INSERT INTO team_members (id, name, role, department, bio, avatar_url, sort_order, is_leadership, is_visible)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, m.name, m.role, m.department, m.bio, m.avatar_url, Number(next.n), m.is_leadership ? 1 : 0, m.is_visible ? 1 : 0);
+    INSERT INTO team_members (id, name, role, department, bio, avatar_url, sort_order, is_leadership, is_visible, photo_x, photo_y, photo_w, photo_h)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    id, m.name, m.role, m.department, m.bio, m.avatar_url, Number(next.n), m.is_leadership ? 1 : 0, m.is_visible ? 1 : 0,
+    r.photo_x, r.photo_y, r.photo_w, r.photo_h
+  );
   return getTeamMemberById(id)!;
 }
 
@@ -547,13 +570,45 @@ export function updateTeamMember(id: string, m: Partial<TeamMemberInput>): TeamM
   const existing = getTeamMemberById(id);
   if (!existing) return null;
   const u = { ...existing, ...m };
+  // Only touch the rectangle when the caller sent one (or explicitly cleared it); a plain
+  // edit of the name or the visibility must not un-place the person.
+  const touchesRegion = (['photo_x', 'photo_y', 'photo_w', 'photo_h'] as const).some((k) => k in m);
+  const r = touchesRegion ? normalizePhotoRegion(u) : existing;
   getDb()
     .prepare(`
-      UPDATE team_members SET name = ?, role = ?, department = ?, bio = ?, avatar_url = ?, is_leadership = ?, is_visible = ?
+      UPDATE team_members SET name = ?, role = ?, department = ?, bio = ?, avatar_url = ?, is_leadership = ?, is_visible = ?,
+        photo_x = ?, photo_y = ?, photo_w = ?, photo_h = ?
       WHERE id = ?
     `)
-    .run(u.name, u.role, u.department, u.bio, u.avatar_url, u.is_leadership ? 1 : 0, u.is_visible ? 1 : 0, id);
+    .run(u.name, u.role, u.department, u.bio, u.avatar_url, u.is_leadership ? 1 : 0, u.is_visible ? 1 : 0, r.photo_x, r.photo_y, r.photo_w, r.photo_h, id);
   return getTeamMemberById(id);
+}
+
+// ----------------- TEAM PHOTO (the group picture the people are placed on) -----------------
+
+export const DEFAULT_TEAM_PHOTO = '/team/cvi-team.jpg';
+
+export function getTeamPhoto(): string {
+  const row = getDb().prepare('SELECT value_json FROM global_settings WHERE key = ?').get('team_photo') as
+    | { value_json: string }
+    | undefined;
+  if (!row) return DEFAULT_TEAM_PHOTO;
+  try {
+    const url = (JSON.parse(row.value_json) as { url?: unknown }).url;
+    return typeof url === 'string' && url ? url : DEFAULT_TEAM_PHOTO;
+  } catch {
+    return DEFAULT_TEAM_PHOTO;
+  }
+}
+
+export function updateTeamPhoto(url: string): string {
+  getDb()
+    .prepare(`
+      INSERT INTO global_settings (key, value_json, updated_at) VALUES ('team_photo', ?, ?)
+      ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json, updated_at = excluded.updated_at
+    `)
+    .run(JSON.stringify({ url }), new Date().toISOString());
+  return url;
 }
 
 export function deleteTeamMember(id: string): boolean {

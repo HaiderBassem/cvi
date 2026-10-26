@@ -16,7 +16,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { Eye, EyeOff, GripVertical, Pencil, Plus, Trash2, Users } from 'lucide-react';
 import type { TeamMemberRecord } from '@/lib/db/types';
 import { adminFetch, ApiError } from '@/components/admin/adminFetch';
-import { Button, ConfirmDialog, EmptyState, IconButton, PageHeader, StatusChip, cx } from '@/components/admin/ui';
+import { Button, Card, CardHeader, ConfirmDialog, EmptyState, IconButton, PageHeader, StatusChip, cx } from '@/components/admin/ui';
+import PhotoRegionCanvas, { type CanvasBox, type Rect } from '@/components/admin/PhotoRegionCanvas';
 import { FormBanner, ListSkeleton, LoadFailed } from '@/components/admin/AdminStates';
 import Drawer from '@/components/admin/Drawer';
 import SaveBar from '@/components/admin/SaveBar';
@@ -32,9 +33,26 @@ type MemberForm = {
   avatar_url: string;
   is_leadership: number;
   is_visible: number;
+  /** Where they stand on the group photo, in % of the photo (all four, or all null). */
+  photo_x: number | null;
+  photo_y: number | null;
+  photo_w: number | null;
+  photo_h: number | null;
 };
 
-const EMPTY: MemberForm = { name: '', role: '', department: '', bio: '', avatar_url: '', is_leadership: 1, is_visible: 1 };
+const EMPTY: MemberForm = {
+  name: '',
+  role: '',
+  department: '',
+  bio: '',
+  avatar_url: '',
+  is_leadership: 1,
+  is_visible: 1,
+  photo_x: null,
+  photo_y: null,
+  photo_w: null,
+  photo_h: null,
+};
 
 function toForm(m: TeamMemberRecord): MemberForm {
   return {
@@ -45,7 +63,19 @@ function toForm(m: TeamMemberRecord): MemberForm {
     avatar_url: m.avatar_url || '',
     is_leadership: m.is_leadership ? 1 : 0,
     is_visible: m.is_visible === 0 ? 0 : 1,
+    photo_x: m.photo_x,
+    photo_y: m.photo_y,
+    photo_w: m.photo_w,
+    photo_h: m.photo_h,
   };
+}
+
+const round1 = (v: number) => Math.round(v * 10) / 10;
+
+/** The person's rectangle on the photo, or null when they have not been placed. */
+function regionOf(f: { photo_x: number | null; photo_y: number | null; photo_w: number | null; photo_h: number | null }): Rect | null {
+  const { photo_x: x, photo_y: y, photo_w: w, photo_h: h } = f;
+  return x === null || y === null || w === null || h === null ? null : { x, y, w, h };
 }
 
 function MemberRow({
@@ -85,7 +115,11 @@ function MemberRow({
       </button>
 
       <div className={cx('relative w-12 h-14 rounded overflow-hidden bg-white/5 shrink-0', hidden && 'opacity-40')}>
-        {member.avatar_url && <Image src={member.avatar_url} alt="" fill className="object-cover" sizes="48px" />}
+        {member.avatar_url ? (
+          <Image src={member.avatar_url} alt="" fill className="object-cover" sizes="48px" />
+        ) : (
+          <Users className="absolute inset-0 m-auto h-5 w-5 text-white/30" aria-hidden="true" />
+        )}
       </div>
 
       <button type="button" onClick={onEdit} className="flex-1 min-w-0 text-left cursor-pointer group">
@@ -98,6 +132,7 @@ function MemberRow({
 
       <div className="hidden sm:flex items-center gap-2">
         {member.is_leadership ? <StatusChip tone="accent">Leadership</StatusChip> : null}
+        {regionOf(member) === null && <StatusChip>Not on the photo</StatusChip>}
         {hidden && <StatusChip>Hidden</StatusChip>}
       </div>
 
@@ -118,6 +153,9 @@ function MemberRow({
 
 export default function TeamAdminPage() {
   const [members, setMembers] = useState<TeamMemberRecord[]>([]);
+  /** The group photo visitors see, with each person placed on it. */
+  const [photo, setPhoto] = useState('');
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [notice, setNotice] = useState<string | null>(null);
   const [rowBusy, setRowBusy] = useState(false);
@@ -132,12 +170,28 @@ export default function TeamAdminPage() {
   const load = useCallback(async () => {
     setState('loading');
     try {
-      setMembers(await adminFetch<TeamMemberRecord[]>('/api/admin/team'));
+      const [list, current] = await Promise.all([
+        adminFetch<TeamMemberRecord[]>('/api/admin/team'),
+        adminFetch<{ url: string }>('/api/admin/team-photo'),
+      ]);
+      setMembers(list);
+      setPhoto(current.url);
       setState('ready');
     } catch {
       setState('error');
     }
   }, []);
+
+  const changePhoto = async (url: string) => {
+    if (!url || url === photo) return; // a team photo is always needed, so "Remove" does nothing
+    try {
+      await adminFetch('/api/admin/team-photo', { method: 'PUT', json: { url } });
+      setPhoto(url);
+      setNotice('Team photo changed. Check that each box still sits on its person.');
+    } catch (err) {
+      setNotice(err instanceof ApiError ? err.message : 'Could not change the team photo.');
+    }
+  };
 
   useEffect(() => {
     load();
@@ -199,7 +253,8 @@ export default function TeamAdminPage() {
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = 'Name is required.';
     if (!form.role.trim()) errs.role = 'Role is required.';
-    if (!form.avatar_url) errs.avatar_url = 'Add a photo.';
+    const setSides = [form.photo_x, form.photo_y, form.photo_w, form.photo_h].filter((v) => v !== null).length;
+    if (setSides > 0 && setSides < 4) errs.photo_x = 'Draw a box around the person, or clear the position.';
     if (Object.keys(errs).length) {
       editor.setErrors(errs);
       editor.focusFirstError();
@@ -234,11 +289,25 @@ export default function TeamAdminPage() {
   const f = editor.form;
   const problems = Object.keys(editor.errors).length;
 
+  /** Boxes already on the photo, optionally leaving out the one being edited. */
+  const boxesFor = (skipId: string | null): CanvasBox[] =>
+    members.flatMap((m) => {
+      const rect = regionOf(m);
+      return rect && m.id !== skipId ? [{ id: m.id, label: m.name, rect, tone: 'other' as const }] : [];
+    });
+
+  const drawnRegion = (r: Rect) => ({
+    photo_x: round1(r.x),
+    photo_y: round1(r.y),
+    photo_w: round1(r.w),
+    photo_h: round1(r.h),
+  });
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Team"
-        description="The people shown on the homepage and the About page. Drag to change the order."
+        description="The people in the team photo on the homepage and the About page. Add each person's details here, then place them on the photo above."
         action={
           <Button onClick={() => editor.open(null, EMPTY)}>
             <Plus className="w-4 h-4" aria-hidden="true" /> Add member
@@ -249,6 +318,41 @@ export default function TeamAdminPage() {
       <div role="status" aria-live="polite" className={notice ? 'text-sm text-white/70 rounded-md border border-white/10 bg-white/[0.03] px-4 py-2' : 'sr-only'}>
         {notice}
       </div>
+
+      {state === 'ready' && photo && (
+        <Card>
+          <CardHeader
+            title="Team photo"
+            description="Visitors see this photo exactly as it is. Hold the mouse down and drag a box around a person to add them; click a box to edit that person."
+          />
+          <div className="space-y-4 p-4 sm:p-5">
+            <PhotoRegionCanvas
+              photo={photo}
+              ariaLabel="The team photo. Drag a box around a person to add them, or click a box to edit that person."
+              boxes={boxesFor(null)}
+              onDraw={(r) => editor.open(null, { ...EMPTY, ...drawnRegion(r) })}
+              onSelect={(id) => {
+                const m = members.find((x) => x.id === id);
+                if (m) editor.open(m.id, toForm(m));
+              }}
+            />
+            <details className="group text-sm">
+              <summary className="cursor-pointer select-none text-xs font-medium text-white/70 hover:text-white">Change the team photo</summary>
+              <div className="mt-3 max-w-md space-y-2">
+                <ImageUpload
+                  label="Team photo"
+                  aspect="aspect-[21/9]"
+                  value={photo}
+                  onChange={changePhoto}
+                  onBusyChange={setPhotoBusy}
+                  hint="Use one wide group picture. After changing it, check each person's box still sits on them."
+                />
+                {photoBusy && <p className="text-xs text-white/60">Uploading…</p>}
+              </div>
+            </details>
+          </div>
+        </Card>
+      )}
 
       {state === 'loading' ? (
         <ListSkeleton rows={4} />
@@ -292,7 +396,7 @@ export default function TeamAdminPage() {
           subtitle={editor.isNew ? 'Shown on the site as soon as you save.' : undefined}
           onClose={editor.requestClose}
           escapeDisabled={editor.confirmingClose}
-          maxWidth="sm:max-w-xl"
+          maxWidth="sm:max-w-3xl"
           footer={
             <SaveBar
               variant="footer"
@@ -312,8 +416,8 @@ export default function TeamAdminPage() {
           <FormSection title="Person">
             <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4">
               <ImageUpload
-                label="Photo"
-                required
+                label="Portrait (optional)"
+                hint="A small picture next to their name. Leave it empty to rely on the group photo."
                 aspect="aspect-[3/4]"
                 value={f.avatar_url}
                 onChange={(url) => editor.patch({ avatar_url: url })}
@@ -351,6 +455,37 @@ export default function TeamAdminPage() {
               error={editor.errors.bio}
               hint="Two or three sentences read best."
             />
+          </FormSection>
+          <FormSection
+            title="Position on the team photo"
+            description="Drag a box around this person. Visitors see their details when they hover or tap inside the box. Drag again to move it."
+          >
+            {photo ? (
+              <PhotoRegionCanvas
+                photo={photo}
+                ariaLabel="The team photo. Drag a box around this person."
+                boxes={[
+                  ...boxesFor(editor.session?.id ?? null),
+                  ...(regionOf(f) ? [{ id: 'current', label: f.name.trim() || 'This person', rect: regionOf(f)!, tone: 'current' as const }] : []),
+                ]}
+                onDraw={(r) => editor.patch(drawnRegion(r))}
+              />
+            ) : null}
+            {editor.errors.photo_x && (
+              <p role="alert" className="text-xs text-red-300">
+                {editor.errors.photo_x}
+              </p>
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-white/60">
+                {regionOf(f) ? 'Placed on the photo.' : 'Not placed yet: this person will not appear on the photo.'}
+              </p>
+              {regionOf(f) && (
+                <Button variant="ghost" onClick={() => editor.patch({ photo_x: null, photo_y: null, photo_w: null, photo_h: null })}>
+                  Clear position
+                </Button>
+              )}
+            </div>
           </FormSection>
           <FormSection title="Display">
             <Toggle

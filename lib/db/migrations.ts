@@ -105,6 +105,23 @@ export const MIGRATIONS: Migration[] = [
       `ALTER TABLE projects DROP COLUMN bg_mode`,
     ],
   },
+  {
+    version: 7,
+    name: 'add_team_member_photo_region',
+    // Where each person stands on the group photo (a rectangle, in % of the photo). Null = not placed.
+    up: [
+      `ALTER TABLE team_members ADD COLUMN photo_x REAL`,
+      `ALTER TABLE team_members ADD COLUMN photo_y REAL`,
+      `ALTER TABLE team_members ADD COLUMN photo_w REAL`,
+      `ALTER TABLE team_members ADD COLUMN photo_h REAL`,
+    ],
+    down: [
+      `ALTER TABLE team_members DROP COLUMN photo_h`,
+      `ALTER TABLE team_members DROP COLUMN photo_w`,
+      `ALTER TABLE team_members DROP COLUMN photo_y`,
+      `ALTER TABLE team_members DROP COLUMN photo_x`,
+    ],
+  },
 ];
 
 function ensureLedger(db: DatabaseSync) {

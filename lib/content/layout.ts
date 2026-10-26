@@ -77,7 +77,7 @@ export const HOME_SECTIONS = [
   {
     id: 'team',
     label: 'Team',
-    description: 'The people behind the work (hidden automatically when nobody is visible).',
+    description: 'The team photo: hover or tap a person to see who they are (hidden automatically when nobody is visible).',
     editHint: 'People: Team',
     editHref: '/admin/team',
   },
@@ -129,7 +129,7 @@ export const ABOUT_SECTIONS = [
   {
     id: 'team',
     label: 'Team',
-    description: 'The leadership and team cards (hidden automatically when nobody is visible).',
+    description: 'The team photo: hover or tap a person to see who they are (hidden automatically when nobody is visible).',
     editHint: 'People: Team',
     editHref: '/admin/team',
   },

@@ -14,7 +14,10 @@ import {
   deleteTeamMember,
   getTeamMembers,
   getSiteContent,
+  getTeamPhoto,
+  normalizePhotoRegion,
   DEFAULT_SITE_CONTENT,
+  DEFAULT_TEAM_PHOTO,
 } from '@/lib/db';
 
 function freshDb() {
@@ -33,6 +36,7 @@ describe('schema migrations', () => {
     expect(runMigrations(db)).toEqual([]);
     expect(columns(db, 'projects')).toEqual(expect.arrayContaining(['site_lat', 'site_lng']));
     expect(columns(db, 'team_members')).toContain('is_visible');
+    expect(columns(db, 'team_members')).toEqual(expect.arrayContaining(['photo_x', 'photo_y', 'photo_w', 'photo_h']));
     expect(columns(db, 'contact_messages')).toEqual(expect.arrayContaining(['status', 'read_at']));
   });
 
@@ -115,6 +119,51 @@ describe('team repository', () => {
     updateTeamMember(t.id, { is_visible: 0, role: 'Hidden tester' });
     expect(getTeamMembers(true).some((x) => x.id === t.id)).toBe(false);
     expect(getTeamMembers().find((x) => x.id === t.id)?.role).toBe('Hidden tester');
+  });
+});
+
+describe('team photo placement', () => {
+  const created: string[] = [];
+  afterAll(() => created.forEach((id) => deleteTeamMember(id)));
+
+  const person = { name: 'Vitest Placed', role: 'Test', department: '', bio: '', avatar_url: '', is_leadership: 0, is_visible: 1 };
+
+  it('keeps a rectangle inside the photo, and all-or-nothing', () => {
+    expect(normalizePhotoRegion({ photo_x: 90, photo_y: 10, photo_w: 40, photo_h: 20 })).toEqual({
+      photo_x: 90,
+      photo_y: 10,
+      photo_w: 10, // cannot run past the right edge
+      photo_h: 20,
+    });
+    expect(normalizePhotoRegion({ photo_x: 10, photo_y: 10, photo_w: 0.1, photo_h: 0.1 })).toMatchObject({ photo_w: 2, photo_h: 2 });
+    expect(normalizePhotoRegion({ photo_x: 10, photo_y: 10, photo_w: 20, photo_h: null })).toEqual({
+      photo_x: null,
+      photo_y: null,
+      photo_w: null,
+      photo_h: null,
+    });
+  });
+
+  it('places a person, keeps the place through a plain edit, and clears it on request', () => {
+    const t = createTeamMember({ ...person, photo_x: 12.345, photo_y: 20, photo_w: 15, photo_h: 60 });
+    created.push(t.id);
+    expect(t).toMatchObject({ photo_x: 12.35, photo_y: 20, photo_w: 15, photo_h: 60 });
+
+    // Hiding or renaming must not un-place them.
+    const renamed = updateTeamMember(t.id, { role: 'Renamed', is_visible: 0 });
+    expect(renamed).toMatchObject({ role: 'Renamed', photo_x: 12.35, photo_w: 15 });
+
+    const cleared = updateTeamMember(t.id, { photo_x: null, photo_y: null, photo_w: null, photo_h: null });
+    expect(cleared).toMatchObject({ photo_x: null, photo_y: null, photo_w: null, photo_h: null });
+  });
+
+  it('starts people unplaced and falls back to the bundled team photo', () => {
+    const t = createTeamMember(person);
+    created.push(t.id);
+    expect(t.photo_x).toBeNull();
+    expect(typeof getTeamPhoto()).toBe('string');
+    expect(getTeamPhoto().length).toBeGreaterThan(0);
+    expect(DEFAULT_TEAM_PHOTO).toBe('/team/cvi-team.jpg');
   });
 });
 

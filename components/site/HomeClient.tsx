@@ -12,6 +12,7 @@ import { FeatureScroll } from '@/components/site/FeatureScroll';
 import { LetterSection } from '@/components/site/LetterSection';
 import { ApproachSection } from '@/components/site/ApproachSection';
 import { FaqSection } from '@/components/site/FaqSection';
+import TeamPhoto from '@/components/site/TeamPhoto';
 import { HOME_SECTIONS, visibleIds, type HomeSectionId, type LayoutEntry } from '@/lib/content/layout';
 
 const HOME_IDS = HOME_SECTIONS.map((section) => section.id);
@@ -96,6 +97,9 @@ interface HomeClientProps {
   settings: GlobalSettings;
   content: SiteContent;
   team: TeamMemberRecord[];
+  /** The group photo the team is placed on (Admin → Team). */
+  teamPhoto: string;
+  teamPhotoSize: { width: number; height: number };
   /** Order and visibility of the sections (Admin → Page layout). */
   layout: LayoutEntry<HomeSectionId>[];
 }
@@ -107,6 +111,8 @@ export function HomeClient({
   settings,
   content,
   team,
+  teamPhoto,
+  teamPhotoSize,
   layout,
 }: HomeClientProps) {
   const [activeDiscipline, setActiveDiscipline] = useState<DisciplineRecord | null>(disciplines[0] || null);
@@ -353,25 +359,16 @@ export function HomeClient({
             )}
           </div>
 
-          <ul data-reveal-group className="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-6 lg:grid-cols-4">
-            {team.map((m) => (
-              <li key={m.id} className="group flex flex-col">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-sm border border-[#1b1b1f]/12 bg-[#d9ccb0] mb-5">
-                  <Image
-                    src={m.avatar_url}
-                    alt={`Portrait of ${m.name}`}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-700"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                </div>
-                <h3 className="text-lg font-grotesk font-semibold leading-snug text-[#1b1b1f] sm:text-xl">{m.name}</h3>
-                <div className="font-mono text-xs text-[#283f7d] mt-1 tracking-wide sm:tracking-wider">{m.role}</div>
-                {m.department && <div className="font-mono text-[13px] text-[#6d675b] mt-0.5">{m.department}</div>}
-                {m.bio && <p className="text-[#4a463d] text-[13px] sm:text-sm font-normal leading-relaxed mt-3 line-clamp-3 sm:line-clamp-4">{m.bio}</p>}
-              </li>
-            ))}
-          </ul>
+          <div data-reveal>
+            <TeamPhoto
+              photo={teamPhoto}
+              photoWidth={teamPhotoSize.width}
+              photoHeight={teamPhotoSize.height}
+              members={team}
+              hint={content.teamPhotoHint}
+              touchHint={content.teamPhotoHintTouch}
+            />
+          </div>
 
           <div className="mt-12">
             <Link href={content.teamMoreHref || '/about'} className="inline-flex items-center gap-2 font-mono text-xs text-[#3f3b33] hover:text-[#283f7d] transition-colors">

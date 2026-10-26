@@ -127,6 +127,8 @@ export const COPY_GROUPS = [
     title: 'Small labels on the homepage',
     fields: [
       { key: 'showcaseLabel', label: 'Label above the framed project', kind: 'text', max: 40, default: 'Now showing' },
+      { key: 'teamPhotoHint', label: 'Hint under the team photo (computer)', kind: 'text', max: 80, default: 'Hover over a person to meet them' },
+      { key: 'teamPhotoHintTouch', label: 'Hint under the team photo (phone)', kind: 'text', max: 80, default: 'Swipe sideways, then tap a person to meet them' },
       { key: 'teamMoreLink', label: 'Link under the team', kind: 'text', max: 40, default: 'More about us' },
       { key: 'teamMoreHref', label: 'Where that link goes', kind: 'text', max: 200, default: '/about' },
     ],

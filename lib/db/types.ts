@@ -128,6 +128,14 @@ export interface TeamMemberRecord {
   sort_order: number;
   is_leadership: number;
   is_visible: number; // 0 or 1 — hidden members stay in the admin but leave the site
+  /**
+   * Where this person is on the group photo: a rectangle, each value a percentage (0–100) of the
+   * photo's width / height. All four are set together or all four are null (not placed yet).
+   */
+  photo_x: number | null;
+  photo_y: number | null;
+  photo_w: number | null;
+  photo_h: number | null;
 }
 
 export type MessageStatus = 'new' | 'read' | 'archived';

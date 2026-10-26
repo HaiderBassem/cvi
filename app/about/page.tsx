@@ -2,7 +2,9 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getSettings, getTeamMembers, getDisciplines, getSiteContent, getPageLayout } from '@/lib/db';
+import { getSettings, getTeamMembers, getTeamPhoto, getDisciplines, getSiteContent, getPageLayout } from '@/lib/db';
+import TeamPhoto from '@/components/site/TeamPhoto';
+import { getImageSize } from '@/lib/site/imageSize';
 import { visibleIds, type AboutSectionId } from '@/lib/content/layout';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -11,8 +13,10 @@ export const metadata: Metadata = {
   description: 'Learn about CVI Architects, our multidisciplinary team, sustainable philosophy, and architectural commitments in Baghdad and beyond.',
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
   const settings = getSettings();
+  const teamPhoto = getTeamPhoto();
+  const teamPhotoSize = (await getImageSize(teamPhoto)) ?? { width: 1863, height: 824 };
   const team = getTeamMembers(true);
   const disciplines = getDisciplines();
   const content = getSiteContent();
@@ -136,29 +140,16 @@ export default function AboutPage() {
           </h2>
         </div>
 
-        <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {team.map((member) => (
-            <div key={member.id} className="flex flex-col border border-white/10 p-6 bg-white/[0.01]">
-              <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-neutral-900 rounded-sm">
-                <Image
-                  src={member.avatar_url}
-                  alt={member.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 25vw"
-                />
-              </div>
-              <h3 className="text-xl font-display font-semibold text-white mb-1">
-                {member.name}
-              </h3>
-              <div className="font-mono text-xs text-skyblue mb-3 tracking-wider">
-                {member.role}
-              </div>
-              <p className="text-white/76 text-xs font-normal leading-relaxed">
-                {member.bio}
-              </p>
-            </div>
-          ))}
+        <div data-reveal>
+          <TeamPhoto
+            photo={teamPhoto}
+            photoWidth={teamPhotoSize.width}
+            photoHeight={teamPhotoSize.height}
+            members={team}
+            hint={content.teamPhotoHint}
+            touchHint={content.teamPhotoHintTouch}
+            tone="dark"
+          />
         </div>
       </section>
       ),

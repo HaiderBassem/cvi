@@ -1,12 +1,15 @@
 import React from 'react';
-import { getAllProjects, getDisciplines, getPageLayout, getSettings, getSiteContent, getTeamMembers } from '@/lib/db';
+import { getAllProjects, getDisciplines, getPageLayout, getSettings, getSiteContent, getTeamMembers, getTeamPhoto } from '@/lib/db';
 import { HomeClient } from '@/components/site/HomeClient';
+import { getImageSize } from '@/lib/site/imageSize';
 
-export default function HomePage() {
+export default async function HomePage() {
   const allProjects = getAllProjects();
   const featuredProjects = allProjects.filter((p) => p.is_featured === 1);
   const disciplines = getDisciplines();
   const settings = getSettings();
+  const teamPhoto = getTeamPhoto();
+  const teamPhotoSize = (await getImageSize(teamPhoto)) ?? { width: 1863, height: 824 };
 
   return (
     <HomeClient
@@ -16,6 +19,8 @@ export default function HomePage() {
       settings={settings}
       content={getSiteContent()}
       team={getTeamMembers(true)}
+      teamPhoto={teamPhoto}
+      teamPhotoSize={teamPhotoSize}
       layout={getPageLayout().home}
     />
   );
