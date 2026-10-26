@@ -69,7 +69,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                   />
                 </div>
                 {content.caption && (
-                  <div className="max-w-6xl mx-auto px-6 mt-3 text-right font-mono text-[13px] text-white/62 tracking-wider">
+                  <div className="max-w-6xl mx-auto px-6 mt-3 text-left sm:text-right font-mono text-[13px] text-white/62 tracking-wider">
                     {content.caption}
                   </div>
                 )}

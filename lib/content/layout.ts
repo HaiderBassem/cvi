@@ -27,9 +27,16 @@ export const HOME_SECTIONS = [
   },
   {
     id: 'drawing',
-    label: 'Drawing board',
-    description: 'The scroll scene where a hand draws a building line by line, with its three steps.',
-    editHint: 'Words: Site content → Homepage → Drawing section',
+    label: 'Process scroll',
+    description: 'Five features that take turns as you scroll, each with a handwritten tag, an inked-in heading, a button and its own drawing.',
+    editHint: 'Words: Site content → Homepage → Process scroll',
+    editHref: '/admin/site',
+  },
+  {
+    id: 'letter',
+    label: 'Letter from the studio',
+    description: 'A letter on a sheet of paper; its words darken as you scroll.',
+    editHint: 'Words: Site content → Homepage → Letter from the studio',
     editHref: '/admin/site',
   },
   {
@@ -54,6 +61,13 @@ export const HOME_SECTIONS = [
     editHref: '/admin/site',
   },
   {
+    id: 'approach',
+    label: 'Ways of working',
+    description: 'Three folder cards: concept, design and delivery, each with what it includes.',
+    editHint: 'Words: Site content → Homepage → Ways of working',
+    editHref: '/admin/site',
+  },
+  {
     id: 'services',
     label: 'Services',
     description: 'The disciplines the studio offers, as picture cards.',
@@ -66,6 +80,13 @@ export const HOME_SECTIONS = [
     description: 'The people behind the work (hidden automatically when nobody is visible).',
     editHint: 'People: Team',
     editHref: '/admin/team',
+  },
+  {
+    id: 'faq',
+    label: 'Questions and answers',
+    description: 'An accordion of common questions with a button to the contact page.',
+    editHint: 'Words: Site content → Homepage → Questions and answers',
+    editHref: '/admin/site',
   },
   {
     id: 'archive',

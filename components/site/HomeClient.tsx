@@ -8,8 +8,13 @@ import { ArrowUpRight, ChevronRight } from 'lucide-react';
 import Card3DTilt from '@/components/ui/Card3DTilt';
 import { IntroHero } from '@/components/site/IntroHero';
 import { BlueprintSheet } from '@/components/site/BlueprintSheet';
-import { SketchScene } from '@/components/site/SketchScene';
-import { visibleIds, type HomeSectionId, type LayoutEntry } from '@/lib/content/layout';
+import { FeatureScroll } from '@/components/site/FeatureScroll';
+import { LetterSection } from '@/components/site/LetterSection';
+import { ApproachSection } from '@/components/site/ApproachSection';
+import { FaqSection } from '@/components/site/FaqSection';
+import { HOME_SECTIONS, visibleIds, type HomeSectionId, type LayoutEntry } from '@/lib/content/layout';
+
+const HOME_IDS = HOME_SECTIONS.map((section) => section.id);
 import { fillCount } from '@/lib/content/copy';
 
 /** Featured work in an arched frame, slowly cross-fading between projects. */
@@ -33,12 +38,12 @@ function HeroShowcase({ projects, label }: { projects: ProjectRecord[]; label: s
     <div className="mx-auto w-full max-w-[22rem] lg:ml-auto lg:mr-0">
       <div className="relative">
         {/* Offset hairline arch behind the frame */}
-        <div aria-hidden="true" className="arch-frame absolute -right-4 -top-4 h-full w-full border border-skyblue/40 sm:-right-6 sm:-top-6" />
+        <div aria-hidden="true" className="arch-frame absolute -right-3 -top-3 h-full w-full border border-[#283f7d]/40 sm:-right-6 sm:-top-6" />
         <Link
           href={`/projects/${current.slug}`}
           data-cursor="view"
           aria-label={`View ${current.title}`}
-          className="arch-frame relative block aspect-[3/3.7] w-full bg-neutral-900 shadow-2xl"
+          className="arch-frame relative block aspect-[3/3.7] w-full bg-[#d9ccb0] shadow-[0_18px_40px_-18px_rgba(40,30,10,0.35)]"
         >
           {shown.map((p, i) => (
             <Image
@@ -57,13 +62,13 @@ function HeroShowcase({ projects, label }: { projects: ProjectRecord[]; label: s
 
       <div className="mt-7 flex items-end justify-between gap-4">
         <div className="min-w-0">
-          <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-skyblue">{label}</div>
-          <div className="truncate font-display text-2xl font-medium text-white">{current.title}</div>
-          <div className="text-sm text-white/70">
+          <div className="mb-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#283f7d]">{label}</div>
+          <div className="truncate font-grotesk text-2xl font-medium text-[#1b1b1f]">{current.title}</div>
+          <div className="text-sm text-[#5b564a]">
             {current.location} · {current.year}
           </div>
         </div>
-        <div className="flex items-center gap-2" role="group" aria-label="Choose featured project">
+        <div className="-mr-2 flex shrink-0 items-center" role="group" aria-label="Choose featured project">
           {shown.map((p, i) => (
             <button
               key={p.id}
@@ -71,8 +76,12 @@ function HeroShowcase({ projects, label }: { projects: ProjectRecord[]; label: s
               onClick={() => setIndex(i)}
               aria-label={`Show ${p.title}`}
               aria-current={i === index}
-              className={`h-1.5 cursor-pointer rounded-full transition-all ${i === index ? 'w-8 bg-skyblue' : 'w-3 bg-white/35 hover:bg-white/60'}`}
-            />
+              className="group/dot flex h-9 cursor-pointer items-center px-1"
+            >
+              <span
+                className={`block h-1.5 rounded-full transition-all ${i === index ? 'w-8 bg-[#283f7d]' : 'w-3 bg-[#1b1b1f]/25 group-hover/dot:bg-[#1b1b1f]/50'}`}
+              />
+            </button>
           ))}
         </div>
       </div>
@@ -115,60 +124,67 @@ export function HomeClient({
           secondaryCta={content.heroSecondaryCta}
           secondaryHref={content.heroSecondaryHref}
           scrollCue={content.heroScrollCue}
+          email={settings.email}
+          images={featuredProjects
+            .map((p) => ({ src: p.hero_image_url || p.thumbnail_url, alt: p.title }))
+            .filter((img): img is { src: string; alt: string } => Boolean(img.src))}
         />
     ),
     drawing: (
-        <SketchScene
-          eyebrow={content.sketchEyebrow}
-          title={content.sketchTitle}
-          note={content.sketchNote}
-          heightLabel={content.sketchHeightLabel}
-          widthLabel={content.sketchWidthLabel}
-          steps={[
-            { title: content.sketchStep1Title, text: content.sketchStep1Text },
-            { title: content.sketchStep2Title, text: content.sketchStep2Text },
-            { title: content.sketchStep3Title, text: content.sketchStep3Text },
+        <FeatureScroll
+          cta={content.featuresCta}
+          ctaHref={content.featuresCtaHref}
+          hint={content.featuresHint}
+          features={[
+            { note: content.feature1Note, title: content.feature1Title, text: content.feature1Text },
+            { note: content.feature2Note, title: content.feature2Title, text: content.feature2Text },
+            { note: content.feature3Note, title: content.feature3Title, text: content.feature3Text },
+            { note: content.feature4Note, title: content.feature4Title, text: content.feature4Text },
+            { note: content.feature5Note, title: content.feature5Title, text: content.feature5Text },
           ]}
         />
     ),
+    letter: (
+      <LetterSection eyebrow={content.letterEyebrow} title={content.letterTitle} body={content.letterBody} sign={content.letterSign} />
+    ),
     glance: (
-      <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-24 pt-10 sm:px-12 sm:pb-32 sm:pt-16">
-        <div className="grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-10">
-          <div data-reveal className="lg:col-span-7">
+      <section className="mx-auto w-full max-w-[112.5rem] px-6 pb-16 pt-10 sm:px-12 sm:pb-32 sm:pt-16">
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-start lg:gap-10">
+          <div data-reveal className="min-w-0 lg:col-span-7">
             <p className="editorial-body mb-14 max-w-2xl">{content.heroBody}</p>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-10 border-t border-white/15 pt-8">
+            <div className="grid grid-cols-2 gap-x-5 gap-y-10 border-t border-[#1b1b1f]/15 pt-8 sm:gap-x-8">
               {content.heroStats.map((st, i) => (
                 <div key={i} className="min-w-0">
-                  <div className="font-display text-5xl font-medium leading-none text-white sm:text-6xl">{fillCount(st.value, allProjects.length)}</div>
-                  <div className="mt-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-white/70">{fillCount(st.label, allProjects.length)}</div>
+                  <div className="font-grotesk text-[clamp(2rem,9.5vw,3rem)] font-medium leading-none text-[#1b1b1f] sm:text-6xl">{fillCount(st.value, allProjects.length)}</div>
+                  <div className="mt-3 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#5b564a]">{fillCount(st.label, allProjects.length)}</div>
                 </div>
               ))}
             </div>
           </div>
-          <div data-reveal className="lg:col-span-5">
+          <div data-reveal className="min-w-0 lg:col-span-5">
             <HeroShowcase projects={featuredProjects} label={content.showcaseLabel} />
           </div>
         </div>
       </section>
     ),
     featured: (
-      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
-        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-white/10 pb-8">
+      <section className="w-full py-16 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-24 border-b border-[#1b1b1f]/12 pb-8">
           <div>
-            <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
+            <div className="font-mono text-xs text-[#283f7d] tracking-widest uppercase mb-2">
               {content.featuredEyebrow}
             </div>
-            <h2 className="section-title font-display text-white">
+            <h2 className="section-title font-grotesk text-[#1b1b1f]">
               {content.featuredTitle}
             </h2>
           </div>
-          <p className="font-mono text-xs text-white/62 max-w-xs text-left sm:text-right">
+          <p className="font-mono text-xs text-[#6d675b] max-w-xs text-left sm:text-right">
             {content.featuredIntro}
           </p>
         </div>
 
         {/* Vertical Chapter Portals */}
-        <div className="flex flex-col gap-24 sm:gap-40">
+        <div className="flex flex-col gap-16 sm:gap-40">
           {featuredProjects.map((p, idx) => (
             <article
               key={p.id}
@@ -178,7 +194,7 @@ export function HomeClient({
               {/* Media Portal (Left on even, Right on odd) with 3D Perspective Tilt */}
               <div className={`w-full lg:w-7/12 ${idx % 2 === 1 ? 'lg:order-2' : 'lg:order-1'}`}>
                 <Card3DTilt maxTilt={6} scale={1.015} className="w-full">
-                  <div className="relative aspect-[16/10] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 shadow-2xl">
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-sm border border-[#1b1b1f]/12 bg-[#d9ccb0] shadow-[0_18px_40px_-18px_rgba(40,30,10,0.35)]">
                     <Link href={`/projects/${p.slug}`} className="block w-full h-full relative" data-cursor="view">
                       <Image
                         src={p.hero_image_url || '/baghdad-urban-map.jpg'}
@@ -202,37 +218,37 @@ export function HomeClient({
               <div className={`w-full lg:w-5/12 flex flex-col ${
                 idx % 2 === 1 ? 'lg:order-1' : 'lg:order-2'
               }`}>
-                <div className="flex items-center gap-3 font-mono text-xs text-skyblue mb-3 tracking-widest uppercase">
+                <div className="flex items-center gap-3 font-mono text-xs text-[#283f7d] mb-3 tracking-widest uppercase">
                   <span>{p.location || 'Iraq'}</span>
                   <span>•</span>
                   <span>{p.year || '2025'}</span>
                 </div>
 
-                <h3 className="card-title font-display text-white mb-4 group-hover:text-skyblue transition-colors">
+                <h3 className="card-title font-grotesk text-[#1b1b1f] mb-4 group-hover:text-[#283f7d] transition-colors">
                   <Link href={`/projects/${p.slug}`}>
                     {p.title}
                   </Link>
                 </h3>
 
-                <p className="text-white/82 text-sm sm:text-base font-normal leading-relaxed mb-6">
+                <p className="text-[#3f3b33] text-sm sm:text-base font-normal leading-relaxed mb-6">
                   {p.summary || p.description}
                 </p>
 
                 {/* Technical Metric Row */}
-                <div className="grid grid-cols-2 gap-4 py-4 border-t border-b border-white/10 font-mono text-xs mb-8">
+                <div className="grid grid-cols-2 gap-4 py-4 border-t border-b border-[#1b1b1f]/12 font-mono text-xs mb-8">
                   <div>
-                    <span className="text-white/62 block text-xs uppercase mb-0.5">{content.cardScaleLabel}</span>
-                    <span className="text-white font-medium">{p.size || 'Confidential'}</span>
+                    <span className="text-[#6d675b] block text-xs uppercase mb-0.5">{content.cardScaleLabel}</span>
+                    <span className="text-[#1b1b1f] font-medium">{p.size || 'Confidential'}</span>
                   </div>
                   <div>
-                    <span className="text-white/62 block text-xs uppercase mb-0.5">{content.cardPhaseLabel}</span>
-                    <span className="text-white font-medium">{p.status || 'Active'}</span>
+                    <span className="text-[#6d675b] block text-xs uppercase mb-0.5">{content.cardPhaseLabel}</span>
+                    <span className="text-[#1b1b1f] font-medium">{p.status || 'Active'}</span>
                   </div>
                 </div>
 
                 <Link
                   href={`/projects/${p.slug}`}
-                  className="inline-flex items-center gap-3 font-mono text-xs text-white tracking-widest group-hover:text-skyblue transition-colors"
+                  className="inline-flex items-center gap-3 font-mono text-xs text-[#1b1b1f] tracking-widest group-hover:text-[#283f7d] transition-colors"
                 >
                   <span>{content.cardCta}</span>
                   <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -244,34 +260,48 @@ export function HomeClient({
       </section>
     ),
     manifesto: (
-      <section className="w-full py-24 sm:py-36 bg-[#060608] border-t border-b border-white/10">
+      <section className="w-full py-16 sm:py-36 bg-white/30 border-t border-b border-[#1b1b1f]/12">
         <div data-reveal className="max-w-[87.5rem] mx-auto px-6 sm:px-12 text-center">
-          <div className="font-mono text-xs text-skyblue tracking-[0.25em] uppercase mb-6">
+          <div className="font-mono text-xs text-[#283f7d] tracking-[0.25em] uppercase mb-6">
             {content.manifestoEyebrow}
           </div>
 
-          <blockquote className="section-title font-display text-white font-medium leading-tight max-w-4xl mx-auto mb-10">
+          <blockquote className="section-title font-grotesk text-[#1b1b1f] font-medium leading-tight max-w-4xl mx-auto mb-10">
             &ldquo;{content.manifestoQuote}&rdquo;
           </blockquote>
 
-          <div className="font-mono text-xs tracking-widest text-white/70 uppercase">
+          <div className="font-mono text-xs tracking-widest text-[#5b564a] uppercase">
             {content.manifestoAttribution}
           </div>
         </div>
       </section>
     ),
+    approach: (
+      <ApproachSection
+        eyebrow={content.approachEyebrow}
+        title={content.approachTitle}
+        intro={content.approachIntro}
+        badge={content.approachBadge}
+        ctaHref={content.approachCtaHref}
+        cards={[
+          { name: content.approach1Name, tag: content.approach1Tag, items: content.approach1Items, cta: content.approach1Cta },
+          { name: content.approach2Name, tag: content.approach2Tag, items: content.approach2Items, cta: content.approach2Cta },
+          { name: content.approach3Name, tag: content.approach3Tag, items: content.approach3Items, cta: content.approach3Cta },
+        ]}
+      />
+    ),
     services: (
-      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
-        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-white/10 pb-8">
+      <section className="w-full py-16 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 sm:mb-20 border-b border-[#1b1b1f]/12 pb-8">
           <div>
-            <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
+            <div className="font-mono text-xs text-[#283f7d] tracking-widest uppercase mb-2">
               {content.servicesEyebrow}
             </div>
-            <h2 className="section-title font-display text-white">
+            <h2 className="section-title font-grotesk text-[#1b1b1f]">
               {content.servicesTitle}
             </h2>
           </div>
-          <p className="font-mono text-xs text-white/62 max-w-xs text-left sm:text-right">
+          <p className="font-mono text-xs text-[#6d675b] max-w-xs text-left sm:text-right">
             {content.servicesIntro}
           </p>
         </div>
@@ -280,10 +310,10 @@ export function HomeClient({
           {disciplines.map((d, i) => (
             <div
               key={d.id}
-              className="group p-8 border border-white/10 hover:border-skyblue bg-white/[0.01] transition-all duration-300 rounded-sm flex flex-col justify-between"
+              className="group p-5 sm:p-8 border border-[#1b1b1f]/12 hover:border-[#283f7d] bg-white/35 transition-all duration-300 rounded-sm flex flex-col justify-between"
             >
               <div>
-                <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-neutral-900 rounded-sm">
+                <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-[#d9ccb0] rounded-sm">
                   <Image
                     src={d.image_url}
                     alt={d.title}
@@ -292,13 +322,13 @@ export function HomeClient({
                     sizes="(max-width: 768px) 100vw, 25vw"
                   />
                 </div>
-                <span className="font-mono text-xs text-skyblue tracking-widest block mb-2">
+                <span className="font-mono text-xs text-[#283f7d] tracking-widest block mb-2">
                   0{i + 1}
                 </span>
-                <h3 className="card-title font-display text-white mb-2 group-hover:text-skyblue transition-colors">
+                <h3 className="card-title font-grotesk text-[#1b1b1f] mb-2 group-hover:text-[#283f7d] transition-colors">
                   {d.title}
                 </h3>
-                <p className="text-white/76 text-xs font-normal leading-relaxed">
+                <p className="text-[#4a463d] text-xs font-normal leading-relaxed">
                   {d.description}
                 </p>
               </div>
@@ -308,25 +338,25 @@ export function HomeClient({
       </section>
     ),
     team: team.length > 0 && (
-        <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10" aria-labelledby="home-team-title">
-          <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
+        <section className="w-full py-16 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-[#1b1b1f]/12" aria-labelledby="home-team-title">
+          <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1b1b1f]/12">
             <div>
-              <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
+              <div className="font-mono text-xs text-[#283f7d] tracking-widest uppercase mb-2">
                 03 • {content.teamEyebrow}
               </div>
-              <h2 id="home-team-title" className="section-title font-display text-white">
+              <h2 id="home-team-title" className="section-title font-grotesk text-[#1b1b1f]">
                 {content.teamTitle}
               </h2>
             </div>
             {content.teamIntro && (
-              <p className="font-mono text-xs text-white/70 max-w-sm text-left sm:text-right leading-relaxed">{content.teamIntro}</p>
+              <p className="font-mono text-xs text-[#5b564a] max-w-sm text-left sm:text-right leading-relaxed">{content.teamIntro}</p>
             )}
           </div>
 
-          <ul data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ul data-reveal-group className="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-6 lg:grid-cols-4">
             {team.map((m) => (
               <li key={m.id} className="group flex flex-col">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-sm border border-white/10 bg-neutral-900 mb-5">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-sm border border-[#1b1b1f]/12 bg-[#d9ccb0] mb-5">
                   <Image
                     src={m.avatar_url}
                     alt={`Portrait of ${m.name}`}
@@ -335,36 +365,52 @@ export function HomeClient({
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 </div>
-                <h3 className="text-xl font-display font-semibold text-white">{m.name}</h3>
-                <div className="font-mono text-xs text-skyblue mt-1 tracking-wider">{m.role}</div>
-                {m.department && <div className="font-mono text-[13px] text-white/62 mt-0.5">{m.department}</div>}
-                {m.bio && <p className="text-white/76 text-sm font-normal leading-relaxed mt-3 line-clamp-4">{m.bio}</p>}
+                <h3 className="text-lg font-grotesk font-semibold leading-snug text-[#1b1b1f] sm:text-xl">{m.name}</h3>
+                <div className="font-mono text-xs text-[#283f7d] mt-1 tracking-wide sm:tracking-wider">{m.role}</div>
+                {m.department && <div className="font-mono text-[13px] text-[#6d675b] mt-0.5">{m.department}</div>}
+                {m.bio && <p className="text-[#4a463d] text-[13px] sm:text-sm font-normal leading-relaxed mt-3 line-clamp-3 sm:line-clamp-4">{m.bio}</p>}
               </li>
             ))}
           </ul>
 
           <div className="mt-12">
-            <Link href={content.teamMoreHref || '/about'} className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-skyblue transition-colors">
+            <Link href={content.teamMoreHref || '/about'} className="inline-flex items-center gap-2 font-mono text-xs text-[#3f3b33] hover:text-[#283f7d] transition-colors">
               <span>{content.teamMoreLink}</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
         </section>
       ),
+    faq: (
+      <FaqSection
+        eyebrow={content.faqEyebrow}
+        title={content.faqTitle}
+        intro={content.faqIntro}
+        cta={content.faqCta}
+        ctaHref={content.faqCtaHref}
+        items={[
+          { q: content.faq1Q, a: content.faq1A },
+          { q: content.faq2Q, a: content.faq2A },
+          { q: content.faq3Q, a: content.faq3A },
+          { q: content.faq4Q, a: content.faq4A },
+          { q: content.faq5Q, a: content.faq5A },
+        ]}
+      />
+    ),
     archive: (
-      <section className="w-full py-24 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-white/10">
-        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-white/10">
+      <section className="w-full py-16 sm:py-36 max-w-[112.5rem] mx-auto px-6 sm:px-12 border-t border-[#1b1b1f]/12">
+        <div data-reveal className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-16 pb-8 border-b border-[#1b1b1f]/12">
           <div>
-            <div className="font-mono text-xs text-skyblue tracking-widest uppercase mb-2">
+            <div className="font-mono text-xs text-[#283f7d] tracking-widest uppercase mb-2">
               {content.archiveEyebrow}
             </div>
-            <h2 className="section-title font-display text-white">
+            <h2 className="section-title font-grotesk text-[#1b1b1f]">
               {content.archiveTitle}
             </h2>
           </div>
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 font-mono text-xs text-white/82 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 font-mono text-xs text-[#3f3b33] hover:text-[#1b1b1f] transition-colors"
           >
             <span>{fillCount(content.archiveLink, allProjects.length)}</span>
             <ChevronRight className="w-4 h-4" />
@@ -372,27 +418,27 @@ export function HomeClient({
         </div>
 
         {/* Minimalist Tabular Index */}
-        <div data-reveal className="flex flex-col divide-y divide-white/10">
+        <div data-reveal className="flex flex-col divide-y divide-[#1b1b1f]/12">
           {allProjects.slice(0, 8).map((p, idx) => (
             <Link
               key={p.id}
               href={`/projects/${p.slug}`}
-              className="group py-6 px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-white/[0.03] transition-colors"
+              className="group py-6 px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-white/45 transition-colors"
             >
               <div className="flex items-baseline gap-6">
-                <span className="font-mono text-xs text-skyblue tracking-widest">
+                <span className="font-mono text-xs text-[#283f7d] tracking-widest">
                   #{String(idx + 1).padStart(2, '0')}
                 </span>
-                <span className="text-xl sm:text-2xl font-display font-medium text-white group-hover:text-skyblue transition-colors">
+                <span className="text-xl sm:text-2xl font-grotesk font-medium text-[#1b1b1f] group-hover:text-[#283f7d] transition-colors">
                   {p.title}
                 </span>
               </div>
 
-              <div className="flex min-w-0 items-center gap-4 text-xs text-white/70 lg:gap-8">
+              <div className="flex min-w-0 items-center gap-4 text-xs text-[#5b564a] lg:gap-8">
                 <span className="hidden w-40 truncate lg:inline-block">{p.typology || 'Architecture'}</span>
                 <span className="w-32 truncate">{p.location || 'Iraq'}</span>
                 <span className="w-12 shrink-0 lg:w-16">{p.year || '2025'}</span>
-                <ArrowUpRight className="w-4 h-4 text-white/55 group-hover:text-skyblue transition-colors" />
+                <ArrowUpRight className="w-4 h-4 text-[#8a8473] group-hover:text-[#283f7d] transition-colors" />
               </div>
             </Link>
           ))}
@@ -401,9 +447,9 @@ export function HomeClient({
     ),
   };
 
-  // The two sections that live on the cream blueprint sheet are grouped when they sit side by side,
-  // so the grid, header colour and fades behave like one continuous sheet.
-  const CREAM = new Set<HomeSectionId>(['intro', 'drawing']);
+  // Every section lives on the cream blueprint sheet. Neighbours are grouped, so the grid, the header
+  // colour and the fades behave like one continuous sheet (a hidden section never breaks it).
+  const CREAM = new Set<HomeSectionId>(HOME_IDS);
   const order = visibleIds(layout);
   const blocks: React.ReactNode[] = [];
   for (let i = 0; i < order.length; ) {
@@ -427,5 +473,5 @@ export function HomeClient({
     }
   }
 
-  return <div className="flex flex-col w-full text-white">{blocks}</div>;
+  return <div className="on-paper flex flex-col w-full text-[#1b1b1f]">{blocks}</div>;
 }

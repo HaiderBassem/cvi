@@ -1,0 +1,11 @@
+services:
+  cvi:
+    build: .
+    container_name: cvi-web
+    restart: unless-stopped
+    environment:
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?set in .env}
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "3010:3000"

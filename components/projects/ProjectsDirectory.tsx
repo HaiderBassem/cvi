@@ -54,12 +54,13 @@ export function ProjectsDirectory({ initialProjects, allLabel = 'All types', sea
       {/* Filter and View Bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-6 border-b border-white/10 font-mono text-xs">
         {/* Typology Pills */}
-        <div className="flex flex-wrap gap-2">
+        <div className="no-scrollbar -mx-6 flex w-[calc(100%+3rem)] gap-2 overflow-x-auto px-6 pb-1 sm:-mx-12 sm:w-[calc(100%+6rem)] sm:px-12 md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           {filters.map((f) => (
             <button
               key={f.id}
               onClick={() => setActiveFilter(f.id)}
-              className={`px-4 py-2 rounded-full border transition-all cursor-pointer ${
+              aria-pressed={activeFilter === f.id}
+              className={`shrink-0 whitespace-nowrap px-4 py-2.5 md:py-2 rounded-full border transition-all cursor-pointer ${
                 activeFilter === f.id
                   ? 'bg-white text-black border-white font-medium'
                   : 'text-white/76 border-white/10 hover:border-white/40 hover:text-white'
@@ -80,7 +81,7 @@ export function ProjectsDirectory({ initialProjects, allLabel = 'All types', sea
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-full pl-9 pr-4 py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-skyblue"
+              className="w-full bg-white/5 border border-white/10 rounded-full pl-9 pr-4 py-2.5 md:py-2 text-xs text-white placeholder-white/30 focus:outline-none focus:border-skyblue"
             />
           </div>
 
@@ -88,7 +89,7 @@ export function ProjectsDirectory({ initialProjects, allLabel = 'All types', sea
           <div className="flex items-center border border-white/10 rounded-full p-1 bg-white/5">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+              className={`p-2.5 md:p-1.5 rounded-full transition-colors cursor-pointer ${
                 viewMode === 'grid' ? 'bg-white text-black' : 'text-white/70 hover:text-white'
               }`}
               title="Grid View"
@@ -98,7 +99,7 @@ export function ProjectsDirectory({ initialProjects, allLabel = 'All types', sea
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+              className={`p-2.5 md:p-1.5 rounded-full transition-colors cursor-pointer ${
                 viewMode === 'list' ? 'bg-white text-black' : 'text-white/70 hover:text-white'
               }`}
               title="Index List View"

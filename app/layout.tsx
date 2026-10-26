@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Manrope, Cormorant_Garamond, Caveat } from 'next/font/google';
+import { Manrope, Cormorant_Garamond, Geist, Architects_Daughter } from 'next/font/google';
 import '@/styles/globals.css';
 import { SiteChrome } from '@/components/site/SiteChrome';
 import { getSettings } from '@/lib/db';
@@ -21,11 +21,19 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 });
 
-// Caveat: the handwritten margin notes on the intro sheet.
-const caveat = Caveat({
+// Geist: the grotesque used for the big headlines, as on illoca.unseen.co.
+const geist = Geist({
   subsets: ['latin'],
-  weight: ['500'],
-  variable: '--font-hand',
+  weight: ['400', '500', '600'],
+  variable: '--font-grotesk',
+  display: 'swap',
+});
+
+// Architects Daughter: the draughtsman's lettering of the margin notes, set in capitals.
+const architect = Architects_Daughter({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-arch',
   display: 'swap',
 });
 
@@ -95,7 +103,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${cormorant.variable} ${caveat.variable} dark`}
+      className={`${manrope.variable} ${cormorant.variable} ${geist.variable} ${architect.variable} dark`}
     >
       <body className="text-[#f4f4f6] selection:bg-[#4cb8f5] selection:text-black">
         <SiteChrome chrome={chrome}>

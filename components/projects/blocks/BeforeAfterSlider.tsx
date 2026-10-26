@@ -22,7 +22,6 @@ export function BeforeAfterSlider({
 }: BeforeAfterSliderProps) {
   const [sliderPos, setSliderPos] = useState(initialPosition);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
 
   const handleMove = useCallback((clientX: number) => {
     if (!containerRef.current) return;
@@ -32,20 +31,42 @@ export function BeforeAfterSlider({
     setSliderPos(pos);
   }, []);
 
-  const onTouchMove = (e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX);
+  // Pointer events cover mouse, pen and finger. The slider takes over horizontal drags
+  // (touch-action: pan-y) while vertical swipes still scroll the page past it. A finger only
+  // moves the handle once it drags sideways or lifts as a tap, so scrolling past never nudges it.
+  const touchStart = useRef<{ x: number; moved: boolean } | null>(null);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (e.pointerType === 'mouse') handleMove(e.clientX);
+    else touchStart.current = { x: e.clientX, moved: false };
   };
 
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (isDragging.current) {
-      handleMove(e.clientX);
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const touch = touchStart.current;
+    if (touch) {
+      // The browser sends a few moves before it decides a vertical swipe is a page scroll.
+      if (!touch.moved && Math.abs(e.clientX - touch.x) <= 6) return;
+      touch.moved = true;
     }
+    handleMove(e.clientX);
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (touchStart.current && !touchStart.current.moved) handleMove(e.clientX);
+    touchStart.current = null;
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') setSliderPos((p) => Math.max(0, p - 5));
+    else if (e.key === 'ArrowRight') setSliderPos((p) => Math.min(100, p + 5));
   };
 
   return (
     <div className="w-full my-12 sm:my-20">
       {title && (
-        <div className="flex items-center justify-between mb-4 font-mono text-xs text-white/76">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-xs text-white/76">
           <span className="tracking-widest uppercase">{title}</span>
           <span className="text-white/62">[ DRAG TO REVEAL ]</span>
         </div>
@@ -53,13 +74,19 @@ export function BeforeAfterSlider({
 
       <div
         ref={containerRef}
-        className="relative w-full aspect-[16/9] sm:aspect-[21/9] overflow-hidden select-none cursor-ew-resize border border-white/10"
+        className="relative w-full aspect-[4/3] sm:aspect-[21/9] touch-pan-y overflow-hidden select-none cursor-ew-resize border border-white/10"
         data-cursor="drag"
-        onMouseDown={() => (isDragging.current = true)}
-        onMouseUp={() => (isDragging.current = false)}
-        onMouseLeave={() => (isDragging.current = false)}
-        onMouseMove={onMouseMove}
-        onTouchMove={onTouchMove}
+        role="slider"
+        tabIndex={0}
+        aria-label={`${title}: drag to compare ${beforeLabel} with ${afterLabel}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(sliderPos)}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => (touchStart.current = null)}
+        onKeyDown={onKeyDown}
       >
         {/* After Image (Background full) */}
         <div className="absolute inset-0 w-full h-full">
@@ -67,10 +94,11 @@ export function BeforeAfterSlider({
             src={afterImage}
             alt={afterLabel}
             fill
+            draggable={false}
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1600px"
           />
-          <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-widest text-white/90">
+          <div className="absolute bottom-3 right-3 max-w-[45%] bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-wider text-white/90 sm:bottom-4 sm:right-4 sm:max-w-none sm:tracking-widest">
             {afterLabel}
           </div>
         </div>
@@ -84,10 +112,11 @@ export function BeforeAfterSlider({
             src={beforeImage}
             alt={beforeLabel}
             fill
+            draggable={false}
             className="object-cover"
             sizes="(max-width: 1200px) 100vw, 1600px"
           />
-          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-widest text-white/90">
+          <div className="absolute bottom-3 left-3 max-w-[45%] bg-black/60 backdrop-blur-md px-3 py-1 font-mono text-xs tracking-wider text-white/90 sm:bottom-4 sm:left-4 sm:max-w-none sm:tracking-widest">
             {beforeLabel}
           </div>
         </div>

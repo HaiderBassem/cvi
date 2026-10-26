@@ -31,7 +31,12 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
     if (!isMenuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setIsMenuOpen(false);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    // The page behind the menu must not scroll while it is open.
+    document.documentElement.classList.add('menu-open');
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.documentElement.classList.remove('menu-open');
+    };
   }, [isMenuOpen]);
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : !/^https?:\/\//.test(href) && pathname.startsWith(href));
@@ -118,11 +123,11 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
         id="site-menu"
         data-lenis-prevent
         aria-hidden={!isMenuOpen}
-        className={`lg:hidden fixed inset-0 z-[8999] bg-[#08080a]/[0.98] backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between px-8 pb-10 pt-28 sm:px-16 overflow-y-auto ${
+        className={`lg:hidden fixed inset-0 z-[8999] bg-[#08080a]/[0.98] backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between px-8 pb-10 pt-28 sm:px-16 overflow-y-auto overscroll-contain ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <nav aria-label="Main" className="my-auto flex max-w-3xl flex-col gap-2 py-8">
+        <nav aria-label="Main" className="my-auto flex max-w-3xl flex-col gap-1 py-6 sm:gap-2 sm:py-8">
           {nav.map((link, i) => (
             <Link
               key={link.href + link.label}
@@ -130,12 +135,12 @@ export function Header({ chrome }: { chrome: SiteChromeData }) {
               {...linkProps(link.external)}
               tabIndex={isMenuOpen ? 0 : -1}
               aria-current={isActive(link.href) ? 'page' : undefined}
-              className="group flex items-baseline gap-5 border-b border-white/10 py-5 text-white sm:gap-8"
+              className="group flex items-baseline gap-5 border-b border-white/10 py-4 text-white sm:gap-8 sm:py-5"
             >
               <span className="w-8 text-sm font-semibold tracking-widest text-skyblue">{String(i + 1).padStart(2, '0')}</span>
               <span className="flex flex-col">
                 <span
-                  className={`font-display text-5xl font-medium leading-none transition-transform duration-300 group-hover:translate-x-2 sm:text-6xl ${
+                  className={`font-display text-4xl font-medium leading-none transition-transform duration-300 group-hover:translate-x-2 min-[400px]:text-5xl sm:text-6xl [@media(max-height:700px)]:!text-4xl ${
                     isActive(link.href) ? 'text-skyblue' : 'text-white'
                   }`}
                 >

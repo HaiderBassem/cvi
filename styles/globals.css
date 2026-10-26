@@ -78,7 +78,55 @@ body {
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   line-height: 1.6;
+}
+
+/* Phones can still pan sideways (and stretch the fixed header) when something pokes past the edge
+   even with overflow-x hidden on body. `clip` stops that without making a scroll container, so the
+   sticky scenes keep working. Both elements must use it: a non-visible value on html alone would
+   stop body's overflow from propagating to the viewport. */
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+/* The phone menu locks the page behind it. */
+html.menu-open {
+  overflow: hidden;
+}
+
+/* Touch: no double-tap-zoom delay on controls, and a soft tap flash instead of the grey box. */
+a,
+button,
+[role='button'],
+summary,
+label,
+select {
+  touch-action: manipulation;
+}
+html {
+  -webkit-tap-highlight-color: rgba(76, 184, 245, 0.18);
+}
+
+/* iOS Safari zooms the whole page when a field under 16px takes focus. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='color']),
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Horizontal strips that scroll by finger, without a scrollbar */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 :focus-visible {
@@ -147,10 +195,7 @@ body {
 /* Lens Noise Overlay */
 .film-grain {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   pointer-events: none;
   z-index: 9998;
   opacity: 0.03;
@@ -160,6 +205,12 @@ body {
 /* ------------------------------------------------------------------ */
 /* Typography — editorial serif for headlines, open sans for reading   */
 /* ------------------------------------------------------------------ */
+.hero-title,
+.section-title,
+.card-title {
+  overflow-wrap: break-word;
+}
+
 .hero-title {
   font-family: var(--font-display), Georgia, serif;
   font-size: clamp(3rem, 6.6vw + 0.6rem, 8rem);
@@ -295,11 +346,11 @@ body {
 }
 
 .intro-title {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-grotesk), system-ui, sans-serif;
   font-weight: 500;
-  font-size: clamp(3rem, 8.6vw, 9.25rem);
-  line-height: 0.94;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, min(7.4vw, 15svh), 7.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
   text-align: center;
   text-wrap: balance;
   user-select: none;
@@ -311,42 +362,67 @@ body {
 .intro-title-fill {
   color: #1b1b1f;
 }
-.intro-title .intro-muted {
-  font-style: italic;
-  font-weight: 400;
-}
-.intro-title-outline .intro-muted {
-  -webkit-text-stroke-color: #283f7d;
-}
-.intro-title-fill .intro-muted {
-  color: #283f7d;
-}
-
 .hand-note {
-  font-family: var(--font-hand), 'Comic Sans MS', cursive;
-  font-weight: 500;
+  font-family: var(--font-arch), 'Comic Sans MS', cursive;
+  font-weight: 400;
   line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: #6d675b;
   white-space: nowrap;
 }
 
 /* Header sits dark-on-cream while the intro sheet is behind it */
-html[data-header-tone='light'] .header-bar {
+html[data-header-tone='light']:not(.menu-open) .header-bar {
   background-color: rgba(234, 223, 201, 0.6) !important;
 }
-html[data-header-tone='light'] .header-ink,
-html[data-header-tone='light'] .header-ink [class*='text-white'] {
+html[data-header-tone='light']:not(.menu-open) .header-ink,
+html[data-header-tone='light']:not(.menu-open) .header-ink [class*='text-white'] {
   color: #1b1b1f !important;
 }
-html[data-header-tone='light'] .header-ink [class*='border-white'] {
+html[data-header-tone='light']:not(.menu-open) .header-ink [class*='border-white'] {
   border-color: rgba(27, 27, 31, 0.3) !important;
 }
-html[data-header-tone='light'] .header-ink [class*='text-white\/70'] {
+html[data-header-tone='light']:not(.menu-open) .header-ink [class*='text-white\/70'] {
   color: #4a463d !important;
 }
-html[data-header-tone='light'] .header-ink button.bg-white {
+html[data-header-tone='light']:not(.menu-open) .header-ink button.bg-white {
   background-color: #1b1b1f !important;
   color: #f5f3ef !important;
+}
+@media (min-width: 1024px) {
+  html[data-header-tone='light']:not(.menu-open) .header-bar {
+    background-color: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding-top: 1rem !important;
+    padding-bottom: 0 !important;
+  }
+  html[data-header-tone='light']:not(.menu-open) .header-ink {
+    max-width: 46rem;
+    gap: 1.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    background: #fff;
+    border: 1px solid rgba(66, 66, 66, 0.3);
+    border-radius: 0.5rem;
+    box-shadow: 4px -2px rgba(0, 0, 0, 0.1);
+  }
+  html[data-header-tone='light']:not(.menu-open) .header-ink [class*='uppercase'] {
+    display: none;
+  }
+  html[data-header-tone='light']:not(.menu-open) .header-ink nav {
+    gap: 1.5rem;
+  }
+  html[data-header-tone='light']:not(.menu-open) .header-ink nav a {
+    font-size: 14px;
+    letter-spacing: -0.01em;
+  }
+  html[data-header-tone='light']:not(.menu-open) .header-ink a[class*='rounded-full'] {
+    background: #365abd;
+    border-color: transparent !important;
+    border-radius: 0.25rem;
+    color: #fffbf3 !important;
+  }
 }
 .header-bar,
 .header-bar * {
@@ -354,38 +430,111 @@ html[data-header-tone='light'] .header-ink button.bg-white {
   transition-duration: 500ms;
 }
 
-/* Drawing section (scroll scene with the sketching hand) */
-.sketch-title {
-  font-family: var(--font-display), Georgia, serif;
+/* Opening screen tiles */
+@keyframes tile-swing {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+@keyframes tile-open {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+@keyframes tile-line {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@keyframes tile-draw {
+  0% { stroke-dashoffset: 1; }
+  60%, 100% { stroke-dashoffset: 0; }
+}
+.loader-square { transform-origin: 28px 28px; animation: tile-swing 1.4s ease-in-out infinite; }
+.loader-leg-a { transform-origin: 28px 10px; animation: tile-open 1.2s ease-in-out infinite; }
+.loader-leg-b { transform-origin: 28px 10px; animation: tile-open 1.2s ease-in-out infinite reverse; }
+.loader-line { animation: tile-line 1.2s ease-in-out infinite; }
+.loader-arch { stroke-dasharray: 1; animation: tile-draw 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .loader-square, .loader-leg-a, .loader-leg-b, .loader-line, .loader-arch { animation: none; }
+}
+
+/* A frame of grid paper around the home page: the sheet shows through a window onto the page */
+.page-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 8500;
+  pointer-events: none;
+  padding: 10px;
+  background-color: #eadfc9;
+  background-image:
+    linear-gradient(90deg, #d3c9b5 1px, transparent 0),
+    linear-gradient(#e3d9c3 1px, transparent 0);
+  background-size: 1rem 1rem;
+  -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+@media (max-width: 639px) {
+  .page-frame {
+    padding: 6px;
+  }
+}
+
+/* Intro sheet: pinned while the picture window rises over the headline */
+.intro-sheet {
+  height: 215svh;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-sheet {
+    height: auto;
+  }
+}
+
+/* The homepage on the cream sheet: headings and body text turn to grotesk and ink */
+.on-paper .section-title,
+.on-paper .card-title {
+  font-family: var(--font-grotesk), system-ui, sans-serif;
   font-weight: 500;
-  font-size: clamp(2.3rem, 4.2vw, 4.6rem);
-  line-height: 0.98;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: #1b1b1f;
+}
+.on-paper .card-title {
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.on-paper .editorial-body {
+  color: #3f3b33;
+}
+
+/* Ruled paper for the letter */
+.letter-paper {
+  background-color: #fbf7ee;
+  background-image: repeating-linear-gradient(transparent 0, transparent 2.1rem, rgba(40, 63, 125, 0.09) 2.1rem, rgba(40, 63, 125, 0.09) calc(2.1rem + 1px));
+  background-position: 0 3.5rem;
+}
+
+/* Process scroll (five features that take turns on one pinned stage) */
+.feature-scroll {
+  height: calc(var(--features, 5) * 170svh);
+}
+.feature-title {
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.4rem, 5.2vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
   text-wrap: balance;
   user-select: none;
 }
-.sketch-step {
-  opacity: 0.32;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.sketch-step[data-active='true'] {
-  opacity: 1;
-}
-/* On narrow screens only the current step is shown, all stacked in one spot */
-@media (max-width: 1023px) {
-  .sketch-step {
-    grid-area: 1 / 1;
-    opacity: 0;
-  }
-  .sketch-step[data-active='true'] {
-    opacity: 1;
-  }
+.feature-slide[data-active='false'] {
+  pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .sketch-step {
-    opacity: 1 !important;
-    grid-area: auto !important;
-    padding-bottom: 1.25rem;
+  .feature-scroll {
+    height: auto;
+  }
+  .feature-slide[data-active='false'] {
+    pointer-events: auto;
   }
 }
 

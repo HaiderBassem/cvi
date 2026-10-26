@@ -7,8 +7,17 @@ module.exports = {
     './lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class',
+  // hover: styles only apply on devices that can really hover, so a tap on a phone doesn't leave
+  // buttons and cards stuck in their hover look.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
+      screens: {
+        // Phones turned sideways: wide enough for columns, far too short for a full-height scene.
+        land: { raw: '(min-width: 640px) and (max-height: 520px)' },
+        // Wide *and* tall enough for the layered full-height layouts.
+        roomy: { raw: '(min-width: 640px) and (min-height: 521px)' },
+      },
       colors: {
         basalt: {
           950: '#060608',
@@ -38,6 +47,7 @@ module.exports = {
         // so existing markup, including the admin, picks it up).
         mono: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'Georgia', 'serif'],
+        grotesk: ['var(--font-grotesk)', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Nothing on the public site should be smaller than 13px.

@@ -26,6 +26,7 @@ export function SiteChrome({ chrome, children }: { chrome: SiteChromeData; child
       <RevealOnScroll />
       <CustomCursor />
       <div className="film-grain" aria-hidden="true" />
+      {pathname === '/' && <div className="page-frame" aria-hidden="true" />}
       <Header chrome={chrome} />
       <main className="relative z-10 flex flex-col min-h-screen">{children}</main>
       <div className="relative z-10">

@@ -1,20 +1,52 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { SketchHandPhoto } from '@/components/site/SketchHandPhoto';
-import { LOGO_GLYPHS, LOGO_VIEWBOX } from '@/lib/brand/logoGlyphs';
-import { layoutStrokeText } from '@/lib/brand/strokeFont';
+import React, { useEffect, useState } from 'react';
 
 interface PreloaderProps {
-  /** The letters drawn on the opening screen (edited in Admin → Site content). */
+  /** The letters shown in the middle (edited in Admin → Site content). */
   text?: string;
   onComplete?: () => void;
 }
 
-type Stage = 'drawing' | 'done';
+type Stage = 'centered' | 'spread' | 'slideUp' | 'done';
 
-const INK = '#111114';
+const EASE = 'cubic-bezier(0.77, 0, 0.175, 1)';
+
+/** Four small drafting tiles under the letters: set square, compass, grid and arch, each in its own slow loop. */
+function Tile({ kind }: { kind: 'square' | 'compass' | 'grid' | 'arch' }) {
+  return (
+    <svg viewBox="0 0 56 56" aria-hidden="true" className="h-full w-full" fill="none" stroke="#f5f3ef" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {kind === 'square' && (
+        <g className="loader-square">
+          <path d="M14 44 V12 L44 44 Z" />
+          <path d="M20 38 V26 L32 38 Z" strokeWidth="1.4" />
+        </g>
+      )}
+      {kind === 'compass' && (
+        <g>
+          <circle cx="28" cy="10" r="2.4" fill="#f5f3ef" stroke="none" />
+          <path className="loader-leg-a" d="M28 10 L16 46" />
+          <path className="loader-leg-b" d="M28 10 L40 46" />
+          <path d="M11 47 A22 22 0 0 0 45 47" strokeWidth="1.2" strokeDasharray="2 4" />
+        </g>
+      )}
+      {kind === 'grid' && (
+        <g>
+          <path className="loader-line" style={{ animationDelay: '0s' }} d="M12 20 H44" />
+          <path className="loader-line" style={{ animationDelay: '0.15s' }} d="M12 28 H44" />
+          <path className="loader-line" style={{ animationDelay: '0.3s' }} d="M12 36 H44" />
+          <path className="loader-line" style={{ animationDelay: '0.45s' }} d="M20 12 V44" />
+          <path className="loader-line" style={{ animationDelay: '0.6s' }} d="M36 12 V44" />
+        </g>
+      )}
+      {kind === 'arch' && (
+        <path className="loader-arch" d="M14 46 V28 A14 14 0 0 1 42 28 V46 M9 46 H47" pathLength={1} />
+      )}
+    </svg>
+  );
+}
+
+const TILES = ['square', 'compass', 'grid', 'arch'] as const;
 
 /** Tells the page (the home hero) that the screen is leaving, so its own entrance can start. */
 function announceIntro() {
@@ -22,240 +54,121 @@ function announceIntro() {
   window.dispatchEvent(new Event('cvi:intro'));
 }
 
-/** Hand size in drawing units per photo pixel (the pencil is ~325 photo px long). */
-const HAND_SCALE = 0.155;
-const HAND_TILT = 24;
-const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
-
-interface Drawing {
-  paths: { d: string; weight: number }[];
-  viewBox: string;
-  /** The studio's real logo is outlined and filled; custom letters are single strokes. */
-  filled: boolean;
-  strokeWidth: number;
-  /** Width of the drawing on screen, per unit of the viewBox. */
-  aspect: number;
-  start: { x: number; y: number };
-  end: { x: number; y: number };
-}
-
-function buildDrawing(text: string): Drawing {
-  const cleaned = text.trim().toUpperCase();
-  if (cleaned === 'CVI' || cleaned === '') {
-    const [x, y, w, h] = LOGO_VIEWBOX.split(' ').map(Number);
-    return {
-      paths: [
-        { d: LOGO_GLYPHS.C, weight: 0.95 },
-        { d: LOGO_GLYPHS.V, weight: 0.7 },
-        { d: LOGO_GLYPHS.I, weight: 0.45 },
-      ],
-      viewBox: LOGO_VIEWBOX,
-      filled: true,
-      strokeWidth: 0.55,
-      aspect: w / h,
-      start: { x: x + w + 70, y: y + h + 60 },
-      end: { x: x + w + 90, y: y - 40 },
-    };
-  }
-  const lay = layoutStrokeText(cleaned);
-  const pad = 16;
-  const w = lay.width + pad * 2;
-  const h = lay.height + pad * 2;
-  const count = Math.max(1, lay.paths.length);
-  return {
-    paths: lay.paths.map((d) => ({ d, weight: Math.max(0.35, 1.6 / count + 0.15) })),
-    viewBox: `${-pad} ${-pad} ${w} ${h}`,
-    filled: false,
-    strokeWidth: 4.5,
-    aspect: w / h,
-    start: { x: w + 130, y: h + 120 },
-    end: { x: w + 160, y: -90 },
-  };
-}
-
 /**
- * Opening screen: the studio's cream drafting sheet. A hand with a blue pencil draws the studio's
- * letters — the real logo outlines for CVI, line by line, the pencil tip riding the live end of
- * each stroke — inks them in, lifts away, and the whole sheet slides up to reveal the page.
+ * Opening screen: the studio's cream drafting sheet with the letters C V I together in the
+ * centre; after 1 s they spread apart; after 2 s the whole screen slides up and away.
  * It is part of the server-rendered page, so there is no flash of content first.
+ * Every moving part is a transform, so the browser animates it on the GPU without re-layout.
  */
 export function Preloader({ text = 'CVI', onComplete }: PreloaderProps) {
-  const drawing = useMemo(() => buildDrawing(text), [text]);
-  const [stage, setStage] = useState<Stage>('drawing');
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const handRef = useRef<SVGGElement>(null);
-  const fillRef = useRef<SVGGElement>(null);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  const letters = Array.from(text.trim() || 'CVI');
+  const [stage, setStage] = useState<Stage>('centered');
 
   useEffect(() => {
-    // Respect reduced motion: no animation, just get out of the way.
+    // Respect reduced motion: no staged animation, just get out of the way.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setStage('done');
       announceIntro();
-      onCompleteRef.current?.();
+      onComplete?.();
       return;
     }
-
-    const sheet = sheetRef.current;
-    const svg = svgRef.current;
-    const hand = handRef.current;
-    const fill = fillRef.current;
-    if (!sheet || !svg || !hand) return;
 
     // Hold the page still while the screen is up.
     const body = document.body;
     const prev = { overflow: body.style.overflow, overscroll: body.style.overscrollBehavior };
     body.style.overflow = 'hidden';
     body.style.overscrollBehavior = 'none';
-    const release = () => {
+
+    const spread = window.setTimeout(() => setStage('spread'), 1000);
+    const slide = window.setTimeout(() => {
+      setStage('slideUp');
+      announceIntro();
+    }, 2000);
+    const finish = window.setTimeout(() => {
+      body.style.overflow = prev.overflow;
+      body.style.overscrollBehavior = prev.overscroll;
+      setStage('done');
+      onComplete?.();
+    }, 2850);
+
+    return () => {
+      window.clearTimeout(spread);
+      window.clearTimeout(slide);
+      window.clearTimeout(finish);
       body.style.overflow = prev.overflow;
       body.style.overscrollBehavior = prev.overscroll;
     };
-
-    const paths = Array.from(svg.querySelectorAll<SVGPathElement>('path[data-stroke]'));
-    const lengths = paths.map((p) => p.getTotalLength());
-    const tweens: gsap.core.Tween[] = [];
-    let alive = true;
-    let tickFn: ((t: number, d: number) => void) | null = null;
-    let tl: gsap.core.Timeline | null = null;
-    let skipped = false;
-
-    const finish = () => {
-      if (!alive) return;
-      release();
-      setStage('done');
-      onCompleteRef.current?.();
-    };
-
-    const run = () => {
-      if (!alive) return;
-      gsap.set(paths, { strokeDashoffset: 1 });
-      if (fill) gsap.set(fill, { opacity: 0 });
-
-      tl = gsap.timeline();
-      let t = 0;
-      paths.forEach((p, i) => {
-        const tw = gsap.fromTo(p, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: drawing.paths[i].weight, ease: 'power1.inOut' });
-        tweens.push(tw);
-        tl!.add(tw, t + 0.5); // the hand needs a moment to arrive
-        t += drawing.paths[i].weight + 0.2;
-      });
-      const drawEnd = t + 0.5;
-      if (fill) tl.to(fill, { opacity: 1, duration: 0.45, ease: 'power1.out' }, drawEnd);
-      const slideAt = drawEnd + 0.7;
-      tl.to(sheet, { yPercent: -100, duration: 0.85, ease: 'power3.inOut', onStart: announceIntro, onComplete: finish }, slideAt);
-
-      const start = paths[0].getPointAtLength(0);
-      let target = { x: start.x, y: start.y };
-      const cur = { x: drawing.start.x, y: drawing.start.y };
-      let ended = false;
-
-      tickFn = (_time, deltaMs) => {
-        if (!tl) return;
-        let active = -1;
-        for (let i = 0; i < tweens.length; i++) {
-          const pr = tweens[i].progress();
-          if (pr > 0 && pr < 1) active = i;
-        }
-        let drawingNow = false;
-        if (active >= 0) {
-          const pt = paths[active].getPointAtLength(tweens[active].progress() * lengths[active]);
-          target = { x: pt.x, y: pt.y };
-          drawingNow = true;
-        }
-        ended = tl.time() >= drawEnd + 0.1;
-        const aim = ended ? drawing.end : target;
-        // while drawing the tip is locked to the stroke end; between strokes the hand glides like a real pen lift
-        const k = 1 - Math.exp((-deltaMs / 1000) * (drawingNow ? 220 : ended ? 5 : 9));
-        cur.x += (aim.x - cur.x) * k;
-        cur.y += (aim.y - cur.y) * k;
-        const wob = drawingNow ? Math.sin(performance.now() / 55) * 0.12 : 0;
-        hand.setAttribute('transform', `translate(${(cur.x + wob).toFixed(2)} ${(cur.y + wob * 0.6).toFixed(2)})`);
-        const approach = clamp01(Math.hypot(cur.x - drawing.start.x, cur.y - drawing.start.y) / 50);
-        hand.setAttribute('opacity', String(ended ? clamp01((drawEnd + 0.9 - tl.time()) / 0.5) : Math.max(approach, 0)));
-      };
-      gsap.ticker.add(tickFn);
-    };
-
-    // Wait (briefly) for the hand photo so the pencil never pops in half-loaded.
-    const img = new Image();
-    img.src = '/brand/hand-pencil.png';
-    const ready = Promise.race([img.decode().catch(() => undefined), new Promise((r) => window.setTimeout(r, 1400))]);
-    ready.then(run);
-
-    // Click or key press skips straight to the reveal.
-    const skip = () => {
-      if (skipped || !tl) return;
-      skipped = true;
-      tl.progress(1);
-    };
-    window.addEventListener('pointerdown', skip);
-    window.addEventListener('keydown', skip);
-
-    return () => {
-      alive = false;
-      window.removeEventListener('pointerdown', skip);
-      window.removeEventListener('keydown', skip);
-      if (tickFn) gsap.ticker.remove(tickFn);
-      tl?.kill();
-      release();
-    };
-  }, [drawing]);
+  }, [onComplete]);
 
   if (stage === 'done') return null;
 
-  const [, , vw, vh] = drawing.viewBox.split(' ').map(Number);
+  const spreadOut = stage !== 'centered';
+  const leaving = stage === 'slideUp';
+  const mid = (letters.length - 1) / 2;
 
   return (
     <div
-      ref={sheetRef}
       role="status"
       aria-label="Loading CVI Architects"
-      className="fixed left-0 top-0 z-[10000] flex w-screen select-none items-center justify-center overflow-hidden bg-[#f5f3ef] text-[#111114]"
-      style={{ height: '100dvh', willChange: 'transform' }}
+      className="fixed left-0 top-0 z-[10000] flex h-screen w-screen select-none items-center justify-center overflow-hidden bg-[#f5f3ef] text-[#111114]"
+      style={{
+        height: '100dvh',
+        transition: `transform 0.85s ${EASE}`,
+        transform: stage === 'slideUp' ? 'translate3d(0, -100%, 0)' : 'translate3d(0, 0, 0)',
+        pointerEvents: stage === 'slideUp' ? 'none' : 'auto',
+        willChange: 'transform',
+      }}
     >
       {/* Drafting-sheet crosshair guides */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-black/10" />
         <div className="absolute bottom-0 left-1/2 top-0 w-px -translate-x-1/2 bg-black/10" />
       </div>
-      <span className="sr-only">{text}</span>
 
-      <svg
-        ref={svgRef}
-        viewBox={drawing.viewBox}
-        aria-hidden="true"
-        className="relative block h-auto overflow-visible"
-        style={{ width: `min(88vw, clamp(300px, 42vw, 600px))`, aspectRatio: `${vw} / ${vh}` }}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <div
+        className="relative flex flex-row font-semibold"
+        style={{
+          fontSize: 'clamp(32px, 3.2vw, 48px)',
+          letterSpacing: 10,
+          // letter-spacing leaves a trailing gap after the last letter; pull it back so the word is centred
+          marginRight: -10,
+        }}
       >
-        {drawing.filled && (
-          <g ref={fillRef} fill={INK} fillRule="evenodd" stroke="none" opacity={0}>
-            {drawing.paths.map((p, i) => (
-              <path key={i} d={p.d} />
-            ))}
-          </g>
-        )}
-        {drawing.paths.map((p, i) => (
-          <path
+        {letters.map((letter, i) => (
+          <span
             key={i}
-            data-stroke=""
-            d={p.d}
-            pathLength={1}
-            stroke={INK}
-            strokeWidth={drawing.strokeWidth}
-            strokeDasharray="1 2"
-            strokeDashoffset={1}
-          />
+            style={{
+              display: 'inline-block',
+              transform: `translate3d(${spreadOut ? `calc(${(i - mid).toFixed(2)} * (30vw + 0.75em))` : '0px'}, 0, 0)`,
+              transition: `transform 1s ${EASE}`,
+              willChange: 'transform',
+            }}
+          >
+            {letter === ' ' ? ' ' : letter}
+          </span>
         ))}
-        <g ref={handRef} opacity={0} pointerEvents="none">
-          <SketchHandPhoto scale={HAND_SCALE} tilt={HAND_TILT} shadow={[1.6, 1.2]} />
-        </g>
-      </svg>
+      </div>
+
+      {/* The tiles: a 2 × 2 block under the letters that flies to the four corners as the letters spread */}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 mt-16 grid -translate-x-1/2 grid-cols-2 gap-2"
+        style={{ opacity: leaving ? 0 : 1, transition: `opacity 0.5s ${EASE}` }}
+      >
+        {TILES.map((kind, i) => (
+          <div
+            key={kind}
+            className="h-11 w-11 bg-[#283f7d] p-1.5 sm:h-12 sm:w-12"
+            style={{
+              transform: spreadOut ? `translate3d(${i % 2 ? '' : '-'}${'36vw'}, ${i < 2 ? '-' : ''}${'34vh'}, 0)` : 'translate3d(0, 0, 0)',
+              transition: `transform 1.1s ${EASE}`,
+              willChange: 'transform',
+            }}
+          >
+            <Tile kind={kind} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
