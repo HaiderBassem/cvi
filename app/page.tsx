@@ -3,6 +3,10 @@ import { getAllProjects, getDisciplines, getPageLayout, getSettings, getSiteCont
 import { HomeClient } from '@/components/site/HomeClient';
 import { getImageSize } from '@/lib/site/imageSize';
 
+// Read the live database on every request. Pre-building this page would freeze whatever the
+// database held at build time, which differs from the server's own data (the mounted volume).
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const allProjects = getAllProjects();
   const featuredProjects = allProjects.filter((p) => p.is_featured === 1);

@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description: 'Learn about CVI Architects, our multidisciplinary team, sustainable philosophy, and architectural commitments in Baghdad and beyond.',
 };
 
+// Read the live database on every request (see app/page.tsx).
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
   const settings = getSettings();
   const teamPhoto = getTeamPhoto();
